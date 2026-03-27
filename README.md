@@ -4,13 +4,13 @@ Sistema web de delivery con gestión de pedidos, seguimiento GPS, control de sto
 
 ## 📋 Tabla de Contenidos
 
-- [Características](#características)
-- [Tecnologías](#tecnologías)
-- [Instalación](#instalación)
-- [Conceptos de Git Aplicados](#conceptos-de-git-aplicados)
-- [Flujo de Trabajo Git](#flujo-de-trabajo-git)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Comandos Útiles](#comandos-útiles)
+- [Características](#características
+- [Tecnologías](#tecnologías
+- [Instalación](#instalación
+- [Conceptos de Git Aplicados](#conceptos-de-git-aplicados
+- [Flujo de Trabajo Git](#flujo-de-trabajo-git
+- [Estructura del Proyecto](#estructura-del-proyecto
+- [Comandos Útiles](#comandos-útiles
 
 ## ✨ Características
 
@@ -172,7 +172,7 @@ git checkout -b feature/nueva-funcionalidad
 
 #### Estrategia de Ramas en este Proyecto
 
-```
+``
 main (producción)
   └── develop (desarrollo)
         ├── feature/usuarios
@@ -180,7 +180,7 @@ main (producción)
         ├── feature/pedidos
         ├── feature/pagos
         └── feature/gps-tracking
-```
+``
 
 ### 5. Estrategias de Ramificación y Fusión
 
@@ -283,7 +283,7 @@ git remote show origin
 
 #### Formato de Mensajes de Commit
 
-```
+``
 tipo(alcance): descripción breve
 
 Descripción detallada (opcional)
@@ -295,7 +295,7 @@ docs(readme): actualizar instrucciones de instalación
 style(templates): mejorar diseño responsive
 refactor(models): optimizar queries de productos
 test(orders): agregar tests para carrito
-```
+``
 
 ### 10. Pull Requests (Solicitudes de Extracción)
 
@@ -359,7 +359,7 @@ git tag
 
 ## 📁 Estructura del Proyecto
 
-```
+``
 delivery_system/
 ├── config/                     # Configuración Django
 │   ├── __init__.py
@@ -389,7 +389,7 @@ delivery_system/
 ├── requirements.txt           # Dependencias
 ├── .gitignore                # Archivos ignorados por Git
 └── README.md                 # Este archivo
-```
+``
 
 ## 🔧 Comandos Útiles
 
