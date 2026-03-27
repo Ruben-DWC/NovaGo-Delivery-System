@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - DeliveryApp{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="jumbotron bg-primary text-white rounded p-5 mb-4">
+    <h1 class="display-4">
+        <i class="fas fa-motorcycle"></i> Bienvenido a DeliveryApp
+    </h1>
+    <p class="lead">Tu tienda favorita ahora con delivery rápido y seguro.</p>
+    <hr class="my-4 bg-white">
+    <p>Haz tu pedido online y sigue en tiempo real la ubicación de tu motorizado.</p>
+    <a class="btn btn-light btn-lg" href="#" role="button">
+        <i class="fas fa-shopping-cart"></i> Ver Productos
+    </a>
+</div>
+
+<!-- Features -->
+<div class="row text-center mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-box fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Amplio Catálogo</h5>
+                <p class="card-text">Variedad de productos con stock actualizado.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-credit-card fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Pagos Seguros</h5>
+                <p class="card-text">Múltiples métodos de pago disponibles.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-map-marked-alt fa-3x text-danger mb-3"></i>
+                <h5 class="card-title">Rastreo GPS</h5>
+                <p class="card-text">Sigue tu pedido en tiempo real.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-shipping-fast fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Entrega Rápida</h5>
+                <p class="card-text">Recibe tu pedido en tiempo récord.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row text-center bg-light rounded p-4">
+    <div class="col-md-4">
+        <h2 class="text-primary"><i class="fas fa-users"></i> 1000+</h2>
+        <p>Clientes Satisfechos</p>
+    </div>
+    <div class="col-md-4">
+        <h2 class="text-success"><i class="fas fa-check-circle"></i> 5000+</h2>
+        <p>Pedidos Completados</p>
+    </div>
+    <div class="col-md-4">
+        <h2 class="text-warning"><i class="fas fa-motorcycle"></i> 50+</h2>
+        <p>Motorizados Activos</p>
+    </div>
+</div>
+{% endblock %}
