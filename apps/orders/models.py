@@ -8,7 +8,7 @@ class Pedido(models.Model):
     """
     
     ESTADO_CHOICES = [
-        ('pendiente', 'Pendiente'),
+        ('pendiente_asignacion', 'Pendiente de Asignación'),
         ('confirmado', 'Confirmado'),
         ('en_preparacion', 'En Preparación'),
         ('en_camino', 'En Camino'),
@@ -38,7 +38,14 @@ class Pedido(models.Model):
         'Estado',
         max_length=20,
         choices=ESTADO_CHOICES,
-        default='pendiente'
+        default='pendiente_asignacion'
+    )
+    
+    fecha_asignacion = models.DateTimeField(
+        'Fecha de Asignación',
+        null=True,
+        blank=True,
+        help_text='Fecha y hora cuando el pedido fue asignado a un motorizado'
     )
     
     direccion_entrega = models.TextField(

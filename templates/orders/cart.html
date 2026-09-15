@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Carrito - NovaGo{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/cart.css' %}">
+{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible cart-page">
+    <div class="section-header">
+        <p class="section-label">COMPRA</p>
+        <h2>Tu carrito</h2>
+    </div>
+
+    {% if items %}
+    <div class="cart-layout">
+        <div class="cart-items-shell">
+            <div class="cart-head-row">
+                <p class="mb-0">Productos en carrito</p>
+                <span class="cart-count-pill">{{ count }} item{{ count|pluralize }}</span>
+            </div>
+
+            <div class="cart-items-list">
+                {% for item in items %}
+                <article class="cart-item-card">
+                    <a class="cart-item-media" href="{% url 'products:product_detail' item.producto.id %}" aria-label="Ver detalle de {{ item.producto.nombre }}">
+                        {% if item.producto.imagen %}
+                        <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
+                        {% else %}
+                        <img src="https://picsum.photos/seed/cart-{{ item.producto.id }}/320/240" alt="{{ item.producto.nombre }}">
+                        {% endif %}
+                    </a>
+
+                    <div class="cart-item-content">
+                        <div class="cart-item-top">
+                            <div>
+                                <h5 class="cart-item-title mb-1">{{ item.producto.nombre }}</h5>
+                                <p class="cart-item-price mb-0">Precio unitario: <strong>S/ {{ item.producto.precio }}</strong></p>
+                            </div>
+                            <form method="post" action="{% url 'orders:remove_from_cart' item.producto.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-danger" type="submit" title="Quitar {{ item.producto.nombre }}">Quitar</button>
+                            </form>
+                        </div>
+
+                        <div class="cart-item-actions">
+                            <form method="post" action="{% url 'orders:update_cart' item.producto.id %}" class="qty-form" data-qty-form>
+                                {% csrf_token %}
+                                <div class="qty-control" role="group" aria-label="Cantidad para {{ item.producto.nombre }}">
+                                    <button type="button" class="qty-btn" data-qty-minus>-</button>
+                                    <input type="number" class="form-control qty-input" name="quantity" min="0" max="{{ item.producto.stock }}" value="{{ item.cantidad }}" aria-label="Cantidad para {{ item.producto.nombre }}" title="Cantidad para {{ item.producto.nombre }}">
+                                    <button type="button" class="qty-btn" data-qty-plus>+</button>
+                                </div>
+                                <button class="btn btn-outline-dark btn-sm" type="submit">Actualizar</button>
+                            </form>
+                            <p class="cart-item-subtotal mb-0">Subtotal: <strong>S/ {{ item.subtotal }}</strong></p>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <aside class="cart-summary-shell">
+            <article class="hero-shell cart-summary-card">
+                <h5>Resumen de compra</h5>
+                <div class="cart-summary-line">
+                    <span>Subtotal</span>
+                    <strong>S/ {{ subtotal }}</strong>
+                </div>
+                <div class="cart-summary-line">
+                    <span>Envio</span>
+                    <strong>S/ {{ shipping }}</strong>
+                </div>
+                <div class="cart-summary-line total">
+                    <span>Total</span>
+                    <strong>S/ {{ total }}</strong>
+                </div>
+
+                <div class="mt-3 d-grid gap-2">
+                    {% if user.is_authenticated and user.role == 'cliente' %}
+                    <a class="btn btn-cta btn-lift" href="{% url 'users:portal_cliente_pago' %}">Ir a pago y checkout</a>
+                    {% else %}
+                    <a class="btn btn-cta btn-lift" href="{% url 'users:login' %}">Inicia sesion para finalizar</a>
+                    {% endif %}
+                    <a class="btn btn-outline-dark" href="{% url 'products:product_list' %}">Seguir comprando</a>
+                </div>
+            </article>
+        </aside>
+    </div>
+    {% else %}
+    <article class="hero-shell cart-empty-state">
+        <h4 class="mb-2">Tu carrito esta vacio</h4>
+        <p class="mb-3">Explora el catalogo y agrega productos para continuar con tu compra.</p>
+        <a class="btn btn-cta" href="{% url 'products:product_list' %}">Ver catalogo</a>
+    </article>
+    {% endif %}
+</section>
+<script src="{% static 'js/orders/cart.js' %}"></script>
+{% endblock %}

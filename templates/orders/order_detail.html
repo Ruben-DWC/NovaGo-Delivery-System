@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}Pedido #{{ order.id }} - NovaGo{% endblock %}
+{% block extra_css %}
+<style>
+    .order-detail-page {
+        max-width: 1120px;
+        margin: 1.35rem auto 2rem;
+        padding: 0 1rem;
+    }
+
+    .order-detail-hero {
+        border-radius: 18px;
+        padding: 1rem 1.15rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 10% 12%, rgba(56, 189, 248, 0.24), transparent 42%),
+            radial-gradient(circle at 85% 84%, rgba(16, 185, 129, 0.2), transparent 36%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 0.85rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.8rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .order-detail-hero h2 {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .order-detail-hero p {
+        margin: 0.26rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .order-detail-back {
+        border-radius: 10px;
+        padding: 0.5rem 0.7rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .order-detail-grid {
+        display: grid;
+        grid-template-columns: 1.35fr 0.95fr;
+        gap: 0.85rem;
+    }
+
+    .order-panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.86rem;
+    }
+
+    .order-panel h4 {
+        margin: 0 0 0.66rem;
+        color: var(--text);
+        font-size: 1rem;
+    }
+
+    .order-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+        margin-bottom: 0.72rem;
+    }
+
+    .meta-item {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.52rem 0.58rem;
+    }
+
+    .meta-item label {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 0.72rem;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 700;
+    }
+
+    .meta-item strong {
+        color: var(--text);
+        font-size: 0.9rem;
+    }
+
+    .items-list {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.7rem;
+        padding: 0.6rem;
+        border-top: 1px solid var(--line);
+        background: var(--bg);
+    }
+
+    .item-row:first-child {
+        border-top: 0;
+    }
+
+    .order-actions {
+        margin-top: 0.8rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .detail-btn {
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.83rem;
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .detail-btn.primary {
+        border-color: rgba(59, 130, 246, 0.58);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    .detail-btn.success {
+        border-color: rgba(16, 185, 129, 0.58);
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #fff;
+    }
+
+    .detail-btn.whatsapp {
+        border-color: rgba(34, 197, 94, 0.58);
+        background: linear-gradient(120deg, #22c55e, #16a34a);
+        color: #fff;
+    }
+
+    .detail-btn.disabled {
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    html[data-theme='dark'] .order-panel,
+    html[data-theme='dark'] .meta-item,
+    html[data-theme='dark'] .item-row {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .detail-btn {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(203, 213, 225, 0.43);
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 992px) {
+        .order-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .order-meta-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+{% if forbidden %}
+<div class="alert alert-danger">No autorizado para ver este pedido.</div>
+{% else %}
+<section class="order-detail-page">
+    <div class="order-detail-hero">
+        <div>
+            <h2><i class="fas fa-receipt"></i> Pedido #{{ order.id }}</h2>
+            <p>Detalle operativo, pago y acciones rápidas para seguimiento.</p>
+        </div>
+        <a class="order-detail-back" href="{% if user.role == 'motorizado' %}{% url 'tracking:motorizado_historial' %}{% else %}{% url 'orders:order_list' %}{% endif %}">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="order-detail-grid">
+        <article class="order-panel">
+            <h4><i class="fas fa-box-open"></i> Información del pedido</h4>
+            <div class="order-meta-grid">
+                <div class="meta-item">
+                    <label>Estado</label>
+                    <strong>{{ order.get_estado_display }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Cliente</label>
+                    <strong>{{ order.cliente.get_full_name|default:order.cliente.username }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Motorizado</label>
+                    <strong>{{ order.motorizado.get_full_name|default:'Sin asignar' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Teléfono</label>
+                    <strong>{{ order.telefono_contacto|default:'No definido' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Dirección</label>
+                    <strong>{{ order.direccion_entrega }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Fecha</label>
+                    <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
+                </div>
+            </div>
+
+            <h4><i class="fas fa-basket-shopping"></i> Items</h4>
+            <div class="items-list">
+                {% for item in order.items.all %}
+                <div class="item-row">
+                    <span>{{ item.producto.nombre }} x{{ item.cantidad }}</span>
+                    <strong>S/ {{ item.subtotal }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="order-panel">
+            <h4><i class="fas fa-credit-card"></i> Pago y totales</h4>
+            <div class="order-meta-grid">
+                <div class="meta-item">
+                    <label>Método</label>
+                    <strong>{% if order.pago %}{{ order.pago.get_metodo_display }}{% else %}Sin registro{% endif %}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Estado pago</label>
+                    <strong>{% if order.pago %}{{ order.pago.get_estado_display }}{% else %}Sin pago{% endif %}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Subtotal</label>
+                    <strong>S/ {{ order.subtotal }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Envío</label>
+                    <strong>S/ {{ order.costo_envio }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Total</label>
+                    <strong>S/ {{ order.total }}</strong>
+                </div>
+            </div>
+
+            <div class="order-actions">
+                <a class="detail-btn primary" href="{% if user.role == 'motorizado' %}{% url 'tracking:motorizado_rastreo_pedido' order.id %}{% else %}{% url 'tracking:track_order' order.id %}{% endif %}">
+                    <i class="fas fa-map-location-dot"></i> Ver ruta
+                </a>
+                {% if user.role == 'motorizado' and order.telefono_contacto %}
+                <a class="detail-btn success" href="tel:{{ order.telefono_contacto }}">
+                    <i class="fas fa-phone"></i> Llamar
+                </a>
+                <a class="detail-btn whatsapp" href="https://wa.me/{{ order.telefono_contacto|cut:' ' }}" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                {% elif user.role == 'motorizado' %}
+                <span class="detail-btn disabled">
+                    <i class="fas fa-phone"></i> Sin teléfono
+                </span>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

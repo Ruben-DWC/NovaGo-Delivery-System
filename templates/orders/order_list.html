@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% block title %}Mis Pedidos - NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-page {
+        max-width: 1120px;
+        margin: 1.3rem auto 2.1rem;
+        padding: 0 1rem;
+    }
+
+    .orders-hero {
+        border-radius: 20px;
+        padding: 1.15rem 1.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.28), transparent 42%),
+            radial-gradient(circle at 86% 84%, rgba(16, 185, 129, 0.22), transparent 38%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 0.95rem;
+    }
+
+    .orders-hero h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .orders-hero p {
+        margin: 0.4rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .orders-kpis {
+        margin-top: 0.85rem;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.6rem;
+    }
+
+    .kpi {
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 0.62rem 0.65rem;
+        background: rgba(255, 255, 255, 0.08);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+    }
+
+    .kpi label {
+        display: block;
+        font-size: 0.73rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #d1e7ff;
+        margin-bottom: 0.22rem;
+        font-weight: 700;
+    }
+
+    .kpi strong {
+        font-size: 1.05rem;
+    }
+
+    .orders-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .order-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.85rem;
+    }
+
+    .order-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.65rem;
+    }
+
+    .order-id {
+        margin: 0;
+        color: var(--text);
+        font-size: 1rem;
+    }
+
+    .status-badge {
+        padding: 0.28rem 0.56rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .status-pendiente_asignacion,
+    .status-confirmado { background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+    .status-en_preparacion { background: rgba(245, 158, 11, 0.17); color: #b45309; }
+    .status-en_camino { background: rgba(16, 185, 129, 0.18); color: #047857; }
+    .status-entregado { background: rgba(34, 197, 94, 0.19); color: #166534; }
+    .status-cancelado { background: rgba(239, 68, 68, 0.17); color: #b91c1c; }
+
+    .order-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .meta-box {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--bg);
+        padding: 0.54rem 0.6rem;
+    }
+
+    .meta-box label {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 0.72rem;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 700;
+    }
+
+    .meta-box strong {
+        color: var(--text);
+        font-size: 0.95rem;
+    }
+
+    .order-progress-track {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.24);
+        overflow: hidden;
+        margin-bottom: 0.72rem;
+    }
+
+    .order-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8 0%, #22c55e 100%);
+    }
+
+    .progress-0 { width: 0%; }
+    .progress-15 { width: 15%; }
+    .progress-45 { width: 45%; }
+    .progress-75 { width: 75%; }
+    .progress-100 { width: 100%; }
+
+    .order-actions {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+    }
+
+    .order-btn {
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.83rem;
+        padding: 0.5rem 0.66rem;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .order-btn.primary {
+        border-color: rgba(59, 130, 246, 0.6);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    .order-btn.confirm {
+        border-color: rgba(16, 185, 129, 0.56);
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #fff;
+    }
+
+    .order-btn.disabled {
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .empty-state {
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--text-secondary, #667799);
+    }
+
+    html[data-theme='dark'] .order-card,
+    html[data-theme='dark'] .meta-box {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .order-progress-track {
+        background: rgba(148, 163, 184, 0.2);
+    }
+
+    html[data-theme='dark'] .order-btn {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(203, 213, 225, 0.43);
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 992px) {
+        .orders-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .order-meta {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .orders-kpis {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-page">
+    <section class="orders-hero">
+        <h2><i class="fas fa-clipboard-list"></i> Mis pedidos</h2>
+        <p>Gestiona tu historial, revisa estados en tiempo real y abre la confirmacion premium cuando quieras.</p>
+
+        <div class="orders-kpis">
+            <div class="kpi">
+                <label>Total</label>
+                <strong>{{ orders_total }}</strong>
+            </div>
+            <div class="kpi">
+                <label>Activos</label>
+                <strong>{{ orders_active }}</strong>
+            </div>
+            <div class="kpi">
+                <label>Entregados</label>
+                <strong>{{ orders_delivered }}</strong>
+            </div>
+            <div class="kpi">
+                <label>Cancelados</label>
+                <strong>{{ orders_cancelled }}</strong>
+            </div>
+        </div>
+    </section>
+
+    {% if orders %}
+    <section class="orders-grid">
+        {% for order in orders %}
+        <article class="order-card">
+            <div class="order-top">
+                <h3 class="order-id">Pedido #{{ order.id }}</h3>
+                <span class="status-badge status-{{ order.estado }}">{{ order.get_estado_display }}</span>
+            </div>
+
+            <div class="order-meta">
+                <div class="meta-box">
+                    <label>Total</label>
+                    <strong>S/. {{ order.total|floatformat:2 }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Fecha</label>
+                    <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Pago</label>
+                    <strong>{% if order.pago %}{{ order.pago.get_estado_display }}{% else %}Sin pago{% endif %}</strong>
+                </div>
+            </div>
+
+            <div class="order-progress-track" aria-label="Progreso del pedido">
+                <div class="order-progress-fill {% if order.estado == 'entregado' %}progress-100{% elif order.estado == 'en_camino' %}progress-75{% elif order.estado == 'en_preparacion' %}progress-45{% elif order.estado == 'confirmado' or order.estado == 'pendiente_asignacion' %}progress-15{% else %}progress-0{% endif %}"></div>
+            </div>
+
+            <div class="order-actions">
+                <a class="order-btn" href="{% if is_client_order_view %}{% url 'users:portal_cliente_pedido_detalle' order.id %}{% else %}{% url 'orders:order_detail' order.id %}{% endif %}">
+                    <i class="fas fa-file-lines"></i> Detalle
+                </a>
+                {% if is_client_order_view %}
+                <a class="order-btn confirm" href="{% url 'users:portal_cliente_confirmacion' order.id %}">
+                    <i class="fas fa-circle-check"></i> Confirmacion
+                </a>
+                {% endif %}
+                {% if order.estado in active_states %}
+                <a class="order-btn primary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
+                    <i class="fas fa-location-crosshairs"></i> Rastrear
+                </a>
+                {% else %}
+                <span class="order-btn disabled">
+                    <i class="fas fa-location-crosshairs"></i> Rastreo no disponible
+                </span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="empty-state">
+        <p>Aun no tienes pedidos registrados.</p>
+        <a class="order-btn primary" href="{% url 'users:portal_cliente_catalogo' %}">
+            <i class="fas fa-basket-shopping"></i> Ir al catalogo
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
