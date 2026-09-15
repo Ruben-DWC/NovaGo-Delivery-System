@@ -154,7 +154,7 @@ LOGOUT_REDIRECT_URL = 'home'
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'  # Estandarizacion Core Desarrolladores
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'  # Resolucion unificada: compatibilidad BigAutoField para Core y Pasarela v2
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
