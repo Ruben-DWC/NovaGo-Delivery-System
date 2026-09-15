@@ -1,8 +1,12 @@
-# 🔀 Guía de Flujo de Trabajo con Git
+[![Git Flow](https://img.shields.io/badge/GitFlow-Standard-blue.svg)](https://nvie.com/posts/a-successful-git-branching-model/)
+[![Icons](https://img.shields.io/badge/Icons-Phosphor_v2.1-purple.svg)](https://phosphoricons.com/)
+[![Academic](https://img.shields.io/badge/Academic-UTP_2026--II-red.svg)](https://www.utp.edu.pe)
+
+# <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/git-branch-duotone.svg" width="30" height="30" align="center" /> Guía Oficial de Flujo de Trabajo con Git
 
 Este documento explica el flujo de trabajo con Git que usaremos en el proyecto.
 
-## 📌 Conceptos Básicos de Git
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/info-duotone.svg" width="24" height="24" align="center" /> 1. Conceptos Fundamentales de Git
 
 ### ¿Qué es Git?
 
@@ -15,12 +19,12 @@ Git es un **sistema de control de versiones distribuido** que permite:
 
 ### ¿Por qué usar Git?
 
-- ✅ **Trazabilidad**: Saber quién hizo qué y cuándo
-- ✅ **Colaboración**: Trabajar en equipo sin pisarse los cambios
-- ✅ **Respaldo**: Tu código está seguro
-- ✅ **Experimentación**: Probar cosas nuevas sin miedo
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> **Trazabilidad**: Saber quién hizo qué y cuándo
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> **Colaboración**: Trabajar en equipo sin pisarse los cambios
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> **Respaldo**: Tu código está seguro
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> **Experimentación**: Probar cosas nuevas sin miedo
 
-## 🌳 Estrategia de Ramas (Branching Strategy)
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/tree-structure-duotone.svg" width="24" height="24" align="center" /> 2. Estrategia de Ramificación (GitFlow Simplificado)
 
 ### Estructura de Ramas
 
@@ -70,7 +74,7 @@ main (producción - código estable)
 - Se fusionan a `main` Y `develop`
 - Ejemplo: `hotfix/corregir-pago`
 
-## 📋 Flujo de Trabajo Completo
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/arrows-split-duotone.svg" width="24" height="24" align="center" /> 3. Flujo de Trabajo Operativo Paso a Paso
 
 ### Paso 1: Actualizar tu repositorio local
 
@@ -139,9 +143,9 @@ git push
 
 El equipo revisa tu código y puede:
 
-- ✅ Aprobar el PR
-- 💬 Dejar comentarios
-- ❌ Solicitar cambios
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> Aprobar el Pull Request
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/chat-circle-dots-duotone.svg" width="16" height="16" align="center" /> Dejar comentarios técnicos
+- <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/x-circle-duotone.svg" width="16" height="16" align="center" /> Solicitar cambios o correcciones
 
 Si solicitan cambios:
 
@@ -181,7 +185,7 @@ git branch -d feature/mi-funcionalidad
 git push origin --delete feature/mi-funcionalidad
 ```
 
-## 🔥 Resolver Conflictos
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/shield-warning-duotone.svg" width="24" height="24" align="center" /> 4. Detección y Resolución de Conflictos (Merge Conflicts)
 
 ### ¿Cuándo ocurren conflictos?
 
@@ -239,7 +243,7 @@ git pull origin develop
 # Si hay conflictos, resolverlos inmediatamente
 ```
 
-## 📝 Convenciones de Commits
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/note-pencil-duotone.svg" width="24" height="24" align="center" /> 5. Estándares y Convenciones de Commits (Conventional Commits)
 
 ### Formato Estándar
 
@@ -295,7 +299,7 @@ Descripción detallada (opcional)
 
 ### Ejemplos Completos
 
-✅ **Buenos commits**:
+<img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="16" height="16" align="center" /> **Buenos commits**:
 
 ```bash
 git commit -m "feat(usuarios): implementar registro con validación de email"
@@ -303,7 +307,7 @@ git commit -m "fix(pagos): corregir error en procesamiento de tarjeta"
 git commit -m "docs(api): agregar documentación de endpoints"
 ```
 
-❌ **Malos commits**:
+<img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/x-circle-duotone.svg" width="16" height="16" align="center" /> **Malos commits**:
 
 ```bash
 git commit -m "cambios"
@@ -312,7 +316,7 @@ git commit -m "asdfasdf"
 git commit -m "ahora si funciona"
 ```
 
-## 🎯 Comandos Git Esenciales
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/terminal-window-duotone.svg" width="24" height="24" align="center" /> 6. Comandos Git Esenciales de Referencia
 
 ### Básicos
 
@@ -386,7 +390,7 @@ git restore --staged archivo.py  # versión moderna
 # Deshacer último commit (mantener cambios)
 git reset --soft HEAD~1
 
-# Deshacer último commit (eliminar cambios) ⚠️
+# Deshacer último commit (eliminar cambios) <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/warning-circle-duotone.svg" width="16" height="16" align="center" />
 git reset --hard HEAD~1
 
 # Ver commit específico
@@ -396,7 +400,7 @@ git show abc123
 git revert abc123
 ```
 
-## 🎓 Ejercicios Prácticos
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/graduation-cap-duotone.svg" width="24" height="24" align="center" /> 7. Laboratorios y Ejercicios Prácticos
 
 ### Ejercicio 1: Primera Feature
 
@@ -421,7 +425,7 @@ git revert abc123
 3. Ver cambios en commit: `git show <hash>`
 4. Ver diferencias entre commits: `git diff <hash1>..<hash2>`
 
-## 🚀 Workflow del Equipo
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/users-three-duotone.svg" width="24" height="24" align="center" /> 8. Gobernanza y Colaboración de Equipo
 
 ### Asignación de Features por Miembro
 
@@ -449,7 +453,7 @@ git revert abc123
    - Resolver conflictos en equipo
    - Probar integración
 
-## 🛠️ Herramientas Útiles
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/wrench-duotone.svg" width="24" height="24" align="center" /> 9. Herramientas y Ecosistema de Soporte
 
 ### GUI para Git
 
@@ -475,16 +479,16 @@ git branch --merged
 git branch --no-merged
 ```
 
-## 📚 Recursos Adicionales
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/book-open-text-duotone.svg" width="24" height="24" align="center" /> 10. Recursos y Documentación Oficial
 
 - [Git Book Oficial](https://git-scm.com/book/es/v2)
 - [GitHub Guides](https://guides.github.com/)
 - [Visualizing Git](http://git-school.github.io/visualizing-git/)
 - [Learn Git Branching](https://learngitbranching.js.org/)
 
-## ⚠️ Buenas Prácticas
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="24" height="24" align="center" /> 11. Buenas Prácticas y Antipatrones
 
-### ✅ Hacer
+### <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="18" height="18" align="center" /> Prácticas Recomendadas (Hacer)
 
 - Commits pequeños y frecuentes
 - Mensajes de commit descriptivos
@@ -493,7 +497,7 @@ git branch --no-merged
 - Resolver conflictos inmediatamente
 - Mantener las ramas actualizadas
 
-### ❌ Evitar
+### <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/x-circle-duotone.svg" width="18" height="18" align="center" /> Antipatrones Críticos (Evitar)
 
 - Commits gigantes con muchos cambios
 - Mensajes vagos ("fix", "cambios")
