@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ product.nombre }} - NovaGo{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products/catalog.css' %}">
+{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible product-detail-page">
+    <a href="{% url catalog_url_name %}" class="btn btn-outline-dark mb-3">Volver al catalogo</a>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <article class="hero-shell detail-shell">
+                <div class="detail-header-row">
+                    <p class="section-label mb-2">DETALLE DE PRODUCTO</p>
+                    {% if product.destacado %}
+                    <span class="detail-kicker">Destacado</span>
+                    {% endif %}
+                </div>
+                <div class="detail-image-wrap">
+                    {% if product.imagen %}
+                    <img class="detail-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}">
+                    {% else %}
+                    <img class="detail-image" src="https://picsum.photos/seed/novago-detail-{{ product.id }}/1100/700" alt="{{ product.nombre }}">
+                    {% endif %}
+                </div>
+                <h2>{{ product.nombre }}</h2>
+                <p class="detail-description">{{ product.descripcion }}</p>
+
+                <div class="detail-meta-grid">
+                    <div class="detail-meta-item">
+                        <span>Categoria</span>
+                        <strong>{{ product.categoria.nombre|default:'Sin categoria' }}</strong>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span>Precio</span>
+                        <strong>S/ {{ product.precio }}</strong>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span>Disponibilidad</span>
+                        <strong>{% if product.stock > 0 %}Stock {{ product.stock }}{% else %}Sin stock{% endif %}</strong>
+                    </div>
+                </div>
+
+                {% if product.stock > 0 %}
+                <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="row g-2 align-items-end detail-buy-form" data-detail-qty-form>
+                    {% csrf_token %}
+                    <div class="col-sm-4">
+                        <label class="form-label" for="qty">Cantidad</label>
+                        <div class="detail-qty-control" role="group" aria-label="Cantidad para {{ product.nombre }}">
+                            <button type="button" class="detail-qty-btn" data-detail-qty-minus>-</button>
+                            <input class="form-control" type="number" id="qty" name="quantity" min="1" max="{{ product.stock }}" value="1">
+                            <button type="button" class="detail-qty-btn" data-detail-qty-plus>+</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 d-grid">
+                        <button class="btn btn-cta btn-lift" type="submit">Agregar al carrito</button>
+                    </div>
+                </form>
+                <p class="detail-stock-note mt-2 mb-0">Disponibles ahora: {{ product.stock }} unidades</p>
+                {% else %}
+                <div class="alert alert-warning">Producto temporalmente sin stock.</div>
+                {% endif %}
+            </article>
+        </div>
+        <div class="col-lg-5">
+            <article class="feature-tile h-100 detail-related-shell">
+                <h5>Productos relacionados</h5>
+                {% for item in related_products %}
+                    <div class="related-row">
+                        <div>
+                            <strong>{{ item.nombre }}</strong>
+                            <p class="related-price">S/ {{ item.precio }}</p>
+                        </div>
+                        <a href="{% url product_detail_url_name item.id %}" class="btn btn-sm btn-outline-dark">Ver</a>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">Aun no hay productos relacionados.</p>
+                {% endfor %}
+            </article>
+        </div>
+    </div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var form = document.querySelector('[data-detail-qty-form]');
+    if (!form) {
+        return;
+    }
+
+    var input = form.querySelector('#qty');
+    var minus = form.querySelector('[data-detail-qty-minus]');
+    var plus = form.querySelector('[data-detail-qty-plus]');
+    if (!input || !minus || !plus) {
+        return;
+    }
+
+    minus.addEventListener('click', function () {
+        var min = parseInt(input.min || '1', 10);
+        var val = parseInt(input.value || '1', 10);
+        if (isNaN(val)) {
+            val = min;
+        }
+        input.value = String(Math.max(min, val - 1));
+    });
+
+    plus.addEventListener('click', function () {
+        var max = parseInt(input.max || '9999', 10);
+        var val = parseInt(input.value || '1', 10);
+        if (isNaN(val)) {
+            val = 1;
+        }
+        input.value = String(Math.min(max, val + 1));
+    });
+});
+</script>
+{% endblock %}
