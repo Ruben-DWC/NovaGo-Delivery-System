@@ -1,5 +1,6 @@
 from django.db import models
 from apps.orders.models import Pedido
+from apps.users.models import User
 
 class Pago(models.Model):
     """
@@ -12,6 +13,7 @@ class Pago(models.Model):
         ('tarjeta', 'Tarjeta de Crédito/Débito'),
         ('yape', 'Yape'),
         ('plin', 'Plin'),
+        ('contra_entrega', 'Pago Contra Entrega (POS)'),
     ]
     
     ESTADO_CHOICES = [
@@ -78,6 +80,28 @@ class Pago(models.Model):
         'Notas',
         blank=True
     )
+
+    conciliado = models.BooleanField(
+        'Conciliado',
+        default=False,
+        help_text='Indica si el pago fue conciliado contablemente.'
+    )
+
+    fecha_conciliacion = models.DateTimeField(
+        'Fecha de Conciliacion',
+        null=True,
+        blank=True
+    )
+
+    conciliado_por = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pagos_conciliados',
+        limit_choices_to={'role': 'admin'},
+        verbose_name='Conciliado por'
+    )
     
     class Meta:
         verbose_name = 'Pago'
@@ -95,8 +119,8 @@ class Pago(models.Model):
         self.save()
         
         # Actualizar estado del pedido
-        if self.pedido.estado == 'pendiente':
-            self.pedido.estado = 'confirmado'
+        if self.pedido.estado in ['pendiente', 'pendiente_asignacion']:
+            self.pedido.estado = 'pendiente_asignacion'
             self.pedido.save()
     
     def rechazar_pago(self, motivo=''):
