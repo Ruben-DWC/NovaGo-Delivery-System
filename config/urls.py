@@ -18,16 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
-    # path('users/', include('apps.users.urls')),
-    # path('products/', include('apps.products.urls')),
-    # path('orders/', include('apps.orders.urls')),
-    # path('payments/', include('apps.payments.urls')),
-    # path('tracking/', include('apps.tracking.urls')),
+    path('', RedirectView.as_view(url='/home/')),
+    path('home/', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('users/', include('apps.users.urls')),
+    path('products/', include('apps.products.urls')),
+    path('orders/', include('apps.orders.urls')),
+    path('tracking/', include('apps.tracking.urls')),
 ]
 
 # Media files in development
