@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido #{{ order.id }} - Cliente NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-detail-page {
+        max-width: 1120px;
+        margin: 1.4rem auto 2.2rem;
+        padding: 0 1rem;
+    }
+
+    .order-hero {
+        border-radius: 20px;
+        padding: 1.15rem 1.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 10% 14%, rgba(59, 130, 246, 0.28), transparent 42%),
+            radial-gradient(circle at 84% 84%, rgba(16, 185, 129, 0.2), transparent 36%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 1rem;
+    }
+
+    .order-hero-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+    }
+
+    .order-hero h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .order-hero p {
+        margin: 0.4rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.3rem 0.58rem;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .live-status {
+        margin-top: 0.8rem;
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 0.7rem 0.75rem;
+    }
+
+    .live-status-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.45rem;
+    }
+
+    .live-status-title {
+        margin: 0;
+        font-size: 0.84rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #e2ecfb;
+    }
+
+    .live-status-meta {
+        margin: 0;
+        font-size: 0.73rem;
+        color: #c7d5ea;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .live-progress-track {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.28);
+        overflow: hidden;
+    }
+
+    .live-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8 0%, #22c55e 100%);
+        transition: width 0.4s ease;
+    }
+
+    .live-progress-caption {
+        margin: 0.42rem 0 0;
+        font-size: 0.75rem;
+        color: #d6e2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-layout {
+        display: grid;
+        grid-template-columns: 1.3fr 0.92fr;
+        gap: 1rem;
+    }
+
+    .detail-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.92rem;
+    }
+
+    .detail-title {
+        margin: 0 0 0.72rem;
+        color: var(--text);
+        font-size: 1.02rem;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .meta-box {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--bg);
+        padding: 0.55rem 0.62rem;
+    }
+
+    .meta-box.full {
+        grid-column: 1 / -1;
+    }
+
+    .meta-box label {
+        display: block;
+        font-size: 0.72rem;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.22rem;
+        font-weight: 700;
+    }
+
+    .meta-box strong {
+        color: var(--text);
+        font-size: 0.95rem;
+    }
+
+    .items-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .item-row {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--bg);
+        padding: 0.54rem 0.62rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .item-row small {
+        color: var(--text-secondary, #667799);
+    }
+
+    .summary-list {
+        display: grid;
+        gap: 0.48rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.56rem 0.64rem;
+    }
+
+    .summary-row.total {
+        border-color: rgba(249, 115, 22, 0.42);
+        background: linear-gradient(120deg, rgba(249, 115, 22, 0.12), rgba(245, 158, 11, 0.12));
+    }
+
+    .detail-actions {
+        margin-top: 0.82rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.56rem;
+    }
+
+    .detail-btn {
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.84rem;
+        padding: 0.54rem 0.7rem;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .detail-btn.primary {
+        border-color: rgba(16, 185, 129, 0.58);
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #fff;
+    }
+
+    .detail-btn.secondary {
+        border-color: rgba(59, 130, 246, 0.58);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    html[data-theme='dark'] .detail-card,
+    html[data-theme='dark'] .meta-box,
+    html[data-theme='dark'] .item-row,
+    html[data-theme='dark'] .summary-row {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .detail-btn {
+        background: rgba(15, 23, 42, 0.58);
+        border-color: rgba(203, 213, 225, 0.42);
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .summary-row.total {
+        border-color: rgba(249, 115, 22, 0.5);
+        background: linear-gradient(120deg, rgba(249, 115, 22, 0.22), rgba(245, 158, 11, 0.2));
+    }
+
+    html[data-theme='dark'] .live-status {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(203, 213, 225, 0.35);
+    }
+
+    @media (max-width: 992px) {
+        .detail-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .meta-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if forbidden %}
+<div class="container mt-3">
+    <div class="alert alert-danger">No autorizado para ver este pedido.</div>
+</div>
+{% else %}
+<div class="order-detail-page">
+    <section class="order-hero">
+        <div class="order-hero-top">
+            <h2><i class="fas fa-receipt"></i> Pedido #{{ order.id }}</h2>
+            <span class="status-chip"><i class="fas fa-bolt"></i> <span id="liveEstadoText">{{ estado_display|default:order.get_estado_display }}</span></span>
+        </div>
+        <p>Vista cliente del pedido con resumen, pago y accesos directos a confirmación y rastreo.</p>
+
+        <div class="live-status" data-progress-url="{{ progress_status_url }}">
+            <div class="live-status-top">
+                <p class="live-status-title"><i class="fas fa-signal"></i> Estado en vivo</p>
+                <p class="live-status-meta">
+                    <span><i class="fas fa-clock"></i> ETA: <strong id="liveEtaText">{{ eta_minutes }} min</strong></span>
+                    <span><i class="fas fa-wifi"></i> Canal: <strong id="liveChannelText">conectando...</strong></span>
+                    <span><i class="fas fa-rotate"></i> Sync: <strong id="liveLastSync">justo ahora</strong></span>
+                </p>
+            </div>
+            <div class="live-progress-track" aria-label="Progreso en vivo del pedido">
+                <div id="liveProgressFill" class="live-progress-fill" data-initial-progress="{{ progress_percent|default:0 }}"></div>
+            </div>
+            <p class="live-progress-caption">
+                <span id="liveProgressLabel">Progreso {{ progress_percent|default:0 }}%</span>
+                <span id="livePaymentText">Pago: {% if order.pago %}{{ order.pago.get_estado_display }}{% else %}Sin pago{% endif %}</span>
+            </p>
+        </div>
+    </section>
+
+    <section class="detail-layout">
+        <article class="detail-card">
+            <h3 class="detail-title"><i class="fas fa-user"></i> Datos del pedido</h3>
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <label>Cliente</label>
+                    <strong>{{ order.cliente.username }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Motorizado</label>
+                    <strong>{{ order.motorizado.username|default:'Sin asignar' }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Fecha</label>
+                    <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Telefono</label>
+                    <strong>{{ order.telefono_contacto }}</strong>
+                </div>
+                <div class="meta-box full">
+                    <label>Direccion de entrega</label>
+                    <strong>{{ order.direccion_entrega }}</strong>
+                </div>
+            </div>
+
+            <h3 class="detail-title"><i class="fas fa-basket-shopping"></i> Items</h3>
+            <div class="items-list">
+                {% for item in order.items.all %}
+                <div class="item-row">
+                    <div>
+                        <strong>{{ item.producto.nombre }}</strong><br>
+                        <small>x{{ item.cantidad }}</small>
+                    </div>
+                    <strong>S/. {{ item.subtotal|floatformat:2 }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="detail-card">
+            <h3 class="detail-title"><i class="fas fa-wallet"></i> Pago y total</h3>
+
+            {% if order.pago %}
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <label>Metodo</label>
+                    <strong>{{ order.pago.get_metodo_display }}</strong>
+                </div>
+                <div class="meta-box">
+                    <label>Estado de pago</label>
+                    <strong id="livePaymentMeta">{{ order.pago.get_estado_display }}</strong>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-muted">Aun no hay registro de pago.</p>
+            {% endif %}
+
+            <div class="summary-list">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong>S/. {{ order.subtotal|floatformat:2 }}</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Envio</span>
+                    <strong>S/. {{ order.costo_envio|floatformat:2 }}</strong>
+                </div>
+                <div class="summary-row total">
+                    <span><strong>Total</strong></span>
+                    <strong>S/. {{ order.total|floatformat:2 }}</strong>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <a class="detail-btn" href="{% url 'users:portal_cliente_pedidos' %}"><i class="fas fa-arrow-left"></i> Volver a pedidos</a>
+                <a class="detail-btn primary" href="{% url 'users:portal_cliente_confirmacion' order.id %}"><i class="fas fa-circle-check"></i> Ver confirmacion</a>
+                <a class="detail-btn secondary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}"><i class="fas fa-location-crosshairs"></i> Rastrear</a>
+            </div>
+        </article>
+    </section>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+    const liveCard = document.querySelector('.live-status[data-progress-url]');
+    if (!liveCard) return;
+
+    const endpoint = liveCard.getAttribute('data-progress-url');
+    const estadoText = document.getElementById('liveEstadoText');
+    const etaText = document.getElementById('liveEtaText');
+    const syncText = document.getElementById('liveLastSync');
+    const progressFill = document.getElementById('liveProgressFill');
+    const progressLabel = document.getElementById('liveProgressLabel');
+    const paymentText = document.getElementById('livePaymentText');
+    const paymentMeta = document.getElementById('livePaymentMeta');
+    const channelText = document.getElementById('liveChannelText');
+    const orderId = '{{ order.id }}';
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl = `${wsProtocol}://${window.location.host}/ws/orders/${orderId}/status/`;
+    let statusSocket = null;
+    let reconnectTimer = null;
+    let reconnectAttempt = 0;
+    let pollInterval = null;
+
+    if (progressFill) {
+        const initialProgress = Number(progressFill.getAttribute('data-initial-progress') || 0);
+        progressFill.style.width = `${initialProgress}%`;
+    }
+
+    const updateSyncText = () => {
+        const now = new Date();
+        syncText.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const applyPayload = (payload) => {
+        if (!payload) return;
+
+        if (estadoText && payload.estado_display) {
+            estadoText.textContent = payload.estado_display;
+        }
+
+        if (etaText && typeof payload.eta_minutes === 'number') {
+            etaText.textContent = `${payload.eta_minutes} min`;
+        }
+
+        if (progressFill && typeof payload.progress_percent === 'number') {
+            progressFill.style.width = `${payload.progress_percent}%`;
+        }
+
+        if (progressLabel && typeof payload.progress_percent === 'number') {
+            progressLabel.textContent = `Progreso ${payload.progress_percent}%`;
+        }
+
+        if (paymentText && payload.payment_status_display) {
+            paymentText.textContent = `Pago: ${payload.payment_status_display}`;
+        }
+
+        if (paymentMeta && payload.payment_status_display) {
+            paymentMeta.textContent = payload.payment_status_display;
+        }
+
+        updateSyncText();
+    };
+
+    const refreshStatus = async () => {
+        try {
+            const response = await fetch(endpoint, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                cache: 'no-store',
+            });
+            if (!response.ok) return;
+            const payload = await response.json();
+            applyPayload(payload);
+        } catch (error) {
+            console.debug('Live status polling error:', error);
+        }
+    };
+
+    const setChannelState = (text) => {
+        if (!channelText) return;
+        channelText.textContent = text;
+    };
+
+    const startPollingFallback = () => {
+        if (pollInterval) return;
+        pollInterval = setInterval(refreshStatus, 12000);
+    };
+
+    const stopPollingFallback = () => {
+        if (!pollInterval) return;
+        clearInterval(pollInterval);
+        pollInterval = null;
+    };
+
+    const scheduleReconnect = () => {
+        if (reconnectTimer) return;
+        reconnectAttempt += 1;
+        const waitMs = Math.min(2000 * reconnectAttempt, 10000);
+        reconnectTimer = setTimeout(() => {
+            reconnectTimer = null;
+            connectSocket();
+        }, waitMs);
+    };
+
+    const connectSocket = () => {
+        if (statusSocket && (statusSocket.readyState === WebSocket.OPEN || statusSocket.readyState === WebSocket.CONNECTING)) {
+            return;
+        }
+
+        try {
+            statusSocket = new WebSocket(wsUrl);
+        } catch (error) {
+            setChannelState('fallback polling');
+            startPollingFallback();
+            scheduleReconnect();
+            return;
+        }
+
+        statusSocket.addEventListener('open', () => {
+            reconnectAttempt = 0;
+            setChannelState('websocket activo');
+            stopPollingFallback();
+            statusSocket.send(JSON.stringify({ type: 'order.request_snapshot' }));
+        });
+
+        statusSocket.addEventListener('message', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type !== 'order.status') return;
+                applyPayload(data.payload || {});
+            } catch (error) {
+                console.debug('Live status websocket parse error:', error);
+            }
+        });
+
+        statusSocket.addEventListener('close', () => {
+            setChannelState('reconectando...');
+            startPollingFallback();
+            scheduleReconnect();
+        });
+
+        statusSocket.addEventListener('error', () => {
+            setChannelState('fallback polling');
+            startPollingFallback();
+        });
+    };
+
+    refreshStatus();
+    connectSocket();
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        if (statusSocket && statusSocket.readyState === WebSocket.OPEN) {
+            statusSocket.send(JSON.stringify({ type: 'order.request_snapshot' }));
+            return;
+        }
+        refreshStatus();
+    });
+
+    window.addEventListener('beforeunload', () => {
+        stopPollingFallback();
+        if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+        }
+        if (statusSocket && statusSocket.readyState === WebSocket.OPEN) {
+            statusSocket.close();
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Gestión de Pagos - NovaGo{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .payments-page { padding: 1.15rem; }
+    .payments-header { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.8rem; padding: 1rem 1.05rem; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(120deg, rgba(255,255,255,0.9), rgba(245,249,255,0.92)); box-shadow: 0 18px 36px -30px rgba(15, 23, 42, 0.5); }
+    html[data-theme='dark'] .payments-header, html[data-theme='dark'] .payments-table-wrap, html[data-theme='dark'] .payments-filters, html[data-theme='dark'] .payments-bulk { background: rgba(15, 23, 42, 0.64); border-color: rgba(148, 163, 184, 0.24); }
+    .payments-title { margin: 0; color: var(--text); font-size: 1.4rem; }
+    .payments-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .payments-btn { text-decoration: none; padding: 0.5rem 0.72rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); font-weight: 700; background: var(--bg); }
+    .payments-btn.primary { border: none; color: #fff; background: linear-gradient(120deg, #0ea5e9, #0284c7); }
+
+    .payments-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.55rem; margin-bottom: 0.75rem; }
+    .payments-kpi { border: 1px solid var(--line); border-radius: 12px; background: var(--bg-secondary, #f5f9ff); padding: 0.58rem 0.65rem; box-shadow: 0 12px 24px -24px rgba(15, 23, 42, 0.5); }
+    html[data-theme='dark'] .payments-kpi { background: rgba(15, 23, 42, 0.64); border-color: rgba(148, 163, 184, 0.24); }
+    .payments-kpi label { display: block; margin-bottom: 0.15rem; color: var(--text-secondary, #667799); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; }
+    .payments-kpi strong { color: var(--text); font-size: 1.05rem; }
+
+    .payments-filters { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.55rem; margin-bottom: 0.75rem; }
+    .payments-bulk { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 0.55rem; margin-bottom: 0.75rem; align-items: end; }
+    .payments-control { width: 100%; padding: 0.56rem; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+    .payments-label { display: block; font-size: 0.74rem; color: var(--text-secondary, #667799); font-weight: 700; margin-bottom: 0.2rem; }
+
+    .payments-table-wrap { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-secondary, #f5f9ff); overflow: auto; box-shadow: 0 18px 36px -32px rgba(15, 23, 42, 0.5); }
+    html[data-theme='dark'] .payments-table-wrap { background: rgba(15, 23, 42, 0.64); }
+    .payments-table { width: 100%; border-collapse: collapse; }
+    .payments-table th, .payments-table td { text-align: left; padding: 0.58rem; border-bottom: 1px solid var(--line); }
+    .payments-table tbody tr:hover { background: rgba(14, 165, 233, 0.05); }
+    html[data-theme='dark'] .payments-table tbody tr:hover { background: rgba(148, 163, 184, 0.08); }
+    .payments-empty { padding: 0.8rem; }
+    .payments-pagination { margin-top: 0.75rem; display: flex; gap: 0.45rem; flex-wrap: wrap; }
+
+    @media (max-width: 960px) {
+        .payments-filters, .payments-bulk, .payments-kpis { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<section class="payments-page">
+    <header class="payments-header">
+        <h1 class="payments-title"><i class="fas fa-credit-card"></i> Gestión de Pagos</h1>
+        <div class="payments-actions">
+            <a href="{% url 'users:admin_export_payments' %}?{{ request.GET.urlencode }}&format=csv" class="payments-btn">Exportar CSV</a>
+            <a href="{% url 'users:admin_export_payments' %}?{{ request.GET.urlencode }}&format=xlsx" class="payments-btn primary">Exportar XLSX</a>
+            <a href="{% url 'users:admin_export_payments' %}?{{ request.GET.urlencode }}&format=pdf" class="payments-btn">Exportar PDF</a>
+        </div>
+    </header>
+
+    <section class="payments-kpis">
+        <article class="payments-kpi"><label>Total pagos</label><strong>{{ stats_total }}</strong></article>
+        <article class="payments-kpi"><label>Pendientes</label><strong>{{ stats_pendientes }}</strong></article>
+        <article class="payments-kpi"><label>Completados</label><strong>{{ stats_completados }}</strong></article>
+        <article class="payments-kpi"><label>Conciliados</label><strong>{{ stats_conciliados }}</strong></article>
+    </section>
+
+    <form method="get" class="payments-filters">
+        <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar por pago, pedido, cliente o referencia" class="payments-control" aria-label="Buscar pagos">
+        <select name="estado" class="payments-control" aria-label="Filtrar por estado">
+            <option value="">Todos los estados</option>
+            {% for value, label in estado_options %}
+            <option value="{{ value }}" {% if filter_estado == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="metodo" class="payments-control" aria-label="Filtrar por método de pago">
+            <option value="">Todos los métodos</option>
+            {% for value, label in metodo_options %}
+            <option value="{{ value }}" {% if filter_metodo == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="conciliado" class="payments-control" aria-label="Filtrar por conciliación">
+            <option value="">Conciliación</option>
+            <option value="1" {% if filter_conciliado == '1' %}selected{% endif %}>Conciliados</option>
+            <option value="0" {% if filter_conciliado == '0' %}selected{% endif %}>No conciliados</option>
+        </select>
+        <button type="submit" class="payments-control">Filtrar</button>
+    </form>
+
+    <form method="post" action="{% url 'users:admin_payments_bulk_action' %}">
+        {% csrf_token %}
+        <div class="payments-bulk">
+            <div>
+                <label for="payments-action" class="payments-label">Acción masiva</label>
+                <select id="payments-action" name="action" class="payments-control">
+                    <option value="">Selecciona acción</option>
+                    <option value="set_status">Cambiar estado</option>
+                    <option value="reconcile">Marcar conciliado</option>
+                    <option value="unreconcile">Marcar no conciliado</option>
+                </select>
+            </div>
+            <div>
+                <label for="payments-status" class="payments-label">Nuevo estado</label>
+                <select id="payments-status" name="new_status" class="payments-control">
+                    <option value="">-- Opcional --</option>
+                    {% for value, label in estado_options %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="payments-control">Aplicar</button>
+        </div>
+
+        <div class="payments-table-wrap">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th><input id="payments-select-all" type="checkbox" aria-label="Seleccionar todos los pagos"></th>
+                        <th>Pago</th>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Método</th>
+                        <th>Estado</th>
+                        <th>Monto</th>
+                        <th>Conciliación</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in payments %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_payments" value="{{ item.id }}" class="bulk-payment-item" aria-label="Seleccionar pago {{ item.id }}"></td>
+                        <td>#{{ item.id }}</td>
+                        <td>#{{ item.pedido_id }}</td>
+                        <td>{{ item.pedido.cliente.get_full_name|default:item.pedido.cliente.username }}</td>
+                        <td>{{ item.get_metodo_display }}</td>
+                        <td>{{ item.get_estado_display }}</td>
+                        <td>S/. {{ item.monto|floatformat:2 }}</td>
+                        <td>{% if item.conciliado %}Sí{% else %}No{% endif %}</td>
+                        <td>{{ item.fecha_pago|date:'d/m/Y H:i' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="9" class="payments-empty">No hay pagos con los filtros seleccionados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+    {% if is_paginated %}
+    <div class="payments-pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<script>
+    (function () {
+        const selectAll = document.getElementById('payments-select-all');
+        if (!selectAll) {
+            return;
+        }
+        selectAll.addEventListener('change', function () {
+            document.querySelectorAll('.bulk-payment-item').forEach(function (item) {
+                item.checked = selectAll.checked;
+            });
+        });
+    })();
+</script>
+{% endblock %}

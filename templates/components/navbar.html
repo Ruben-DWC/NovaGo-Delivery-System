@@ -1,72 +1,626 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<style>
+    .client-breadcrumb-wrap {
+        padding-top: 0.8rem;
+    }
+
+    .client-breadcrumb {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.55rem 0.85rem;
+        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
+    }
+
+    html[data-theme='dark'] .client-breadcrumb {
+        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
+        border-color: rgba(132, 153, 196, 0.28);
+        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
+    }
+
+    .client-breadcrumb .crumb + .crumb::before {
+        content: '\f054';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 0.58rem;
+        margin: 0 0.42rem;
+        color: #7a879f;
+    }
+
+    html[data-theme='dark'] .client-breadcrumb .crumb + .crumb::before {
+        color: #93a4c4;
+    }
+
+    .client-breadcrumb .crumb {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .client-breadcrumb .crumb a {
+        color: #2f4f8d;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .client-breadcrumb .crumb a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .client-breadcrumb .crumb-root {
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.16rem 0.55rem;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.24);
+    }
+
+    .client-breadcrumb .crumb-root i {
+        color: #2563eb;
+        font-size: 0.75rem;
+    }
+
+    .crumb-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(37, 99, 235, 0.4);
+    }
+
+    .crumb-avatar-fallback {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    }
+
+    .nav-user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .nav-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(100, 116, 139, 0.45);
+    }
+
+    .nav-avatar-fallback {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+        border: 1px solid rgba(100, 116, 139, 0.45);
+    }
+
+    .admin-breadcrumb-wrap {
+        padding-top: 0.8rem;
+    }
+
+    .admin-breadcrumb {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.55rem 0.85rem;
+        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb {
+        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
+        border-color: rgba(132, 153, 196, 0.28);
+        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
+    }
+
+    .admin-breadcrumb .crumb + .crumb::before {
+        content: '\f054';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 0.58rem;
+        margin: 0 0.42rem;
+        color: #7a879f;
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb .crumb + .crumb::before {
+        color: #93a4c4;
+    }
+
+    .admin-breadcrumb .crumb {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .admin-breadcrumb .crumb a {
+        color: #2f4f8d;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .admin-breadcrumb .crumb a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .admin-breadcrumb .crumb-root {
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.16rem 0.55rem;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.24);
+    }
+
+    .admin-breadcrumb .crumb-root i {
+        color: #2563eb;
+        font-size: 0.75rem;
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb .crumb-root {
+        background: rgba(96, 165, 250, 0.14);
+        border-color: rgba(96, 165, 250, 0.28);
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb .crumb-root i {
+        color: #7db4ff;
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb .crumb a {
+        color: #9dc0ff;
+    }
+
+    .admin-breadcrumb .crumb.active {
+        color: #5f6d86;
+        font-weight: 700;
+    }
+
+    html[data-theme='dark'] .admin-breadcrumb .crumb.active {
+        color: #a6b4ce;
+    }
+
+    .admin-nav-dropdown .dropdown-menu {
+        min-width: 18rem;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        box-shadow: 0 20px 40px -24px rgba(15, 23, 40, 0.65);
+    }
+
+    .admin-nav-dropdown .dropdown-header {
+        color: var(--text-secondary, #667799);
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .admin-nav-dropdown .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .admin-nav-dropdown .dropdown-item i {
+        width: 18px;
+        text-align: center;
+    }
+
+    html[data-theme='dark'] .client-breadcrumb .crumb-root {
+        background: rgba(96, 165, 250, 0.14);
+        border-color: rgba(96, 165, 250, 0.28);
+    }
+
+    html[data-theme='dark'] .client-breadcrumb .crumb-root i {
+        color: #7db4ff;
+    }
+
+    html[data-theme='dark'] .client-breadcrumb .crumb a {
+        color: #9dc0ff;
+    }
+
+    .client-breadcrumb .crumb.active {
+        color: #5f6d86;
+        font-weight: 700;
+    }
+
+    html[data-theme='dark'] .client-breadcrumb .crumb.active {
+        color: #a6b4ce;
+    }
+
+    .moto-breadcrumb-wrap {
+        padding-top: 0.8rem;
+    }
+
+    .moto-breadcrumb {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.55rem 0.85rem;
+        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
+    }
+
+    .moto-breadcrumb .crumb + .crumb::before {
+        content: '\f054';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 0.58rem;
+        margin: 0 0.42rem;
+        color: #7a879f;
+    }
+
+    .moto-breadcrumb .crumb {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .moto-breadcrumb .crumb a {
+        color: #8c3d12;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .moto-breadcrumb .crumb a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .moto-breadcrumb .crumb-root {
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.16rem 0.55rem;
+        background: rgba(249, 115, 22, 0.12);
+        border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .moto-breadcrumb .crumb-root i {
+        color: #ea580c;
+        font-size: 0.75rem;
+    }
+
+    .moto-breadcrumb .crumb.active {
+        color: #5f6d86;
+        font-weight: 700;
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb {
+        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
+        border-color: rgba(132, 153, 196, 0.28);
+        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb .crumb + .crumb::before {
+        color: #93a4c4;
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb .crumb a {
+        color: #ffb68e;
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb .crumb-root {
+        background: rgba(251, 146, 60, 0.16);
+        border-color: rgba(251, 146, 60, 0.32);
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb .crumb-root i {
+        color: #fdba74;
+    }
+
+    html[data-theme='dark'] .moto-breadcrumb .crumb.active {
+        color: #a6b4ce;
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg nav-neo sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">
-            <i class="fas fa-motorcycle"></i> DeliveryApp
+        <a class="navbar-brand brand-mark"
+           href="{% if user.is_authenticated %}{% if user.role == 'motorizado' %}{% url 'tracking:portal_motorizado' %}{% elif user.is_staff or user.role == 'admin' %}{% url 'users:portal_admin' %}{% else %}{% url 'users:portal_cliente' %}{% endif %}{% else %}{% url 'home' %}{% endif %}">
+            <span class="brand-icon"><i class="fas fa-bolt"></i></span>
+            <span class="brand-name">NovaGo</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Abrir navegación" aria-label="Abrir navegación principal">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">
-                        <i class="fas fa-home"></i> Inicio
+            <div class="navbar-nav me-auto align-items-lg-center gap-lg-2">
+                {% spaceless %}
+                {% if '/portal/admin/' in request.path %}
+                <div class="nav-item dropdown admin-nav-dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Administración
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-box"></i> Productos
-                    </a>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-shopping-cart"></i> Carrito
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-clipboard-list"></i> Mis Pedidos
-                    </a>
-                </li>
+                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <h6 class="dropdown-header">Panel administrativo</h6>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'portal_admin' %}active{% endif %}" href="{% url 'users:portal_admin' %}"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' %}active{% endif %}" href="{% url 'users:admin_users' %}"><i class="fas fa-users"></i> Usuarios</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'users:admin_orders' %}"><i class="fas fa-clipboard-list"></i> Órdenes</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' %}active{% endif %}" href="{% url 'users:admin_products' %}"><i class="fas fa-box"></i> Productos</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' %}active{% endif %}" href="{% url 'users:admin_categories' %}"><i class="fas fa-layer-group"></i> Categorías</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}" href="{% url 'users:admin_payments' %}"><i class="fas fa-credit-card"></i> Pagos</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_audit_logs' %}active{% endif %}" href="{% url 'users:admin_audit_logs' %}"><i class="fas fa-file-alt"></i> Bitácora</a>
+                        <hr class="dropdown-divider">
+                        <a class="dropdown-item" href="{% url 'users:admin_reports' %}"><i class="fas fa-chart-bar"></i> Reportes</a>
+                        <a class="dropdown-item" href="{% url 'users:admin_income' %}"><i class="fas fa-dollar-sign"></i> Ingresos</a>
+                        <a class="dropdown-item" href="{% url 'users:admin_performance' %}"><i class="fas fa-tachometer-alt"></i> Performance</a>
+                    </div>
+                </div>
                 {% endif %}
-            </ul>
-            
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
-                           data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> {{ user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-user-circle"></i> Mi Perfil
-                            </a></li>
-                            {% if user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">
-                                <i class="fas fa-cog"></i> Admin Panel
-                            </a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                            </a></li>
-                        </ul>
-                    </li>
+                {% if user.is_authenticated and user.role == 'motorizado' %}
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_motorizado' or request.resolver_match.url_name == 'motorizado_dashboard' or request.resolver_match.url_name == 'motorizado_dashboard_portal' %}active{% endif %}" href="{% url 'tracking:portal_motorizado' %}">
+                        Inicio
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'motorizado_rastreo_pedido' %}active{% endif %}" href="{% url 'tracking:portal_motorizado' %}">
+                        Entregas
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'motorizado_historial' or request.resolver_match.url_name == 'motorizado_pedido_detalle' %}active{% endif %}" href="{% url 'tracking:motorizado_historial' %}">
+                        Historial
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_motorizado_perfil' %}active{% endif %}" href="{% url 'users:portal_motorizado_perfil' %}">
+                        Perfil
+                    </a>
+                </div>
+                {% elif user.is_authenticated and user.role == 'cliente' %}
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente' %}active{% endif %}" href="{% url 'users:portal_cliente' %}">
+                        Inicio
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_catalogo' %}active{% endif %}" href="{% url 'users:portal_cliente_catalogo' %}">
+                        Catalogo
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_carrito' %}active{% endif %}" href="{% url 'users:portal_cliente_carrito' %}">
+                        Carrito
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_pedidos' or request.resolver_match.url_name == 'portal_cliente_pedido_detalle' %}active{% endif %}" href="{% url 'users:portal_cliente_pedidos' %}">
+                        Mis pedidos
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_pago' %}active{% endif %}" href="{% url 'users:portal_cliente_pago' %}">
+                        Pago
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_rastreo' or request.resolver_match.url_name == 'portal_cliente_rastreo_pedido' %}active{% endif %}" href="{% url 'users:portal_cliente_rastreo' %}">
+                        Rastreo
+                    </a>
+                </div>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-user-plus"></i> Registrarse
-                        </a>
-                    </li>
+                <div class="nav-item">
+                    <a class="nav-link" href="{% if user.is_authenticated %}{% url 'users:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+                        Inicio
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" href="{% url 'products:product_list' %}">
+                        Catalogo
+                    </a>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="nav-item">
+                    <a class="nav-link" href="{% url 'orders:cart' %}">
+                        Carrito
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" href="{% url 'orders:order_list' %}">
+                        Mis pedidos
+                    </a>
+                </div>
                 {% endif %}
-            </ul>
+                {% endif %}
+                {% endspaceless %}
+            </div>
+            
+            <div class="navbar-nav align-items-lg-center gap-lg-2">
+                {% spaceless %}
+                            <div class="nav-item dropdown">
+                                <button class="nav-link nav-theme-toggle dropdown-toggle" id="themeMenu" data-bs-toggle="dropdown" aria-expanded="false" type="button">
+                                    <i class="fas fa-circle-half-stroke"></i>
+                                    Tema
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end theme-menu" aria-labelledby="themeMenu">
+                                    <button class="dropdown-item" type="button" data-theme-option="auto">Automatico</button>
+                                    <button class="dropdown-item" type="button" data-theme-option="light">Claro</button>
+                                    <button class="dropdown-item" type="button" data-theme-option="dark">Oscuro</button>
+                                </div>
+                            </div>
+                {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle nav-user-chip" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown">
+                            {% if user.foto_perfil %}
+                            <img src="{{ user.foto_perfil.url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto de perfil" class="nav-avatar">
+                            {% else %}
+                            <span class="nav-avatar-fallback">{{ user.username|first|upper }}</span>
+                            {% endif %}
+                            <span>{{ user.username }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="{% if user.role == 'cliente' %}{% url 'users:portal_cliente_perfil' %}{% elif user.role == 'motorizado' %}{% url 'users:portal_motorizado_perfil' %}{% else %}{% url 'users:profile' %}{% endif %}">
+                                <i class="fas fa-user-circle"></i> Mi Perfil
+                            </a>
+                            {% if user.role == 'cliente' %}
+                            <a class="dropdown-item" href="{% url 'users:portal_cliente' %}">
+                                <i class="fas fa-house"></i> Portal Cliente
+                            </a>
+                            {% endif %}
+                            {% if user.is_staff %}
+                            <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog"></i> Admin Panel
+                            </a>
+                            {% endif %}
+                            <hr class="dropdown-divider">
+                            <a class="dropdown-item" href="{% url 'users:logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="nav-item">
+                        <a class="nav-link nav-link-soft" href="{% url 'users:login' %}">
+                            Iniciar sesion
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link btn btn-cta" href="{% url 'users:register' %}">
+                            Crear cuenta
+                        </a>
+                    </div>
+                {% endif %}
+                {% endspaceless %}
+            </div>
         </div>
     </div>
 </nav>
+
+{% if user.is_authenticated and user.role == 'cliente' and 'portal_cliente' in request.resolver_match.url_name %}
+<section class="container client-breadcrumb-wrap">
+    <nav aria-label="breadcrumb">
+        <div class="breadcrumb client-breadcrumb">
+            {% spaceless %}
+            <span class="crumb crumb-root">
+                {% if user.foto_perfil %}
+                <img src="{{ user.foto_perfil.url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto perfil" class="crumb-avatar">
+                {% else %}
+                <span class="crumb-avatar-fallback">{{ user.username|first|upper }}</span>
+                {% endif %}
+                <a href="{% url 'users:portal_cliente' %}">Portal cliente</a>
+            </span>
+            {% if request.resolver_match.url_name == 'portal_cliente' %}
+            <span class="crumb active" aria-current="page">Inicio</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_catalogo' %}
+            <span class="crumb active" aria-current="page">Catalogo</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_carrito' %}
+            <span class="crumb active" aria-current="page">Carrito</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_pedidos' %}
+            <span class="crumb active" aria-current="page">Mis pedidos</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_pedido_detalle' %}
+            <span class="crumb"><a href="{% url 'users:portal_cliente_pedidos' %}">Mis pedidos</a></span>
+            <span class="crumb active" aria-current="page">Detalle del pedido</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_pago' %}
+            <span class="crumb active" aria-current="page">Pasarela de pago</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_confirmacion' %}
+            <span class="crumb active" aria-current="page">Confirmación</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_rastreo' %}
+            <span class="crumb active" aria-current="page">Rastreo</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_rastreo_pedido' %}
+            <span class="crumb"><a href="{% url 'users:portal_cliente_rastreo' %}">Rastreo</a></span>
+            <span class="crumb active" aria-current="page">Mapa del pedido</span>
+            {% elif request.resolver_match.url_name == 'portal_cliente_perfil' %}
+            <span class="crumb active" aria-current="page">Perfil</span>
+            {% endif %}
+            {% endspaceless %}
+        </div>
+    </nav>
+</section>
+{% endif %}
+
+{% if user.is_authenticated and user.role == 'motorizado' %}
+{% if request.resolver_match.url_name == 'portal_motorizado' or request.resolver_match.url_name == 'motorizado_dashboard' or request.resolver_match.url_name == 'motorizado_dashboard_portal' or request.resolver_match.url_name == 'motorizado_historial' or request.resolver_match.url_name == 'motorizado_pedido_detalle' or request.resolver_match.url_name == 'motorizado_rastreo_pedido' or request.resolver_match.url_name == 'portal_motorizado_perfil' %}
+<section class="container moto-breadcrumb-wrap">
+    <nav aria-label="breadcrumb">
+        <div class="breadcrumb moto-breadcrumb">
+            {% spaceless %}
+            <span class="crumb crumb-root">
+                <i class="fas fa-motorcycle"></i>
+                <a href="{% url 'tracking:portal_motorizado' %}">Portal motorizado</a>
+            </span>
+            {% if request.resolver_match.url_name == 'portal_motorizado' or request.resolver_match.url_name == 'motorizado_dashboard' or request.resolver_match.url_name == 'motorizado_dashboard_portal' %}
+            <span class="crumb active" aria-current="page">Inicio</span>
+            {% elif request.resolver_match.url_name == 'motorizado_historial' %}
+            <span class="crumb active" aria-current="page">Historial</span>
+            {% elif request.resolver_match.url_name == 'motorizado_pedido_detalle' %}
+            <span class="crumb"><a href="{% url 'tracking:motorizado_historial' %}">Historial</a></span>
+            <span class="crumb active" aria-current="page">Pedido #{{ request.resolver_match.kwargs.pedido_id }}</span>
+            {% elif request.resolver_match.url_name == 'motorizado_rastreo_pedido' %}
+            <span class="crumb"><a href="{% url 'tracking:motorizado_historial' %}">Historial</a></span>
+            <span class="crumb active" aria-current="page">Rastreo #{{ request.resolver_match.kwargs.pedido_id }}</span>
+            {% elif request.resolver_match.url_name == 'portal_motorizado_perfil' %}
+            <span class="crumb active" aria-current="page">Perfil</span>
+            {% endif %}
+            {% endspaceless %}
+        </div>
+    </nav>
+</section>
+{% endif %}
+{% endif %}
+
+{% if user.is_authenticated and user.is_staff or user.role == 'admin' %}
+{% if request.resolver_match.url_name == 'portal_admin' or request.resolver_match.url_name == 'admin_orders' or request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' or request.resolver_match.url_name == 'admin_clients' or request.resolver_match.url_name == 'admin_employees' or request.resolver_match.url_name == 'admin_roles' or request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' or request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' or request.resolver_match.url_name == 'admin_payments' or request.resolver_match.url_name == 'admin_audit_logs' or request.resolver_match.url_name == 'admin_reports' or request.resolver_match.url_name == 'admin_income' or request.resolver_match.url_name == 'admin_performance' %}
+<section class="container admin-breadcrumb-wrap">
+    <nav aria-label="breadcrumb">
+        <div class="breadcrumb admin-breadcrumb">
+            {% spaceless %}
+            <span class="crumb crumb-root">
+                <i class="fas fa-shield-halved"></i>
+                <a href="{% url 'users:portal_admin' %}">Panel admin</a>
+            </span>
+            {% if request.resolver_match.url_name == 'portal_admin' %}
+            <span class="crumb active" aria-current="page">Dashboard</span>
+            {% elif request.resolver_match.url_name == 'admin_orders' %}
+            <span class="crumb active" aria-current="page">Órdenes</span>
+            {% elif request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' %}
+            <span class="crumb active" aria-current="page">Usuarios</span>
+            {% elif request.resolver_match.url_name == 'admin_clients' %}
+            <span class="crumb active" aria-current="page">Clientes</span>
+            {% elif request.resolver_match.url_name == 'admin_employees' %}
+            <span class="crumb active" aria-current="page">Empleados</span>
+            {% elif request.resolver_match.url_name == 'admin_roles' %}
+            <span class="crumb active" aria-current="page">Roles</span>
+            {% elif request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' %}
+            <span class="crumb active" aria-current="page">Productos</span>
+            {% elif request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' %}
+            <span class="crumb active" aria-current="page">Categorías</span>
+            {% elif request.resolver_match.url_name == 'admin_payments' %}
+            <span class="crumb active" aria-current="page">Pagos</span>
+            {% elif request.resolver_match.url_name == 'admin_audit_logs' %}
+            <span class="crumb active" aria-current="page">Bitácora</span>
+            {% elif request.resolver_match.url_name == 'admin_reports' %}
+            <span class="crumb active" aria-current="page">Reportes</span>
+            {% elif request.resolver_match.url_name == 'admin_income' %}
+            <span class="crumb active" aria-current="page">Ingresos</span>
+            {% elif request.resolver_match.url_name == 'admin_performance' %}
+            <span class="crumb active" aria-current="page">Performance</span>
+            {% endif %}
+            {% endspaceless %}
+        </div>
+    </nav>
+</section>
+{% endif %}
+{% endif %}

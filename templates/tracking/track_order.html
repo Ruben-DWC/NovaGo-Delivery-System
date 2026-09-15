@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Rastreo Pedido #{{ order.id }} - NovaGo{% endblock %}
+{% block content %}
+{% if forbidden %}
+<div class="alert alert-danger">No autorizado para ver este rastreo.</div>
+{% else %}
+<section class="section-space reveal-up is-visible">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Rastreo Pedido #{{ order.id }}</h2>
+        <a class="btn btn-outline-dark" href="{% if user.is_authenticated and user.role == 'cliente' %}{% url 'users:portal_cliente_pedido_detalle' order.id %}{% else %}{% url 'orders:order_detail' order.id %}{% endif %}">Volver al pedido</a>
+    </div>
+
+    <div class="hero-shell mb-3">
+        <p><strong>Estado actual:</strong> {{ order.get_estado_display }}</p>
+        {% if route %}
+        <p><strong>Distancia estimada:</strong> {{ route.distancia_km|default:'-' }} km</p>
+        <p><strong>Tiempo estimado:</strong> {{ route.tiempo_estimado_min|default:'-' }} min</p>
+        {% endif %}
+    </div>
+
+    <article class="feature-tile">
+        <h5>Ultimas ubicaciones</h5>
+        {% if tracking_points %}
+            <div class="list-group list-group-flush">
+            {% for point in tracking_points %}
+                <div class="list-group-item d-flex justify-content-between">
+                    <span>{{ point.latitud }}, {{ point.longitud }}</span>
+                    <span>{{ point.timestamp|date:'d/m H:i:s' }}</span>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Aun no hay puntos de tracking para este pedido.</p>
+        {% endif %}
+    </article>
+</section>
+{% endif %}
+{% endblock %}

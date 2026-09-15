@@ -1,49 +1,177 @@
-# 🚀 Sistema de Delivery - Proyecto Herramientas de Desarrollo
+# NovaGo - Sistema de Delivery & Despacho de Encomiendas
 
-Sistema web de delivery con gestión de pedidos, seguimiento GPS, control de stock y pagos. Desarrollado con Django como proyecto educativo para demostrar el uso de Git y control de versiones.
+[![Django](https://img.shields.io/badge/Django-6.0-green.svg)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
+[![GitFlow](https://img.shields.io/badge/GitFlow-Standard-orange.svg)](https://nvie.com/posts/a-successful-git-branching-model/)
+[![License](https://img.shields.io/badge/Academic-UTP_2026--II-red.svg)](https://www.utp.edu.pe)
 
-## 📋 Tabla de Contenidos
+> **Universidad Tecnológica del Perú (UTP)**  
+> **Facultad de Ingeniería de Sistemas e Informática**  
+> **Curso:** Herramientas de Desarrollo (`100000S66T`) - Ciclo 2026-II  
+> **Estudiante:** Ruben Walter Vivas Jimenez (Código: `U18209770` | Correo: `u22224908@utp.edu.pe`)  
+> **Repositorio Oficial:** [https://github.com/Ruben-DWC/NovaGo-Delivery-System](https://github.com/Ruben-DWC/NovaGo-Delivery-System)
 
-- [Características](#características)
-- [Tecnologías](#tecnologías)
-- [Instalación](#instalación)
-- [Conceptos de Git Aplicados](#conceptos-de-git-aplicados)
-- [Flujo de Trabajo Git](#flujo-de-trabajo-git)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Comandos Útiles](#comandos-útiles)
+---
 
-## ✨ Características
+## 1. Descripción del Proyecto
+
+Sistema web integral de delivery y gestión de despachos con seguimiento telemático GPS en tiempo real, control riguroso de inventario, pasarela de pagos con conciliación y auditoría administrativa de pedidos. Desarrollado con Django y Python bajo una arquitectura MVT modular y un ciclo de vida gestionado rigurosamente mediante Git y GitHub.
+
+---
+
+## Propuesta de Valor de NovaGo
+
+**NovaGo** no compite como marketplace multi-tienda (como DiDi o PedidosYa). NovaGo es un **minimarket digital con delivery propio**.
+
+Eso significa que el sistema controla de extremo a extremo:
+
+- Catálogo y stock de una tienda única.
+- Flujo completo del pedido en una sola plataforma.
+- Gestión directa de motorizados y seguimiento del recorrido.
+
+### ¿Por qué NovaGo es diferente y único?
+
+1. **Control total de inventario y despacho**: al ser tienda única, el stock y la preparación son más consistentes.
+2. **Trazabilidad operativa interna**: pedido, pago, ruta y entrega se auditan dentro del mismo sistema.
+3. **Experiencia más predecible para el cliente**: menos variabilidad por comercios externos.
+4. **Modelo ideal para prototipo académico serio**: suficiente complejidad real sin convertirse en plataforma masiva.
+
+### ¿Qué problema resuelve el sistema?
+
+NovaGo resuelve la falta de coordinación entre inventario, pedidos, pagos y entrega en pequeños comercios con reparto propio. Evita:
+
+- Sobreventa por falta de sincronización de stock.
+- Pedidos sin trazabilidad clara para cliente y administrador.
+- Gestión manual desordenada de pagos y estados de entrega.
+
+### ¿Quiénes lo usan?
+
+1. **Clientes**: compran productos del minimarket, pagan y rastrean su pedido.
+2. **Motorizados**: revisan pedidos asignados, reportan ubicación y estado de entrega.
+3. **Administradores**: gestionan productos, stock, pedidos, pagos y usuarios.
+
+## Definición del Proyecto (Rubro)
+
+**NovaGo** se define como una **tienda de conveniencia (minimarket) con delivery propio**.
+
+No es un marketplace tipo "PedidosYa" o "DiDi Food" (multi-tienda), sino una plataforma de **una sola tienda** con 3 roles: cliente, motorizado y administrador.
+
+### ¿Qué vende NovaGo?
+
+- Alimentos envasados y snacks
+- Bebidas (agua, gaseosas, jugos, energéticas)
+- Productos de uso rápido del hogar (básicos)
+
+### ¿Por qué este rubro?
+
+Este enfoque cumple de forma directa con lo solicitado por el curso y la profesora, con una complejidad intermedia y realista para un prototipo:
+
+- Stock por producto (inventario)
+- Pagos (transferencia y otros métodos)
+- Entrega por motorizado
+- Mapa GPS con ruta de pedido
+- Flujo web para cliente y motorizado
+
+### Alcance MVP (versión académica intermedia)
+
+1. Cliente: registro/login, catálogo, pedido, pago, seguimiento.
+2. Motorizado: pedidos asignados, actualización de ubicación y estado.
+3. Admin: gestión de productos/stock, pedidos, pagos y usuarios.
+
+Con este alcance se prioriza demostrar buenas prácticas de desarrollo y Git (ramas, commits, merge, resolución de conflictos), sin intentar una complejidad de producción completa.
+
+## Tabla de Contenidos
+
+- [Propuesta de Valor de NovaGo](#-propuesta-de-valor-de-novago
+- [Definición del Proyecto (Rubro)](#-definición-del-proyecto-rubro
+- [Estado Actual del Desarrollo](#-estado-actual-del-desarrollo
+- [Roadmap de Integración](#-roadmap-de-integración
+- [Cómo Demostrar que NovaGo es Diferente](#-cómo-demostrar-que-novago-es-diferente)
+- [Características](#-características
+- [Tecnologías](#-tecnologías
+- [Instalación](#-instalación
+- [Conceptos de Git Aplicados](#-conceptos-de-git-aplicados
+- [Estructura del Proyecto](#-estructura-del-proyecto
+- [Comandos Útiles](#-comandos-útiles
+
+## Estado Actual del Desarrollo
+
+### Implementado
+
+1. **Branding y UX base**: identidad NovaGo, landing moderna, testimonios, microinteracciones y tema claro/oscuro.
+2. **Autenticación por rol**: login/registro con pantallas de éxito y redirección por rol.
+3. **Catálogo funcional**: listado, búsqueda, filtro por categoría y detalle de producto.
+4. **Carrito y checkout**: agregar/actualizar/eliminar productos, crear pedido y pago pendiente.
+5. **Pedidos**: listado y detalle con control de permisos por rol.
+6. **Tracking operativo**: panel de motorizado, registro de ubicación y vista de rastreo del pedido.
+7. **Arquitectura modular**: separación de servicios de negocio (por ejemplo, servicios de carrito/orden).
+
+### En progreso
+
+1. Refuerzo de panel administrativo con métricas operativas.
+2. Mayor profundidad en visualización de mapa (ruta interactiva en interfaz).
+3. Cobertura de pruebas automatizadas por módulo.
+
+## 🗺️ Roadmap de Integración
+
+### Fase 1 (base funcional) ✅
+
+- Branding + landing + autenticación + catálogo + carrito + checkout + pedidos + tracking básico.
+
+### Fase 2 (consolidación operativa) 🚧
+
+- Integración visual de mapa en vivo en tracking.
+- Estados de pedido más guiados (workflow operativo).
+- Mejoras de panel cliente y motorizado con indicadores.
+
+### Fase 3 (calidad y demostración final) 📅
+
+- Suite de tests (unitarios e integración).
+- Hardening de validaciones de negocio.
+- Evidencias de rendimiento y usabilidad para exposición.
+
+## 🧪 Cómo Demostrar que NovaGo es Diferente
+
+Para la sustentación, recomendamos mostrar evidencias concretas:
+
+1. **Tiempo y trazabilidad**: desde creación de pedido hasta entrega con eventos visibles.
+2. **Consistencia de stock**: prueba de reducción de inventario al confirmar pedido.
+3. **Flujo por roles**: cliente, motorizado y admin con vistas y permisos distintos.
+4. **UX coherente**: tema claro/oscuro, diseño responsive y rutas funcionales.
+5. **Mantenibilidad**: separación de vistas, forms, urls y servicios para evolución sencilla.
+
+## Características
 
 ### Para Clientes
 
-- 🛒 Catálogo de productos con stock en tiempo real
-- 🛍️ Carrito de compras
-- 💳 Sistema de pagos (transferencia/tarjeta)
-- 📍 Seguimiento GPS del motorizado
-- 📦 Historial de pedidos
+- Catálogo de productos con stock en tiempo real
+- Carrito de compras
+- Sistema de pagos (transferencia/tarjeta)
+- Seguimiento GPS del motorizado
+- Historial de pedidos
 
 ### Para Motorizados
 
-- 📋 Lista de pedidos asignados
-- 🗺️ Compartir ubicación en tiempo real
-- ✅ Actualizar estado de entregas
+- Lista de pedidos asignados
+- Compartir ubicación en tiempo real
+- Actualizar estado de entregas
 
 ### Panel Administrativo
 
-- 👥 Gestión de usuarios
-- 📦 Control de stock
-- 💰 Gestión de pagos
-- 📊 Reportes básicos
+- Gestión de usuarios
+- Control de stock
+- Gestión de pagos
+- Reportes básicos
 
-## 🛠️ Tecnologías
+## Tecnologías
 
-- **Backend**: Python 3.13 + Django 4.2
+- **Backend**: Python 3.13 + Django 6.x
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Base de Datos**: SQLite (desarrollo)
 - **Control de Versiones**: Git + GitHub
-- **Mapas**: Leaflet.js
+- **Mapas**: tracking GPS propio + integración de mapa interactivo (Leaflet.js planificado para vista avanzada)
 
-## 📦 Instalación
+## Instalación
 
 ### Prerrequisitos
 
@@ -102,7 +230,7 @@ python manage.py runserver
 - Frontend: <http://localhost:8000>
 - Admin: <http://localhost:8000/admin>
 
-## 🔄 Conceptos de Git Aplicados
+## Conceptos de Git Aplicados
 
 Este proyecto está diseñado para demostrar los conceptos de la **Primera Unidad** del curso:
 
@@ -172,7 +300,7 @@ git checkout -b feature/nueva-funcionalidad
 
 #### Estrategia de Ramas en este Proyecto
 
-```
+``
 main (producción)
   └── develop (desarrollo)
         ├── feature/usuarios
@@ -180,7 +308,7 @@ main (producción)
         ├── feature/pedidos
         ├── feature/pagos
         └── feature/gps-tracking
-```
+``
 
 ### 5. Estrategias de Ramificación y Fusión
 
@@ -275,15 +403,15 @@ git remote show origin
 
 #### Buenas Prácticas
 
-- ✅ Commits pequeños y frecuentes
-- ✅ Mensajes de commit descriptivos
-- ✅ Pull antes de Push
-- ✅ Crear rama para cada funcionalidad
-- ✅ Code review antes de merge
+- Commits pequeños y frecuentes
+- Mensajes de commit descriptivos
+- Pull antes de Push
+- Crear rama para cada funcionalidad
+- Code review antes de merge
 
 #### Formato de Mensajes de Commit
 
-```
+``
 tipo(alcance): descripción breve
 
 Descripción detallada (opcional)
@@ -295,7 +423,7 @@ docs(readme): actualizar instrucciones de instalación
 style(templates): mejorar diseño responsive
 refactor(models): optimizar queries de productos
 test(orders): agregar tests para carrito
-```
+``
 
 ### 10. Pull Requests (Solicitudes de Extracción)
 
@@ -357,9 +485,9 @@ git push origin v1.0.0
 git tag
 ```
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
-```
+``
 delivery_system/
 ├── config/                     # Configuración Django
 │   ├── __init__.py
@@ -389,9 +517,9 @@ delivery_system/
 ├── requirements.txt           # Dependencias
 ├── .gitignore                # Archivos ignorados por Git
 └── README.md                 # Este archivo
-```
+``
 
-## 🔧 Comandos Útiles
+## Comandos Útiles
 
 ### Django
 
@@ -432,7 +560,7 @@ git checkout -- archivo.py
 git diff develop..main
 ```
 
-## 👥 Equipo de Desarrollo
+## Equipo de Desarrollo
 
 - **Miembro 1**: Feature/Usuarios y Autenticación
 - **Miembro 2**: Feature/Productos y Stock
@@ -440,7 +568,7 @@ git diff develop..main
 - **Miembro 4**: Feature/Pagos
 - **Miembro 5**: Feature/GPS Tracking
 
-## 📝 Convenciones del Proyecto
+## Convenciones del Proyecto
 
 ### Nombres de Ramas
 
@@ -463,7 +591,7 @@ git diff develop..main
 - Asignar reviewers
 - Vincular issues relacionados
 
-## 🐛 Reportar Bugs
+## Reportar Bugs
 
 Usar el sistema de Issues de GitHub con la plantilla:
 
@@ -483,20 +611,20 @@ Lo que debería pasar
 Si aplica
 ```
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es con fines educativos para el curso de Herramientas de Desarrollo.
 
-## 🎓 Conceptos Aprendidos
+## Conceptos Aprendidos
 
-- ✅ Control de versiones con Git
-- ✅ Branching y merging
-- ✅ Resolución de conflictos
-- ✅ Trabajo colaborativo con repositorios remotos
-- ✅ Pull requests y code review
-- ✅ Git Flow workflow
-- ✅ Desarrollo web con Django
-- ✅ Trabajo en equipo
+- Control de versiones con Git
+- Branching y merging
+- Resolución de conflictos
+- Trabajo colaborativo con repositorios remotos
+- Pull requests y code review
+- Git Flow workflow
+- Desarrollo web con Django
+- Trabajo en equipo
 
 ---
 

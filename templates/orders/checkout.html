@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Checkout - NovaGo{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible">
+    <div class="section-header">
+        <p class="section-label">FINALIZAR PEDIDO</p>
+        <h2>Checkout</h2>
+    </div>
+
+    {% if items %}
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <article class="auth-card auth-card-wide">
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="id_direccion_entrega">Direccion de entrega</label>
+                            {{ form.direccion_entrega }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_telefono_contacto">Telefono</label>
+                            {{ form.telefono_contacto }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_metodo_pago">Metodo de pago</label>
+                            {{ form.metodo_pago }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_referencia">Referencia</label>
+                            {{ form.referencia }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_notas">Notas</label>
+                            {{ form.notas }}
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button class="btn btn-cta btn-lg btn-lift" type="submit">Confirmar pedido</button>
+                    </div>
+                </form>
+            </article>
+        </div>
+        <div class="col-lg-5">
+            <article class="hero-shell">
+                <h5>Resumen</h5>
+                <div class="list-group list-group-flush mb-3">
+                    {% for item in items %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ item.producto.nombre }} x{{ item.cantidad }}</span>
+                        <strong>S/ {{ item.subtotal }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p><strong>Subtotal:</strong> S/ {{ subtotal }}</p>
+                <p><strong>Envio:</strong> S/ {{ shipping }}</p>
+                <p class="fs-5"><strong>Total:</strong> S/ {{ total }}</p>
+            </article>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No tienes productos en el carrito.</div>
+    <a class="btn btn-cta" href="{% url 'products:product_list' %}">Ir al catalogo</a>
+    {% endif %}
+</section>
+{% endblock %}

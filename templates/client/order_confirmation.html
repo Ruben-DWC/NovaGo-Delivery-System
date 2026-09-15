@@ -1,0 +1,1285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmacion de Pedido - NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-page * {
+        box-sizing: border-box;
+    }
+
+    .confirm-page {
+        max-width: 1080px;
+        margin: 1.6rem auto 2.2rem;
+        padding: 0 1rem;
+        position: relative;
+        isolation: isolate;
+    }
+
+    .confirm-page::before,
+    .confirm-page::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    .confirm-page::before {
+        width: 260px;
+        height: 260px;
+        top: -40px;
+        left: -20px;
+        background: rgba(16, 185, 129, 0.25);
+        animation: auraFloat 6.5s ease-in-out infinite;
+    }
+
+    .confirm-page::after {
+        width: 220px;
+        height: 220px;
+        right: 0;
+        bottom: -10px;
+        background: rgba(59, 130, 246, 0.24);
+        animation: auraFloat 7.3s ease-in-out infinite reverse;
+    }
+
+    .confirm-hero {
+        border-radius: 20px;
+        padding: 1.2rem 1.3rem;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        background:
+            radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.24), transparent 40%),
+            radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.22), transparent 36%),
+            linear-gradient(115deg, #0b1220 0%, #16243e 55%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+        animation: revealUp 0.55s ease both;
+    }
+
+    .confirm-hero::after {
+        content: '';
+        position: absolute;
+        inset: -120% -40%;
+        background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.25) 50%, transparent 65%);
+        transform: rotate(7deg);
+        animation: heroShine 2.6s ease-in-out 0.4s 1;
+        pointer-events: none;
+    }
+
+    .confirm-hero h1 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .confirm-hero p {
+        margin: 0.45rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .confirm-layout {
+        display: grid;
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 1rem;
+    }
+
+    .progress-shell {
+        margin-top: 0.95rem;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f7fbff);
+        padding: 0.82rem 0.86rem;
+    }
+
+    .progress-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .progress-title strong {
+        color: var(--text);
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+    }
+
+    .progress-title span {
+        font-size: 0.78rem;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+    }
+
+    .sync-pill {
+        margin-top: 0.45rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.38rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.22rem 0.54rem;
+        font-size: 0.74rem;
+        color: var(--text-secondary, #667799);
+        background: var(--bg);
+    }
+
+    .sync-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: syncPulse 1.7s ease-in-out infinite;
+    }
+
+    .sync-pill.error .sync-dot {
+        background: #ef4444;
+        animation: none;
+    }
+
+    .app-toast {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 1200;
+        width: min(380px, calc(100vw - 2rem));
+        border-radius: 14px;
+        border: 1px solid rgba(16, 185, 129, 0.36);
+        background: linear-gradient(120deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.96));
+        color: #e2e8f0;
+        box-shadow: 0 22px 42px -28px rgba(2, 6, 23, 0.9);
+        padding: 0.8rem 0.85rem;
+        transform: translateY(14px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    .app-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .toast-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .toast-title {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #86efac;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .toast-close {
+        border: 0;
+        background: transparent;
+        color: #cbd5e1;
+        font-size: 1.05rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0.12rem;
+    }
+
+    .toast-close:hover {
+        color: #ffffff;
+    }
+
+    .toast-body {
+        margin: 0;
+        font-size: 0.86rem;
+        color: #d1d5db;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(148, 163, 184, 0.22);
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #34d399 0%, #10b981 40%, #06b6d4 100%);
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.42);
+        transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .progress-dots {
+        margin-top: 0.75rem;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.55rem;
+    }
+
+    .p-step {
+        display: grid;
+        gap: 0.28rem;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .p-step-btn {
+        border: none;
+        background: transparent;
+        padding: 0;
+        display: grid;
+        gap: 0.28rem;
+        justify-items: center;
+        text-align: center;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .p-step-btn:focus-visible {
+        outline: 2px solid rgba(16, 185, 129, 0.65);
+        outline-offset: 3px;
+        border-radius: 10px;
+    }
+
+    .p-step-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        background: var(--bg);
+        color: #64748b;
+        font-size: 0.78rem;
+        transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .p-step-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+    }
+
+    .p-step.done .p-step-dot,
+    .p-step.current .p-step-dot {
+        border-color: rgba(16, 185, 129, 0.65);
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .p-step.current .p-step-dot {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15);
+    }
+
+    .p-step.done .p-step-label,
+    .p-step.current .p-step-label {
+        color: #065f46;
+    }
+
+    .p-step.pending .p-step-dot {
+        opacity: 0.75;
+    }
+
+    .p-step.cancelled .p-step-dot {
+        border-color: rgba(239, 68, 68, 0.55);
+        background: rgba(239, 68, 68, 0.12);
+        color: #b91c1c;
+    }
+
+    .p-step.selected .p-step-dot {
+        box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.14);
+        transform: translateY(-1px) scale(1.02);
+    }
+
+    .progress-context {
+        margin-top: 0.78rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        padding: 0.72rem;
+        display: grid;
+        gap: 0.45rem;
+        animation: revealUp 0.35s ease both;
+    }
+
+    .progress-context h4 {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.92rem;
+    }
+
+    .progress-context p {
+        margin: 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.88rem;
+    }
+
+    .progress-context .context-cta {
+        justify-self: start;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 0.48rem 0.68rem;
+        border: 1px solid var(--line);
+        background: var(--bg-secondary, #f7fbff);
+        color: var(--text);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .progress-context .context-cta:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px -18px rgba(15, 23, 42, 0.7);
+    }
+
+    .success-banner {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 0.85rem;
+        margin-top: 0.95rem;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 14px;
+        padding: 0.75rem 0.85rem;
+        background: rgba(255, 255, 255, 0.08);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+    }
+
+    .success-ring {
+        width: 54px;
+        height: 54px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        position: relative;
+        background: radial-gradient(circle at 30% 25%, #34d399, #059669);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55);
+        animation: pulseRing 1.8s ease-out infinite;
+    }
+
+    .success-ring i {
+        color: #ffffff;
+        font-size: 1.25rem;
+        animation: checkPop 0.35s ease-out 0.25s both;
+    }
+
+    .success-copy {
+        margin: 0;
+        color: #f0fdf7;
+        line-height: 1.32;
+    }
+
+    .success-copy strong {
+        display: block;
+        font-size: 0.98rem;
+        margin-bottom: 0.18rem;
+    }
+
+    .success-copy small {
+        color: #dcfce7;
+    }
+
+    .confirm-card {
+        background: var(--bg-secondary, #f5f8ff);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1rem;
+        animation: revealUp 0.55s ease both;
+    }
+
+    .confirm-layout .confirm-card:nth-child(1) {
+        animation-delay: 0.12s;
+    }
+
+    .confirm-layout .confirm-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .confirm-title {
+        margin: 0 0 0.8rem;
+        color: var(--text);
+        font-size: 1.04rem;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        background: rgba(16, 185, 129, 0.16);
+        color: #047857;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        animation: chipPop 0.4s ease-out 0.28s both;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .meta-item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        padding: 0.7rem;
+    }
+
+    .meta-item.full {
+        grid-column: 1 / -1;
+    }
+
+    .meta-item label {
+        display: block;
+        font-size: 0.76rem;
+        color: var(--text-secondary, #667799);
+        margin-bottom: 0.28rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 700;
+    }
+
+    .meta-item strong {
+        color: var(--text);
+        font-size: 0.98rem;
+    }
+
+    .items-list {
+        display: grid;
+        gap: 0.52rem;
+    }
+
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.55rem 0.65rem;
+        background: var(--bg);
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .item-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 18px -18px rgba(15, 23, 42, 0.72);
+    }
+
+    .sum-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .sum-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.58rem 0.68rem;
+    }
+
+    .sum-row.total {
+        border-color: rgba(249, 115, 22, 0.42);
+        background: linear-gradient(120deg, rgba(249, 115, 22, 0.12), rgba(245, 158, 11, 0.12));
+        animation: totalGlow 2.6s ease-in-out infinite;
+    }
+
+    .confirm-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .btn-confirm {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 0.72rem 0.9rem;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px -18px rgba(15, 23, 42, 0.68);
+        filter: saturate(1.06);
+    }
+
+    .btn-confirm.primary {
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #ffffff;
+        border-color: rgba(5, 150, 105, 0.8);
+        box-shadow: 0 10px 25px -15px rgba(5, 150, 105, 0.72);
+    }
+
+    .note {
+        font-size: 0.88rem;
+        color: var(--text-secondary, #667799);
+        margin-top: 0.65rem;
+    }
+
+    .payment-ok {
+        margin-top: 0.75rem;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        border-radius: 12px;
+        padding: 0.68rem 0.72rem;
+        background: rgba(16, 185, 129, 0.1);
+        color: #065f46;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    html[data-theme='dark'] .confirm-card,
+    html[data-theme='dark'] .meta-item,
+    html[data-theme='dark'] .item-row,
+    html[data-theme='dark'] .sum-row {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .progress-shell {
+        background: rgba(15, 23, 42, 0.58);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .progress-context {
+        background: rgba(15, 23, 42, 0.7);
+        border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    html[data-theme='dark'] .progress-context h4 {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .progress-context p {
+        color: #cbd5e1;
+    }
+
+    html[data-theme='dark'] .progress-context .context-cta {
+        background: rgba(15, 23, 42, 0.55);
+        border-color: rgba(203, 213, 225, 0.42);
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .progress-context .context-cta:hover {
+        box-shadow: 0 10px 20px -18px rgba(2, 6, 23, 0.95);
+    }
+
+    html[data-theme='dark'] .progress-track {
+        background: rgba(148, 163, 184, 0.22);
+    }
+
+    html[data-theme='dark'] .progress-title strong {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .progress-title span,
+    html[data-theme='dark'] .p-step-label {
+        color: #94a3b8;
+    }
+
+    html[data-theme='dark'] .sync-pill {
+        background: rgba(15, 23, 42, 0.72);
+        border-color: rgba(148, 163, 184, 0.35);
+        color: #cbd5e1;
+    }
+
+    html[data-theme='dark'] .p-step-dot {
+        background: rgba(15, 23, 42, 0.7);
+        border-color: rgba(148, 163, 184, 0.4);
+        color: #94a3b8;
+    }
+
+    html[data-theme='dark'] .p-step.done .p-step-label,
+    html[data-theme='dark'] .p-step.current .p-step-label {
+        color: #6ee7b7;
+    }
+
+    html[data-theme='dark'] .status-chip {
+        color: #34d399;
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.2);
+    }
+
+    html[data-theme='dark'] .sum-row.total {
+        border-color: rgba(249, 115, 22, 0.5);
+        background: linear-gradient(120deg, rgba(249, 115, 22, 0.2), rgba(245, 158, 11, 0.2));
+    }
+
+    html[data-theme='dark'] .btn-confirm {
+        background: rgba(15, 23, 42, 0.54);
+        color: #e2e8f0;
+        border-color: rgba(203, 213, 225, 0.48);
+    }
+
+    html[data-theme='dark'] .item-row:hover,
+    html[data-theme='dark'] .btn-confirm:hover {
+        box-shadow: 0 12px 22px -18px rgba(2, 6, 23, 0.95);
+    }
+
+    html[data-theme='dark'] .payment-ok {
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.16);
+        color: #6ee7b7;
+    }
+
+    @keyframes revealUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes chipPop {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes heroShine {
+        0% {
+            transform: translateX(-40%) rotate(7deg);
+            opacity: 0;
+        }
+        30% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(48%) rotate(7deg);
+            opacity: 0;
+        }
+    }
+
+    @keyframes auraFloat {
+        0%, 100% {
+            transform: translateY(0px) scale(1);
+        }
+        50% {
+            transform: translateY(-8px) scale(1.05);
+        }
+    }
+
+    @keyframes pulseRing {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+        }
+        70% {
+            box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    @keyframes checkPop {
+        from {
+            opacity: 0;
+            transform: scale(0.6);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes totalGlow {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+        }
+        50% {
+            box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.12);
+        }
+    }
+
+    @keyframes syncPulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .confirm-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .meta-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-page">
+    <section class="confirm-hero">
+        <h1><i class="fas fa-circle-check"></i> Pedido confirmado correctamente</h1>
+        <p>Tu pedido #{{ order.id }} fue registrado con exito. Desde aqui puedes revisar el resumen y rastrearlo en vivo.</p>
+        <div class="success-banner">
+            <div class="success-ring">
+                <i class="fas fa-check"></i>
+            </div>
+            <p class="success-copy">
+                <strong>Pago enviado exitosamente</strong>
+                <small>Tu transaccion quedo registrada y el equipo de NovaGo procesara tu pedido de inmediato.</small>
+            </p>
+        </div>
+
+        <div class="progress-shell" id="progressShell" data-refresh-url="{% url 'users:portal_cliente_confirmacion_estado' order.id %}" data-order-id="{{ order.id }}">
+            <div class="progress-title">
+                <strong>Progreso del pedido</strong>
+                <span id="progressPercentLabel">
+                    {% if order.estado == 'cancelado' %}
+                    Pedido cancelado
+                    {% else %}
+                    {{ progress_percent }}% completado
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="sync-pill" id="syncPill" aria-live="polite">
+                <span class="sync-dot"></span>
+                <span id="syncText">Actualizacion automatica activa</span>
+            </div>
+
+            <div class="progress-track" aria-label="Progreso del pedido">
+                <div class="progress-fill" data-progress="{% if order.estado == 'cancelado' %}0{% else %}{{ progress_percent }}{% endif %}"></div>
+            </div>
+
+            <div class="progress-dots">
+                <div class="p-step {% if order.estado == 'cancelado' %}cancelled{% elif progress_step >= 1 %}done{% else %}pending{% endif %}" data-step="1">
+                    <button type="button" class="p-step-btn" data-context-title="Pedido confirmado" data-context-body="Tu pedido fue recibido y validado por NovaGo. Estamos iniciando el flujo de preparacion." data-context-cta-label="Ver mis pedidos" data-context-cta-url="{% url 'users:portal_cliente_pedidos' %}">
+                        <span class="p-step-dot"><i class="fas fa-check"></i></span>
+                        <span class="p-step-label">Confirmado</span>
+                    </button>
+                </div>
+                <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 2 %}current{% elif progress_step > 2 %}done{% else %}pending{% endif %}" data-step="2">
+                    <button type="button" class="p-step-btn" data-context-title="Pedido en preparacion" data-context-body="Tu pedido esta siendo preparado. Tiempo estimado actual: {{ eta_minutes }} min." data-context-cta-label="Ver detalle de pedido" data-context-cta-url="{% url 'users:portal_cliente_pedido_detalle' order.id %}">
+                        <span class="p-step-dot"><i class="fas fa-utensils"></i></span>
+                        <span class="p-step-label">Preparacion</span>
+                    </button>
+                </div>
+                <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 3 %}current{% elif progress_step > 3 %}done{% else %}pending{% endif %}" data-step="3">
+                    <button type="button" class="p-step-btn" data-context-title="Pedido en camino" data-context-body="Tu pedido ya va rumbo a tu direccion. Puedes abrir el rastreo en vivo para seguirlo en tiempo real." data-context-cta-label="Abrir rastreo en vivo" data-context-cta-url="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
+                        <span class="p-step-dot"><i class="fas fa-motorcycle"></i></span>
+                        <span class="p-step-label">En camino</span>
+                    </button>
+                </div>
+                <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 4 %}current{% elif progress_step > 4 %}done{% else %}pending{% endif %}" data-step="4">
+                    <button type="button" class="p-step-btn" data-context-title="Pedido entregado" data-context-body="Tu pedido fue entregado correctamente. Gracias por comprar en NovaGo." data-context-cta-label="Volver al portal" data-context-cta-url="{% url 'users:portal_cliente' %}">
+                        <span class="p-step-dot"><i class="fas fa-house"></i></span>
+                        <span class="p-step-label">Entregado</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="progress-context" id="progressContext" role="status" aria-live="polite">
+                <h4 id="progressContextTitle">Detalle de estado</h4>
+                <p id="progressContextBody">Selecciona una etapa para ver su detalle contextual.</p>
+                <a id="progressContextCta" class="context-cta" href="{% url 'users:portal_cliente_pedidos' %}">Ver mis pedidos</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="confirm-layout">
+        <article class="confirm-card">
+            <h2 class="confirm-title"><i class="fas fa-receipt"></i> Resumen del pedido #{{ order.id }}</h2>
+            <span class="status-chip"><i class="fas fa-bolt"></i> <span id="orderStatusLabel">{{ order.get_estado_display }}</span></span>
+
+            <div class="meta-grid mt-3">
+                <div class="meta-item">
+                    <label>Fecha</label>
+                    <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Telefono</label>
+                    <strong>{{ order.telefono_contacto }}</strong>
+                </div>
+                <div class="meta-item full">
+                    <label>Direccion de entrega</label>
+                    <strong>{{ order.direccion_entrega }}</strong>
+                </div>
+            </div>
+
+            <h3 class="confirm-title mt-2"><i class="fas fa-basket-shopping"></i> Productos</h3>
+            <div class="items-list">
+                {% for item in order.items.all %}
+                <div class="item-row">
+                    <div>
+                        <strong>{{ item.producto.nombre }}</strong><br>
+                        <small class="note">x{{ item.cantidad }}</small>
+                    </div>
+                    <strong>S/. {{ item.subtotal|floatformat:2 }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="confirm-card">
+            <h2 class="confirm-title"><i class="fas fa-wallet"></i> Pago y totales</h2>
+
+            <div class="sum-list">
+                <div class="sum-row">
+                    <span>Subtotal</span>
+                    <strong>S/. {{ order.subtotal|floatformat:2 }}</strong>
+                </div>
+                <div class="sum-row">
+                    <span>Envio</span>
+                    <strong>S/. {{ order.costo_envio|floatformat:2 }}</strong>
+                </div>
+                <div class="sum-row total">
+                    <span><strong>Total</strong></span>
+                    <strong>S/. {{ order.total|floatformat:2 }}</strong>
+                </div>
+            </div>
+
+            {% if order.pago %}
+            <div class="meta-grid mt-3">
+                <div class="meta-item">
+                    <label>Metodo de pago</label>
+                    <strong>{{ order.pago.get_metodo_display }}</strong>
+                </div>
+                <div class="meta-item">
+                    <label>Estado de pago</label>
+                    <strong id="confirmPaymentStatus">{{ order.pago.get_estado_display }}</strong>
+                </div>
+            </div>
+            <div class="payment-ok">
+                <i class="fas fa-shield-check"></i> Registro de pago generado correctamente
+            </div>
+            {% endif %}
+
+            <p class="note">Recibiras actualizaciones de estado desde tu seccion de rastreo.</p>
+
+            <div class="confirm-actions">
+                <a class="btn-confirm primary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
+                    <i class="fas fa-location-crosshairs"></i> Rastrear pedido
+                </a>
+                <a class="btn-confirm" href="{% url 'users:portal_cliente_pedidos' %}">
+                    <i class="fas fa-clipboard-list"></i> Ver mis pedidos
+                </a>
+                <a class="btn-confirm" href="{% url 'users:portal_cliente' %}">
+                    <i class="fas fa-house"></i> Ir al portal
+                </a>
+            </div>
+        </article>
+    </section>
+</div>
+
+<aside class="app-toast" id="statusToast" role="status" aria-live="polite" aria-atomic="true">
+    <div class="toast-head">
+        <p class="toast-title" id="toastTitle"><i class="fas fa-bell"></i> Estado actualizado</p>
+        <button class="toast-close" id="toastClose" type="button" aria-label="Cerrar notificacion">×</button>
+    </div>
+    <p class="toast-body" id="toastBody">Tu pedido ha cambiado de estado.</p>
+</aside>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cards = document.querySelectorAll('.confirm-card .item-row');
+        const progressFill = document.querySelector('.progress-fill');
+        const stepButtons = document.querySelectorAll('.p-step-btn');
+        const contextTitle = document.getElementById('progressContextTitle');
+        const contextBody = document.getElementById('progressContextBody');
+        const contextCta = document.getElementById('progressContextCta');
+        const progressShell = document.getElementById('progressShell');
+        const percentLabel = document.getElementById('progressPercentLabel');
+        const orderStatusLabel = document.getElementById('orderStatusLabel');
+        const confirmPaymentStatus = document.getElementById('confirmPaymentStatus');
+        const syncPill = document.getElementById('syncPill');
+        const syncText = document.getElementById('syncText');
+        const toast = document.getElementById('statusToast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastBody = document.getElementById('toastBody');
+        const toastClose = document.getElementById('toastClose');
+        const orderKey = `novago-order-status-{{ order.id }}`;
+        const refreshUrl = progressShell ? progressShell.getAttribute('data-refresh-url') : null;
+        const orderId = progressShell ? progressShell.getAttribute('data-order-id') : null;
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = orderId ? `${wsProtocol}://${window.location.host}/ws/orders/${orderId}/status/` : null;
+        let orderSocket = null;
+        let reconnectTimer = null;
+        let reconnectAttempt = 0;
+        let toastTimer = null;
+
+        if (progressFill) {
+            const target = progressFill.getAttribute('data-progress') || '0';
+            requestAnimationFrame(() => {
+                progressFill.style.width = target + '%';
+            });
+        }
+
+        function stepContextByNumber(step, etaMinutes, trackingUrl, ordersUrl, detailUrl, portalUrl, isCancelled) {
+            if (isCancelled) {
+                return {
+                    title: 'Pedido cancelado',
+                    body: 'Este pedido fue cancelado. Puedes crear uno nuevo desde el portal.',
+                    ctaLabel: 'Ir al portal',
+                    ctaUrl: portalUrl,
+                };
+            }
+
+            if (step === 1) {
+                return {
+                    title: 'Pedido confirmado',
+                    body: 'Tu pedido fue recibido y validado por NovaGo. Estamos iniciando el flujo de preparacion.',
+                    ctaLabel: 'Ver mis pedidos',
+                    ctaUrl: ordersUrl,
+                };
+            }
+            if (step === 2) {
+                return {
+                    title: 'Pedido en preparacion',
+                    body: `Tu pedido esta siendo preparado. Tiempo estimado actual: ${etaMinutes} min.`,
+                    ctaLabel: 'Ver detalle de pedido',
+                    ctaUrl: detailUrl,
+                };
+            }
+            if (step === 3) {
+                return {
+                    title: 'Pedido en camino',
+                    body: 'Tu pedido ya va rumbo a tu direccion. Puedes abrir el rastreo en vivo para seguirlo en tiempo real.',
+                    ctaLabel: 'Abrir rastreo en vivo',
+                    ctaUrl: trackingUrl,
+                };
+            }
+            return {
+                title: 'Pedido entregado',
+                body: 'Tu pedido fue entregado correctamente. Gracias por comprar en NovaGo.',
+                ctaLabel: 'Volver al portal',
+                ctaUrl: portalUrl,
+            };
+        }
+
+        function selectStep(button) {
+            if (!button) return;
+
+            document.querySelectorAll('.p-step').forEach((step) => {
+                step.classList.remove('selected');
+            });
+
+            const parent = button.closest('.p-step');
+            if (parent) {
+                parent.classList.add('selected');
+            }
+
+            const title = button.getAttribute('data-context-title') || 'Detalle de estado';
+            const body = button.getAttribute('data-context-body') || 'Sin detalle disponible.';
+            const ctaLabel = button.getAttribute('data-context-cta-label') || '';
+            const ctaUrl = button.getAttribute('data-context-cta-url') || '';
+
+            if (contextTitle) contextTitle.textContent = title;
+            if (contextBody) contextBody.textContent = body;
+
+            if (contextCta) {
+                if (ctaLabel && ctaUrl) {
+                    contextCta.textContent = ctaLabel;
+                    contextCta.setAttribute('href', ctaUrl);
+                    contextCta.style.display = 'inline-flex';
+                } else {
+                    contextCta.style.display = 'none';
+                }
+            }
+        }
+
+        function paintSteps(progressStep, isCancelled) {
+            const allSteps = document.querySelectorAll('.p-step');
+            allSteps.forEach((stepNode) => {
+                const stepNumber = Number(stepNode.getAttribute('data-step') || '0');
+                stepNode.classList.remove('pending', 'done', 'current', 'cancelled');
+
+                if (isCancelled) {
+                    if (stepNumber === 1) {
+                        stepNode.classList.add('cancelled');
+                    } else {
+                        stepNode.classList.add('pending');
+                    }
+                    return;
+                }
+
+                if (progressStep === stepNumber) {
+                    stepNode.classList.add('current');
+                } else if (progressStep > stepNumber) {
+                    stepNode.classList.add('done');
+                } else {
+                    stepNode.classList.add('pending');
+                }
+            });
+        }
+
+        function setSyncState(ok, label) {
+            if (!syncPill || !syncText) return;
+            syncText.textContent = label;
+            if (ok) {
+                syncPill.classList.remove('error');
+            } else {
+                syncPill.classList.add('error');
+            }
+        }
+
+        function showStatusToast(previousLabel, currentLabel) {
+            if (!toast || !toastTitle || !toastBody) return;
+            toastTitle.innerHTML = '<i class="fas fa-bell"></i> Estado actualizado';
+            toastBody.textContent = `Tu pedido paso de "${previousLabel}" a "${currentLabel}".`;
+
+            toast.classList.add('show');
+            if (toastTimer) {
+                clearTimeout(toastTimer);
+            }
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4200);
+        }
+
+        function updateStoredState(data) {
+            if (!data || !data.estado) return;
+
+            const lastRaw = sessionStorage.getItem(orderKey);
+            const lastState = lastRaw ? JSON.parse(lastRaw) : null;
+            const currentState = {
+                estado: data.estado,
+                estado_display: data.estado_display,
+            };
+
+            if (lastState && lastState.estado !== currentState.estado) {
+                showStatusToast(lastState.estado_display || 'Estado anterior', currentState.estado_display || 'Nuevo estado');
+            }
+
+            sessionStorage.setItem(orderKey, JSON.stringify(currentState));
+        }
+
+        function applyStatusData(data) {
+            if (!data) return;
+
+            const isCancelled = data.estado === 'cancelado';
+
+            updateStoredState(data);
+
+            if (orderStatusLabel) {
+                orderStatusLabel.textContent = data.estado_display || 'Actualizando...';
+            }
+
+            if (confirmPaymentStatus && data.payment_status_display) {
+                confirmPaymentStatus.textContent = data.payment_status_display;
+            }
+
+            if (percentLabel) {
+                percentLabel.textContent = isCancelled ? 'Pedido cancelado' : `${data.progress_percent}% completado`;
+            }
+
+            if (progressFill) {
+                progressFill.setAttribute('data-progress', String(data.progress_percent || 0));
+                progressFill.style.width = `${data.progress_percent || 0}%`;
+            }
+
+            paintSteps(Number(data.progress_step || 1), isCancelled);
+
+            stepButtons.forEach((button) => {
+                const stepNode = button.closest('.p-step');
+                const stepNumber = Number(stepNode?.getAttribute('data-step') || '0');
+                const context = stepContextByNumber(
+                    stepNumber,
+                    Number(data.eta_minutes || 20),
+                    data.tracking_url || '#',
+                    data.orders_url || '#',
+                    data.detail_url || '#',
+                    data.portal_url || '#',
+                    isCancelled
+                );
+                button.setAttribute('data-context-title', context.title);
+                button.setAttribute('data-context-body', context.body);
+                button.setAttribute('data-context-cta-label', context.ctaLabel);
+                button.setAttribute('data-context-cta-url', context.ctaUrl);
+            });
+
+            const selectedButton = document.querySelector('.p-step.selected .p-step-btn');
+            const fallbackButton = document.querySelector('.p-step.current .p-step-btn') || document.querySelector('.p-step.done .p-step-btn');
+            selectStep(selectedButton || fallbackButton || stepButtons[0]);
+        }
+
+        async function refreshProgress() {
+            if (!progressShell || !refreshUrl || document.hidden) return;
+            if (!refreshUrl) return;
+
+            try {
+                const response = await fetch(refreshUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Refresh failed');
+                }
+
+                const data = await response.json();
+                applyStatusData(data);
+                setSyncState(true, orderSocket && orderSocket.readyState === WebSocket.OPEN
+                    ? 'En vivo por WebSocket · respaldo 12s'
+                    : 'Actualizado hace instantes · cada 12s');
+            } catch (err) {
+                setSyncState(false, 'Sincronizacion temporalmente inactiva');
+            }
+        }
+
+        function scheduleReconnect() {
+            if (!wsUrl || reconnectTimer) return;
+            reconnectAttempt += 1;
+            const delay = Math.min(2000 * reconnectAttempt, 10000);
+            reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                connectSocket();
+            }, delay);
+        }
+
+        function connectSocket() {
+            if (!wsUrl) return;
+            if (orderSocket && (orderSocket.readyState === WebSocket.OPEN || orderSocket.readyState === WebSocket.CONNECTING)) {
+                return;
+            }
+
+            try {
+                orderSocket = new WebSocket(wsUrl);
+            } catch (error) {
+                scheduleReconnect();
+                return;
+            }
+
+            orderSocket.addEventListener('open', () => {
+                reconnectAttempt = 0;
+                setSyncState(true, 'En vivo por WebSocket');
+                orderSocket.send(JSON.stringify({ type: 'order.request_snapshot' }));
+            });
+
+            orderSocket.addEventListener('message', (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    if (message.type !== 'order.status') return;
+                    applyStatusData(message.payload || {});
+                } catch (error) {
+                    console.debug('WebSocket parse error:', error);
+                }
+            });
+
+            orderSocket.addEventListener('close', () => {
+                setSyncState(false, 'Reconectando canal en vivo...');
+                scheduleReconnect();
+            });
+
+            orderSocket.addEventListener('error', () => {
+                setSyncState(false, 'Canal en vivo con problemas, usando respaldo');
+                if (orderSocket) {
+                    orderSocket.close();
+                }
+            });
+        }
+
+        stepButtons.forEach((button) => {
+            button.addEventListener('click', () => selectStep(button));
+        });
+
+        const currentBtn = document.querySelector('.p-step.current .p-step-btn');
+        const doneBtn = document.querySelector('.p-step.done .p-step-btn');
+        selectStep(currentBtn || doneBtn || stepButtons[0]);
+        setSyncState(true, 'Actualizado hace instantes · cada 12s');
+
+        if (!sessionStorage.getItem(orderKey)) {
+            sessionStorage.setItem(orderKey, JSON.stringify({
+                estado: '{{ order.estado }}',
+                estado_display: '{{ order.get_estado_display|escapejs }}',
+            }));
+        }
+
+        if (toastClose && toast) {
+            toastClose.addEventListener('click', () => {
+                toast.classList.remove('show');
+                if (toastTimer) {
+                    clearTimeout(toastTimer);
+                    toastTimer = null;
+                }
+            });
+        }
+
+        connectSocket();
+        refreshProgress();
+        const pollInterval = setInterval(refreshProgress, 12000);
+
+        window.addEventListener('beforeunload', () => {
+            clearInterval(pollInterval);
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+            }
+            if (orderSocket && orderSocket.readyState === WebSocket.OPEN) {
+                orderSocket.close();
+            }
+        });
+
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(6px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 240ms ease, transform 240ms ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 80 + (index * 45));
+        });
+    });
+</script>
+{% endblock %}

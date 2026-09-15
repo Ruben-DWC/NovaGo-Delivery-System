@@ -1,0 +1,482 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .admin-layout {
+        display: flex;
+        align-items: stretch;
+        min-height: calc(100vh - 80px);
+        gap: 0;
+        background: var(--bg);
+    }
+
+    .admin-sidebar {
+        width: 304px !important;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 247, 255, 0.98));
+        border-right: 1px solid var(--line) !important;
+        padding: 1.1rem 0.95rem 1rem !important;
+        overflow-y: auto !important;
+        flex-shrink: 0 !important;
+        position: sticky !important;
+        top: 80px !important;
+        height: calc(100vh - 80px) !important;
+        box-shadow: 18px 0 36px -34px rgba(15, 23, 42, 0.55) !important;
+    }
+
+    html[data-theme='dark'] .admin-sidebar {
+        background: linear-gradient(180deg, rgba(10, 17, 32, 0.98), rgba(8, 13, 24, 0.995));
+        border-color: rgba(148, 163, 184, 0.16);
+        box-shadow: 18px 0 36px -34px rgba(0, 0, 0, 0.85);
+    }
+
+    .admin-sidebar-shell {
+        display: grid !important;
+        gap: 0.9rem !important;
+        min-height: 100% !important;
+    }
+
+    .admin-sidebar-brand {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.75rem !important;
+        padding: 0.9rem 0.95rem !important;
+        border-radius: 18px !important;
+        border: 1px solid rgba(148, 163, 184, 0.14) !important;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(249, 115, 22, 0.10));
+    }
+
+    html[data-theme='dark'] .admin-sidebar-brand {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(249, 115, 22, 0.12));
+        border-color: rgba(148, 163, 184, 0.16);
+    }
+
+    .admin-sidebar-brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        box-shadow: 0 14px 22px -18px rgba(234, 88, 12, 0.75);
+        flex-shrink: 0;
+    }
+
+    .admin-sidebar-brand-text {
+        min-width: 0;
+    }
+
+    .admin-sidebar-brand-text h2 {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.1;
+        color: var(--text);
+    }
+
+    .admin-sidebar-brand-text p {
+        margin: 0.18rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.78rem;
+    }
+
+    .admin-user-card {
+        display: grid !important;
+        grid-template-columns: auto 1fr !important;
+        gap: 0.75rem !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0.95rem !important;
+        border-radius: 20px !important;
+        border: 1px solid var(--line) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 249, 255, 0.98));
+        box-shadow: 0 16px 28px -28px rgba(15, 23, 42, 0.45) !important;
+    }
+
+    .admin-user-avatar {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .admin-user-avatar-fallback {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+        border: 2px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .admin-user-main {
+        min-width: 0;
+    }
+
+    .admin-user-name {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.95rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .admin-user-role {
+        margin: 0.2rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-weight: 700;
+    }
+
+    .admin-user-badges {
+        margin-top: 0.55rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .admin-user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.26rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        color: #2563eb;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    html[data-theme='dark'] .admin-user-chip {
+        background: rgba(59, 130, 246, 0.16);
+        border-color: rgba(96, 165, 250, 0.24);
+        color: #bfdbfe;
+    }
+
+    html[data-theme='dark'] .admin-user-card {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.58));
+        border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme='dark'] .admin-user-name {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .admin-user-role {
+        color: #94a3b8;
+    }
+
+    .admin-nav-group {
+        margin-bottom: 0.2rem !important;
+        padding: 0.8rem !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(148, 163, 184, 0.12) !important;
+        background: rgba(255, 255, 255, 0.66);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .admin-nav-group::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.9), rgba(249, 115, 22, 0.82));
+        opacity: 0.7;
+    }
+
+    html[data-theme='dark'] .admin-nav-group {
+        background: rgba(15, 23, 42, 0.42);
+        border-color: rgba(148, 163, 184, 0.12);
+    }
+
+    .admin-nav-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+        margin: 0 0 0.7rem;
+        padding: 0 0.25rem;
+    }
+
+    .admin-nav-stack {
+        display: grid !important;
+        gap: 0.5rem !important;
+    }
+
+    .admin-nav-list {
+        display: grid !important;
+        gap: 0.5rem !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+
+    .admin-nav-item {
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+
+    .admin-nav-link {
+        display: grid !important;
+        grid-template-columns: 18px 1fr !important;
+        align-items: center !important;
+        gap: 0.7rem !important;
+        padding: 0.82rem 0.95rem !important;
+        color: var(--text-secondary, #667799);
+        text-decoration: none !important;
+        border-radius: 16px !important;
+        transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
+        font-weight: 700 !important;
+        background: transparent !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    .admin-nav-link::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(120deg, rgba(59, 130, 246, 0.10), rgba(249, 115, 22, 0.08));
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .admin-nav-link:hover::before,
+    .admin-nav-link.active::before {
+        opacity: 1;
+    }
+
+    .admin-nav-link > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-nav-link:hover {
+        background: rgba(59, 130, 246, 0.08);
+        color: var(--brand);
+        transform: translateX(3px);
+    }
+
+    html[data-theme='dark'] .admin-nav-link:hover {
+        background: rgba(59, 130, 246, 0.14);
+    }
+
+    .admin-nav-link.active {
+        background: linear-gradient(120deg, var(--brand), #2563eb);
+        color: white !important;
+        box-shadow: 0 16px 28px -20px rgba(37, 99, 235, 0.85) !important;
+    }
+
+    .admin-nav-link i {
+        width: 18px;
+        text-align: center;
+    }
+
+    .admin-main {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        background:
+            radial-gradient(circle at 8% 8%, rgba(59, 130, 246, 0.06), transparent 28%),
+            radial-gradient(circle at 92% 6%, rgba(249, 115, 22, 0.06), transparent 24%),
+            var(--bg);
+    }
+    
+        .admin-main .container,
+        .admin-main .container-fluid {
+            max-width: none;
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+    .admin-main > * {
+        min-width: 0;
+    }
+
+    .admin-sidebar .admin-nav-link[href*='#'] {
+        color: var(--text-secondary, #667799);
+    }
+
+    .admin-sidebar .admin-nav-link[href*='#']:hover {
+        color: var(--brand);
+    }
+
+    /* Responsive */
+    @media (max-width: 912px) {
+        .admin-sidebar {
+            width: 280px;
+            padding: 1rem 0.75rem;
+        }
+
+        .admin-nav-link {
+            padding: 0.7rem 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-layout {
+            flex-direction: column;
+        }
+
+        .admin-sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid var(--line);
+            padding: 0.95rem;
+            position: static;
+            height: auto;
+            overflow: visible;
+        }
+
+        .admin-sidebar-shell {
+            gap: 0.85rem;
+        }
+
+        .admin-nav-group {
+            padding: 0.7rem;
+        }
+
+        .admin-nav-title {
+            display: block;
+        }
+
+        .admin-nav-link {
+            padding: 0.72rem 0.85rem;
+        }
+
+        .admin-main {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar de Admin -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-shell">
+            <div class="admin-sidebar-brand">
+                <div class="admin-sidebar-brand-mark"><i class="fas fa-shield-halved"></i></div>
+                <div class="admin-sidebar-brand-text">
+                    <h2>Panel Ejecutivo</h2>
+                    <p>Gestión centralizada de NovaGo</p>
+                </div>
+            </div>
+
+            <div class="admin-user-card">
+                {% if user.foto_perfil %}
+                <img src="{{ user.foto_perfil.url }}" alt="Avatar" class="admin-user-avatar">
+                {% else %}
+                <span class="admin-user-avatar-fallback">{{ user.username|first|upper }}</span>
+                {% endif %}
+                <div class="admin-user-main">
+                    <p class="admin-user-name">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="admin-user-role">{{ user.get_role_display }}</p>
+                    <div class="admin-user-badges">
+                        <span class="admin-user-chip"><i class="fas fa-circle"></i> Activo</span>
+                        <span class="admin-user-chip"><i class="fas fa-user-shield"></i> Admin</span>
+                        {% if user.last_login %}
+                        <span class="admin-user-chip"><i class="fas fa-clock"></i> {{ user.last_login|date:'d/m H:i' }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-nav-stack">
+                <div class="admin-nav-group">
+                    <h4 class="admin-nav-title">Principal</h4>
+                    <div class="admin-nav-list">
+                        <a href="{% url 'users:portal_admin' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'portal_admin' %}active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h4 class="admin-nav-title">Operativa</h4>
+                    <div class="admin-nav-list">
+                        <a href="{% url 'users:admin_users' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' %}active{% endif %}"><i class="fas fa-users"></i> Usuarios</a>
+                        <a href="{% url 'users:admin_clients' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_clients' %}active{% endif %}"><i class="fas fa-user-group"></i> Clientes</a>
+                        <a href="{% url 'users:admin_employees' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_employees' %}active{% endif %}"><i class="fas fa-user-tie"></i> Empleados</a>
+                        <a href="{% url 'users:admin_roles' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_roles' %}active{% endif %}"><i class="fas fa-shield-halved"></i> Roles</a>
+                        <a href="{% url 'users:admin_orders' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Órdenes</a>
+                        <a href="{% url 'users:admin_payments' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}"><i class="fas fa-credit-card"></i> Pagos</a>
+                        <a href="{% url 'users:admin_audit_logs' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_audit_logs' %}active{% endif %}"><i class="fas fa-file-alt"></i> Bitácora</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h4 class="admin-nav-title">Catálogo</h4>
+                    <div class="admin-nav-list">
+                        <a href="{% url 'users:admin_products' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' %}active{% endif %}"><i class="fas fa-box"></i> Productos</a>
+                        <a href="{% url 'users:admin_categories' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' %}active{% endif %}"><i class="fas fa-list"></i> Categorías</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h4 class="admin-nav-title">Analytics</h4>
+                    <div class="admin-nav-list">
+                        <a href="{% url 'users:admin_reports' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}"><i class="fas fa-chart-bar"></i> Reportes</a>
+                        <a href="{% url 'users:admin_income' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_income' %}active{% endif %}"><i class="fas fa-dollar-sign"></i> Ingresos</a>
+                        <a href="{% url 'users:admin_performance' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_performance' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Performance</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h4 class="admin-nav-title">Sistema</h4>
+                    <div class="admin-nav-list">
+                        <a href="{% url 'users:profile_edit' %}" class="admin-nav-link"><i class="fas fa-cog"></i> Configuración</a>
+                        <a href="{% url 'users:admin_export_dashboard' %}?format=csv" class="admin-nav-link"><i class="fas fa-file-csv"></i> Exportar dashboard</a>
+                        <a href="{% url 'users:admin_audit_logs' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_audit_logs' %}active{% endif %}"><i class="fas fa-history"></i> Revisar bitácora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        {% block admin_content %}
+        <!-- El contenido específico va aquí -->
+        {% endblock %}
+    </main>
+</div>
+
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navbar {
+        flex-shrink: 0;
+    }
+
+    .admin-layout {
+        flex: 1;
+    }
+
+    @media (max-width: 768px) {
+        .admin-layout {
+            min-height: 0;
+        }
+    }
+</style>
+{% endblock %}

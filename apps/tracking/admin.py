@@ -1,3 +1,10 @@
 from django.contrib import admin
+from .models import UbicacionTracking, RutaEntrega
 
-# Register your models here.
+@admin.register(UbicacionTracking)
+class UbicacionTrackingAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(RutaEntrega)
+class RutaEntregaAdmin(admin.ModelAdmin):
+    pass

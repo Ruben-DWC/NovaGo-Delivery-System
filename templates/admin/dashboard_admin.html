@@ -1,0 +1,754 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard Admin - NovaGo{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .admin-dashboard {
+        padding: 2rem;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.95;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
+    }
+
+    .section {
+        background: #0f3460;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #ff6b35;
+        border-bottom: 2px solid #ff6b35;
+        padding-bottom: 0.5rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    thead {
+        background: #1a1a2e;
+        color: #ff6b35;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+
+    th {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid #ff6b35;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid #2d3561;
+    }
+
+    tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background-color: #1a2a4a;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .badge-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .badge-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .badge-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .motorizado-card {
+        background: #1a2a4a;
+        border-left: 4px solid #ff6b35;
+        padding: 1.5rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.3s ease;
+    }
+
+    .motorizado-card:hover {
+        transform: translateX(5px);
+    }
+
+    .motorizado-info h4 {
+        margin: 0 0 0.5rem 0;
+        color: #ff6b35;
+    }
+
+    .motorizado-info p {
+        margin: 0.3rem 0;
+        font-size: 0.9rem;
+        color: #aaa;
+    }
+
+    .motorizado-stats {
+        text-align: right;
+    }
+
+    .motorizado-stats div {
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-num {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .stat-label-small {
+        font-size: 0.75rem;
+        color: #aaa;
+        text-transform: uppercase;
+    }
+
+    .action-button {
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.3s ease;
+        margin: 0.25rem;
+    }
+
+    .action-button:hover {
+        background: #e55a25;
+    }
+
+    .action-button.secondary {
+        background: #6c757d;
+    }
+
+    .action-button.secondary:hover {
+        background: #5a636a;
+    }
+
+    #map {
+        width: 100%;
+        height: 500px;
+        border-radius: 10px;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #aaa;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .dashboard-main-title {
+        margin-bottom: 2rem;
+        color: #ff6b35;
+    }
+
+    .moto-assigned {
+        color: #88dd00;
+    }
+
+    .moto-unassigned {
+        color: #ff6b35;
+    }
+
+    .dot-active {
+        color: #88dd00;
+    }
+
+    .dot-inactive {
+        color: #888;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+    }
+
+    .stats-group-spacing {
+        margin-top: 0.8rem;
+    }
+
+    .reasignar-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 1000;
+        flex-direction: center;
+        align-items: center;
+    }
+
+    .reasignar-modal-content {
+        background: #1a1a2e;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .reasignar-title {
+        color: #ff6b35;
+        margin-bottom: 1.5rem;
+    }
+
+    .reasignar-group {
+        margin-bottom: 1rem;
+    }
+
+    .reasignar-label {
+        display: block;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .reasignar-select {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 1px solid #ff6b35;
+    }
+
+    .reasignar-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .action-flex {
+        flex: 1;
+    }
+
+    @media (max-width: 768px) {
+        .admin-dashboard {
+            padding: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .motorizado-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .motorizado-stats {
+            text-align: left;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-dashboard">
+    <h1 class="dashboard-main-title">
+        <i class="fas fa-chart-line"></i> Dashboard de Control - NovaGo
+    </h1>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Pedidos Hoy</div>
+            <div class="stat-value">{{ stats.total_pedidos_hoy }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Entregados</div>
+            <div class="stat-value">{{ stats.pedidos_entregado }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🚗</div>
+            <div class="stat-label">En Camino</div>
+            <div class="stat-value">{{ stats.pedidos_en_camino }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-label">Pendientes Asignación</div>
+            <div class="stat-value">{{ stats.pedidos_pendientes_asignacion }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🏍️</div>
+            <div class="stat-label">Motorizados Activos</div>
+            <div class="stat-value">{{ stats.motorizados_activos }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">💵</div>
+            <div class="stat-label">Ingresos Hoy</div>
+            <div class="stat-value">S/. {{ stats.ingresos_hoy|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- TABLA DE PEDIDOS -->
+    <div class="section">
+        <h2 class="section-title">
+            <i class="fas fa-list"></i> Últimos Pedidos
+        </h2>
+
+        <button class="action-button" onclick="ejecutarAsignacionAutomatica()">
+            <i class="fas fa-magic"></i> Ejecutar Asignación Automática
+        </button>
+
+        {% if pedidos %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Motorizado</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td><strong>#{{ pedido.id }}</strong></td>
+                        <td>{{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</td>
+                        <td>
+                            {% if pedido.motorizado %}
+                            <span class="moto-assigned">{{ pedido.motorizado.get_full_name|default:pedido.motorizado.username }}</span>
+                            {% else %}
+                            <span class="moto-unassigned">SIN ASIGNAR</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pedido.estado == 'entregado' %}
+                            <span class="badge badge-success">{{ pedido.get_estado_display }}</span>
+                            {% elif pedido.estado == 'en_camino' %}
+                            <span class="badge badge-warning">{{ pedido.get_estado_display }}</span>
+                            {% elif pedido.estado == 'pendiente_asignacion' %}
+                            <span class="badge badge-danger">{{ pedido.get_estado_display }}</span>
+                            {% elif pedido.estado == 'cancelado' %}
+                            <span class="badge badge-secondary">{{ pedido.get_estado_display }}</span>
+                            {% else %}
+                            <span class="badge badge-info">{{ pedido.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>S/. {{ pedido.total|floatformat:2 }}</strong></td>
+                        <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'orders:order_detail' pedido.id %}" class="action-button secondary">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                            {% if pedido.estado == 'pendiente_asignacion' %}
+                            <button class="action-button btn-reasignar" data-pedido-id="{{ pedido.id }}">
+                                <i class="fas fa-exchange-alt"></i> Asignar
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            No hay pedidos registrados
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- MOTORIZADOS ACTIVOS -->
+    <div class="section">
+        <h2 class="section-title">
+            <i class="fas fa-motorcycle"></i> Motorizados
+        </h2>
+
+        {% if motorizados %}
+        {% for moto in motorizados %}
+        <div class="motorizado-card">
+            <div class="motorizado-info">
+                <h4>
+                    {% if moto.jornada_activa %}
+                    <span class="dot-active">●</span>
+                    {% else %}
+                    <span class="dot-inactive">●</span>
+                    {% endif %}
+                    {{ moto.usuario.get_full_name|default:moto.usuario.username }}
+                </h4>
+                <p><strong>Placa:</strong> {{ moto.placa_vehiculo }}</p>
+                <p><strong>Vehículo:</strong> {{ moto.tipo_vehiculo }}</p>
+                <p>
+                    <strong>Calificación:</strong>
+                    <span class="rating-stars">⭐ {{ moto.calificacion }}</span>
+                </p>
+            </div>
+            <div class="motorizado-stats">
+                <div>
+                    <div class="stat-num">{{ moto.pedidos_hoy }}</div>
+                    <div class="stat-label-small">Pedidos Hoy</div>
+                </div>
+                <div class="stats-group-spacing">
+                    <div class="stat-num">{{ moto.entregas_hoy }}</div>
+                    <div class="stat-label-small">Entregas Completadas</div>
+                </div>
+                <div class="stats-group-spacing">
+                    <div class="stat-num">{{ moto.entregas_completadas }}</div>
+                    <div class="stat-label-small">Entregas Totales</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👻</div>
+            No hay motorizados registrados
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- MAPA DE UBICACIONES -->
+    <div class="section">
+        <h2 class="section-title">
+            <i class="fas fa-map-marker-alt"></i> Ubicación en Vivo de Motorizados
+        </h2>
+        <div id="map"></div>
+    </div>
+</div>
+
+<!-- Modal Reasignar -->
+<div id="reasignarModal" class="reasignar-modal">
+    <div class="reasignar-modal-content">
+        <h3 class="reasignar-title">Reasignar Pedido</h3>
+        <form id="reasignarForm">
+            {% csrf_token %}
+            <input type="hidden" id="pedidoId" value="">
+            <div class="reasignar-group">
+                <label for="motorizadoSelect" class="reasignar-label">
+                    <strong>Selecciona un motorizado:</strong>
+                </label>
+                <select id="motorizadoSelect" class="reasignar-select">
+                    <option value="">Cargando...</option>
+                </select>
+            </div>
+            <div class="reasignar-actions">
+                <button type="submit" class="action-button action-flex">
+                    <i class="fas fa-check"></i> Reasignar
+                </button>
+                <button type="button" class="action-button secondary action-flex" onclick="cerrarReasignarModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Leaflet para el mapa -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+    // Inicializar mapa
+    function inicializarMapa() {
+        const map = L.map('map').setView([-12.0262, -76.9212], 13);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CartoDB',
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Agregar marcadores de motorizados
+        const motorizadoLocations = JSON.parse('{{ motorizado_locations|safe|escapejs }}');
+        motorizadoLocations.forEach(moto => {
+            L.circleMarker([moto.lat, moto.lng], {
+                radius: 8,
+                fillColor: '#ff6b35',
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).bindPopup(`
+                <strong>${moto.nombre}</strong><br>
+                Placa: ${moto.placa}<br>
+                ⭐ ${moto.calificacion}
+            `).addTo(map);
+        });
+    }
+
+    // Modal Reasignar
+    function abrirReasignarModal(pedidoId) {
+        document.getElementById('pedidoId').value = pedidoId;
+        document.getElementById('reasignarModal').style.display = 'flex';
+        cargarMotorizados();
+    }
+
+    function cerrarReasignarModal() {
+        document.getElementById('reasignarModal').style.display = 'none';
+    }
+
+    function cargarMotorizados() {
+        // Cargar lista de motorizados desde servidor
+        // Por ahora, es un placeholder
+        const select = document.getElementById('motorizadoSelect');
+        select.innerHTML = '<option value="">Selecciona un motorizado...</option>';
+    }
+
+    // Reasignar pedido
+    document.getElementById('reasignarForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pedidoId = document.getElementById('pedidoId').value;
+        const motorizadoId = document.getElementById('motorizadoSelect').value;
+        
+        if (!motorizadoId) {
+            alert('Selecciona un motorizado');
+            return;
+        }
+
+        fetch('{% url "orders:admin_reasignar" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: `pedido_id=${pedidoId}&motorizado_id=${motorizadoId}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                alert('Pedido reasignado correctamente');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    });
+
+    // Ejecutar asignación automática
+    function ejecutarAsignacionAutomatica() {
+        if (!confirm('¿Ejecutar asignación automática de pedidos pendientes?')) return;
+        
+        fetch('{% url "orders:admin_asignacion_automatica" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(`✓ ${data.asignados} pedidos asignados\n⏳ ${data.pendientes} totales pendientes`);
+            location.reload();
+        });
+    }
+
+    // Inicializar al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        inicializarMapa();
+        
+        // Event listeners para botones reasignar
+        const botonesReasignar = document.querySelectorAll('.btn-reasignar');
+        botonesReasignar.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pedidoId = this.getAttribute('data-pedido-id');
+                abrirReasignarModal(pedidoId);
+            });
+        });
+        
+        // Event listener para modal cerrar
+        document.getElementById('reasignarModal').addEventListener('click', function(e) {
+            if (e.target === this) cerrarReasignarModal();
+        });
+    });
+</script>
+
+<style>
+    .admin-dashboard {
+        padding: 1.3rem;
+        background:
+            radial-gradient(circle at 10% 6%, rgba(14, 165, 233, 0.08), transparent 32%),
+            radial-gradient(circle at 90% 92%, rgba(249, 115, 22, 0.08), transparent 30%),
+            var(--bg);
+        min-height: 100%;
+        color: var(--text);
+    }
+
+    html[data-theme='dark'] .admin-dashboard {
+        background:
+            radial-gradient(circle at 10% 6%, rgba(14, 165, 233, 0.12), transparent 32%),
+            radial-gradient(circle at 90% 92%, rgba(249, 115, 22, 0.1), transparent 30%),
+            var(--bg);
+    }
+
+    .admin-dashboard .section,
+    .admin-dashboard .stat-card,
+    .admin-dashboard .reasignar-modal-content {
+        border: 1px solid var(--line);
+        background: var(--bg-secondary, #f5f9ff);
+        box-shadow: 0 18px 36px -32px rgba(15, 23, 42, 0.5);
+    }
+
+    html[data-theme='dark'] .admin-dashboard .section,
+    html[data-theme='dark'] .admin-dashboard .stat-card,
+    html[data-theme='dark'] .admin-dashboard .reasignar-modal-content {
+        background: rgba(15, 23, 42, 0.64);
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    .admin-dashboard .section-title,
+    .admin-dashboard .dashboard-main-title,
+    .admin-dashboard .motorizado-info h4,
+    .admin-dashboard .reasignar-title {
+        color: var(--brand);
+    }
+
+    .admin-dashboard thead {
+        background: var(--bg);
+        color: var(--brand);
+    }
+
+    .admin-dashboard th,
+    .admin-dashboard td,
+    .admin-dashboard .motorizado-info p,
+    .admin-dashboard .stat-label-small,
+    .admin-dashboard .empty-state,
+    .admin-dashboard .reasignar-label {
+        color: var(--text-secondary, #667799);
+    }
+
+    .admin-dashboard tbody tr:hover {
+        background: rgba(14, 165, 233, 0.05);
+    }
+
+    html[data-theme='dark'] .admin-dashboard tbody tr:hover {
+        background: rgba(148, 163, 184, 0.08);
+    }
+
+    .admin-dashboard .action-button {
+        background: linear-gradient(120deg, #f97316, #ea580c);
+        color: #fff;
+    }
+
+    .admin-dashboard .action-button.secondary {
+        background: var(--text-secondary, #667799);
+    }
+
+    .admin-dashboard .badge-success { background: rgba(34, 197, 94, 0.18); color: #166534; }
+    .admin-dashboard .badge-warning { background: rgba(245, 158, 11, 0.18); color: #b45309; }
+    .admin-dashboard .badge-danger { background: rgba(239, 68, 68, 0.18); color: #b91c1c; }
+    .admin-dashboard .badge-info { background: rgba(59, 130, 246, 0.18); color: #1d4ed8; }
+    .admin-dashboard .badge-secondary { background: rgba(100, 116, 139, 0.18); color: #475569; }
+
+    html[data-theme='dark'] .admin-dashboard .badge-success { background: rgba(34, 197, 94, 0.22); color: #86efac; }
+    html[data-theme='dark'] .admin-dashboard .badge-warning { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+    html[data-theme='dark'] .admin-dashboard .badge-danger { background: rgba(239, 68, 68, 0.22); color: #fca5a5; }
+    html[data-theme='dark'] .admin-dashboard .badge-info { background: rgba(59, 130, 246, 0.22); color: #93c5fd; }
+    html[data-theme='dark'] .admin-dashboard .badge-secondary { background: rgba(100, 116, 139, 0.24); color: #cbd5e1; }
+
+    .admin-dashboard #map {
+        border: 1px solid var(--line);
+    }
+</style>
+{% endblock %}

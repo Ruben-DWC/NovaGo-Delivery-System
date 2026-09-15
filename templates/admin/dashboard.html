@@ -1,0 +1,334 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Panel Ejecutivo - NovaGo{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .admin-dashboard {
+        padding: 1.35rem;
+        background:
+            radial-gradient(circle at 8% 6%, rgba(14, 165, 233, 0.11), transparent 35%),
+            radial-gradient(circle at 90% 92%, rgba(249, 115, 22, 0.11), transparent 32%),
+            var(--bg);
+        min-height: 100%;
+    }
+
+    .admin-dashboard section[id] {
+        scroll-margin-top: 104px;
+    }
+
+    .exec-header {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1rem 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.9rem;
+        align-items: center;
+        flex-wrap: wrap;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(245, 249, 255, 0.92));
+        margin-bottom: 1rem;
+    }
+
+    html[data-theme='dark'] .exec-header {
+        background: linear-gradient(120deg, rgba(15, 23, 42, 0.88), rgba(8, 15, 30, 0.92));
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    .exec-title h1 {
+        margin: 0;
+        color: var(--text);
+        font-size: 1.5rem;
+    }
+
+    .exec-title p {
+        margin: 0.26rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.9rem;
+    }
+
+    .exec-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .exec-btn {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 0.48rem 0.72rem;
+        font-weight: 700;
+        font-size: 0.83rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .exec-btn.primary {
+        background: linear-gradient(120deg, #f97316, #ea580c);
+        color: #fff;
+        border-color: rgba(249, 115, 22, 0.5);
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.72rem;
+        margin-bottom: 1rem;
+    }
+
+    .kpi-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0.85rem;
+        background: var(--bg-secondary, #f5f9ff);
+    }
+
+    html[data-theme='dark'] .kpi-card {
+        background: rgba(15, 23, 42, 0.64);
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    .kpi-label {
+        display: block;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-weight: 700;
+        font-size: 0.72rem;
+    }
+
+    .kpi-value {
+        margin-top: 0.32rem;
+        color: var(--text);
+        font-size: 1.3rem;
+        font-weight: 800;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 0.72rem;
+        margin-bottom: 1rem;
+    }
+
+    .route-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.72rem;
+        margin-bottom: 1rem;
+    }
+
+    .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f5f9ff);
+        padding: 0.85rem;
+    }
+
+    html[data-theme='dark'] .card {
+        background: rgba(15, 23, 42, 0.64);
+        border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    .card h3 {
+        margin: 0 0 0.7rem;
+        color: var(--text);
+        font-size: 0.98rem;
+    }
+
+    .route-card {
+        display: grid;
+        gap: 0.55rem;
+        min-height: 100%;
+    }
+
+    .route-card p {
+        margin: 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.86rem;
+    }
+
+    .route-card a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        width: fit-content;
+        padding: 0.48rem 0.72rem;
+        border-radius: 10px;
+        background: linear-gradient(120deg, #f97316, #ea580c);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        text-align: left;
+        padding: 0.58rem 0.4rem;
+        border-bottom: 1px solid var(--line);
+        color: var(--text);
+        font-size: 0.83rem;
+    }
+
+    .table th {
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-size: 0.69rem;
+    }
+
+    .status-pill {
+        border-radius: 999px;
+        padding: 0.22rem 0.5rem;
+        font-weight: 700;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+
+    .status-entregado { background: rgba(34, 197, 94, 0.18); color: #166534; }
+    .status-en_camino { background: rgba(16, 185, 129, 0.18); color: #047857; }
+    .status-en_preparacion { background: rgba(245, 158, 11, 0.17); color: #b45309; }
+    .status-confirmado,
+    .status-pendiente_asignacion { background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+    .status-cancelado { background: rgba(239, 68, 68, 0.17); color: #b91c1c; }
+
+    .mini-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .mini-item {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.55rem 0.6rem;
+    }
+
+    .mini-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.84rem;
+        font-weight: 700;
+    }
+
+    .mini-meta {
+        margin: 0.18rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.75rem;
+    }
+
+    .top-products-title {
+        margin-top: 0.9rem;
+    }
+
+    @media (max-width: 992px) {
+        .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .analytics-grid,
+        .route-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 576px) {
+        .kpi-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-dashboard">
+    <section class="exec-header" id="reportes">
+        <div class="exec-title">
+            <h1><i class="fas fa-chart-pie"></i> Centro de Control Administrativo</h1>
+            <p>Monitoreo operativo, financiero y comercial en tiempo real para NovaGo.</p>
+        </div>
+        <div class="exec-actions">
+            <a href="{% url 'users:admin_products' %}" class="exec-btn primary"><i class="fas fa-box"></i> Gestionar Productos</a>
+            <a href="{% url 'users:admin_categories' %}" class="exec-btn"><i class="fas fa-layer-group"></i> Categorías</a>
+            <a href="{% url 'users:admin_users' %}" class="exec-btn"><i class="fas fa-users-cog"></i> Usuarios</a>
+            <a href="{% url 'users:admin_orders' %}" class="exec-btn"><i class="fas fa-clipboard-check"></i> Pedidos</a>
+            <a href="{% url 'users:admin_export_dashboard' %}?format=csv" class="exec-btn"><i class="fas fa-file-csv"></i> CSV</a>
+            <a href="{% url 'users:admin_export_dashboard' %}?format=xlsx" class="exec-btn"><i class="fas fa-file-excel"></i> XLSX</a>
+        </div>
+    </section>
+
+    <section class="kpi-grid" id="ingresos">
+        <article class="kpi-card"><span class="kpi-label">Ingresos acumulados</span><div class="kpi-value">{{ total_revenue }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Ingresos hoy</span><div class="kpi-value">{{ revenue_today }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Pedidos hoy / mes</span><div class="kpi-value">{{ orders_today }} / {{ orders_month }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Ticket promedio</span><div class="kpi-value">{{ avg_ticket }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Cumplimiento</span><div class="kpi-value">{{ completion_rate }}%</div></article>
+        <article class="kpi-card"><span class="kpi-label">Usuarios</span><div class="kpi-value">{{ total_users }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Productos</span><div class="kpi-value">{{ total_products }}</div></article>
+        <article class="kpi-card"><span class="kpi-label">Stock crítico</span><div class="kpi-value">{{ low_stock_count }}</div></article>
+    </section>
+
+    <section class="route-grid">
+        <article class="card route-card">
+            <h3><i class="fas fa-chart-bar"></i> Reportes ejecutivos</h3>
+            <p>Estados de pedidos, usuarios por rol y pedidos recientes en una página propia.</p>
+            <a href="{% url 'users:admin_reports' %}"><i class="fas fa-arrow-right"></i> Abrir reportes</a>
+        </article>
+        <article class="card route-card">
+            <h3><i class="fas fa-dollar-sign"></i> Ingresos y ventas</h3>
+            <p>Tendencia de ingresos, pagos y productos vendidos en su ruta independiente.</p>
+            <a href="{% url 'users:admin_income' %}"><i class="fas fa-arrow-right"></i> Abrir ingresos</a>
+        </article>
+        <article class="card route-card">
+            <h3><i class="fas fa-tachometer-alt"></i> Performance operativa</h3>
+            <p>Embudo, cohortes y comportamiento operativo para seguimiento de gestión.</p>
+            <a href="{% url 'users:admin_performance' %}"><i class="fas fa-arrow-right"></i> Abrir performance</a>
+        </article>
+    </section>
+
+    <section class="analytics-grid">
+        <article class="card">
+            <h3><i class="fas fa-clock-rotate-left"></i> Pedidos recientes</h3>
+            <table class="table">
+                <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.cliente.get_full_name|default:order.cliente.username }}</td>
+                        <td>S/. {{ order.total|floatformat:2 }}</td>
+                        <td><span class="status-pill status-{{ order.estado }}">{{ order.get_estado_display }}</span></td>
+                        <td>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">No hay pedidos recientes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </article>
+
+        <article class="card">
+            <h3><i class="fas fa-trophy"></i> Top productos vendidos</h3>
+            {% spaceless %}
+            <div class="mini-list" role="list">
+                {% for product in top_products %}
+                <div class="mini-item" role="listitem">
+                    <p class="mini-title">{{ product.producto__nombre }}</p>
+                    <p class="mini-meta">{{ product.total_vendido }} unidades vendidas</p>
+                </div>
+                {% empty %}
+                <div class="mini-item" role="listitem"><p class="mini-title">Aún no hay ventas registradas</p></div>
+                {% endfor %}
+            </div>
+            {% endspaceless %}
+        </article>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /accounts/login/
+Disallow: /accounts/register/
+
+Sitemap: /sitemap.xml
+
+# Allow bots to access media files
+Allow: /media/
+Allow: /static/
+
+# Crawl delay to prevent overload
+Crawl-delay: 1

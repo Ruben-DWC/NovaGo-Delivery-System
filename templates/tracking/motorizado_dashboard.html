@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Panel Motorizado - NovaGo{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible">
+    <div class="section-header">
+        <p class="section-label">OPERACIONES</p>
+        <h2>Panel de motorizado</h2>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <article class="hero-shell">
+                <h5>Entregas activas</h5>
+                {% if active_orders %}
+                    {% for order in active_orders %}
+                    <div class="feature-tile mb-3">
+                        <p class="mb-1"><strong>Pedido #{{ order.id }}</strong> - {{ order.get_estado_display }}</p>
+                        <p class="mb-1">Cliente: {{ order.cliente.username }}</p>
+                        <p class="mb-2">Direccion: {{ order.direccion_entrega }}</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-sm btn-outline-dark" href="{% url 'tracking:track_order' order.id %}">Ver tracking</a>
+                            <form method="post" action="{% url 'tracking:update_location' %}" class="d-flex gap-2 align-items-center">
+                                {% csrf_token %}
+                                <input type="hidden" name="pedido_id" value="{{ order.id }}">
+                                <input type="text" class="form-control form-control-sm" name="latitud" placeholder="Lat" required>
+                                <input type="text" class="form-control form-control-sm" name="longitud" placeholder="Lng" required>
+                                <button class="btn btn-sm btn-cta" type="submit">Enviar posicion</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">No tienes entregas activas por ahora.</div>
+                {% endif %}
+            </article>
+        </div>
+        <div class="col-lg-5">
+            <article class="feature-tile h-100">
+                <h5>Ultimas entregas completadas</h5>
+                {% if completed_orders %}
+                <div class="list-group list-group-flush">
+                    {% for order in completed_orders %}
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span>Pedido #{{ order.id }}</span>
+                        <span>{{ order.fecha_pedido|date:'d/m' }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">Sin entregas completadas recientes.</p>
+                {% endif %}
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

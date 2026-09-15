@@ -1,0 +1,1034 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pasarela de Pago - NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pay-page {
+        max-width: 1180px;
+        margin: 1.6rem auto 2.2rem;
+        padding: 0 1rem;
+    }
+
+    .pay-hero {
+        border-radius: 20px;
+        padding: 1.4rem;
+        border: 1px solid rgba(255, 140, 66, 0.35);
+        background:
+            radial-gradient(circle at 12% 12%, rgba(255, 106, 61, 0.3), transparent 42%),
+            radial-gradient(circle at 84% 80%, rgba(16, 185, 129, 0.23), transparent 36%),
+            linear-gradient(115deg, #0b1220 0%, #141f35 60%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 1.2rem;
+    }
+
+    .pay-hero h1 {
+        margin: 0;
+        font-size: 1.6rem;
+    }
+
+    .pay-hero p {
+        margin: 0.55rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .pay-layout {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 1rem;
+    }
+
+    .pay-card {
+        background: var(--bg-secondary, #f4f7fc);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1rem;
+    }
+
+    .pay-title {
+        margin: 0 0 0.8rem;
+        font-size: 1.05rem;
+        color: var(--text);
+    }
+
+    .pay-total {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .pay-total-item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.75rem;
+        background: var(--bg);
+    }
+
+    .pay-total-item label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-secondary, #667799);
+        margin-bottom: 0.35rem;
+    }
+
+    .pay-total-item strong {
+        color: var(--text);
+        font-size: 1.02rem;
+    }
+
+    .methods-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .pay-title-spaced {
+        margin-top: 1rem;
+    }
+
+    .method-pill {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.7rem 0.8rem;
+        background: var(--bg);
+        color: var(--text);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .state-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+
+    .state-item {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .state-meta {
+        color: var(--text-secondary, #667799);
+    }
+
+    .state-badge {
+        padding: 0.28rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.35px;
+    }
+
+    .state-pendiente { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+    .state-procesando { background: rgba(59, 130, 246, 0.14); color: #2563eb; }
+    .state-completado { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    .state-rechazado { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+    .state-sin_pago { background: rgba(107, 114, 128, 0.16); color: #4b5563; }
+
+    .pay-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .btn-pay {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 0.72rem 0.9rem;
+    }
+
+    .btn-pay.primary {
+        background: linear-gradient(120deg, #f59e0b, #f97316);
+        color: #0f172a;
+        box-shadow: 0 9px 24px rgba(249, 115, 22, 0.28);
+    }
+
+    .btn-pay.primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .btn-pay.soft {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .checkout-grid {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .checkout-grid .full {
+        grid-column: 1 / -1;
+    }
+
+    .pay-form-label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-secondary, #667799);
+        margin-bottom: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .pay-form-input,
+    .pay-form-select,
+    .pay-form-textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.65rem 0.7rem;
+    }
+
+    .pay-form-textarea {
+        min-height: 96px;
+        resize: vertical;
+    }
+
+    .pay-card .form-control,
+    .pay-card .form-select,
+    .pay-card textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.65rem 0.7rem;
+    }
+
+    .pay-form-actions {
+        margin-top: 0.9rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
+    .order-summary-list {
+        display: grid;
+        gap: 0.45rem;
+        margin-top: 0.4rem;
+    }
+
+    .order-summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.55rem 0.65rem;
+        background: var(--bg);
+    }
+
+    .pay-help-note {
+        margin-top: 0.5rem;
+        color: var(--text-secondary, #667799);
+        font-size: 0.88rem;
+    }
+
+    html[data-theme='dark'] .pay-card,
+    html[data-theme='dark'] .pay-total-item,
+    html[data-theme='dark'] .method-pill,
+    html[data-theme='dark'] .state-item,
+    html[data-theme='dark'] .order-summary-item {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .pay-form-input,
+    html[data-theme='dark'] .pay-form-select,
+    html[data-theme='dark'] .pay-form-textarea {
+        background: #0f172a;
+        border-color: rgba(148, 163, 184, 0.35);
+        color: #f8fafc;
+    }
+
+    html[data-theme='dark'] .pay-card .form-control,
+    html[data-theme='dark'] .pay-card .form-select,
+    html[data-theme='dark'] .pay-card textarea {
+        background: #0f172a;
+        border-color: rgba(148, 163, 184, 0.35);
+        color: #f8fafc;
+    }
+
+    html[data-theme='dark'] .pay-form-label,
+    html[data-theme='dark'] .pay-help-note,
+    html[data-theme='dark'] .state-meta {
+        color: #cbd5e1;
+    }
+
+    html[data-theme='dark'] .btn-pay.soft {
+        background: rgba(15, 23, 42, 0.54);
+        color: #e2e8f0;
+        border-color: rgba(203, 213, 225, 0.48);
+    }
+
+    html[data-theme='dark'] .btn-pay.soft:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .empty-payments {
+        color: var(--text-secondary, #667799);
+        margin: 0;
+    }
+
+    @media (max-width: 992px) {
+        .pay-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .pay-total {
+            grid-template-columns: 1fr;
+        }
+
+        .methods-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Nuevos estilos para formulario dinámico */
+    .form-section {
+        margin-top: 1.2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .form-section:first-of-type {
+        margin-top: 0;
+        border-top: none;
+    }
+
+    .form-section-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .card-input-wrapper {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .card-input-wrapper .form-control {
+        padding-right: 3.5rem;
+    }
+
+    .card-type-icon {
+        position: absolute;
+        right: 0.65rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        pointer-events: none;
+        z-index: 2;
+        animation: cardIconPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .card-type-icon i {
+        font-size: 2.2rem;
+    }
+
+    .card-type-icon.visa i {
+        color: #1A1F71;
+    }
+
+    .card-type-icon.mastercard i {
+        color: #FF5F00;
+    }
+
+    .card-type-icon.empty {
+        animation: none;
+    }
+
+    @keyframes cardIconPop {
+        0% {
+            opacity: 0;
+            transform: translateY(-50%) scale(0.3);
+        }
+        50% {
+            transform: translateY(-50%) scale(1.15);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+    }
+
+    html[data-theme='dark'] .card-type-icon.visa i {
+        color: #6B93FF;
+    }
+
+    html[data-theme='dark'] .card-type-icon.mastercard i {
+        color: #FF9A4C;
+    }
+
+    .payment-method-fields {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        animation: slideDown 0.25s ease-out;
+        display: none;
+    }
+
+    .payment-method-fields[style*="display: block"] {
+        display: block !important;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-check-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        margin-bottom: 0.8rem;
+        padding: 0.65rem;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+    }
+
+    .form-check-label {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .form-check-label input[type="checkbox"] {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin: 0;
+        cursor: pointer;
+        accent-color: #f59e0b;
+    }
+
+    .form-check-label input[type="checkbox"]:checked {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    .form-check-label span {
+        flex: 1;
+    }
+
+    .form-error {
+        display: block;
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    html[data-theme='dark'] .form-section {
+        border-top-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .form-section-title {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .payment-method-fields,
+    html[data-theme='dark'] .form-check-group {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .form-check-label {
+        color: #f8fafc;
+    }
+
+    html[data-theme='dark'] .form-check-label input[type="checkbox"] {
+        background-color: #1e293b;
+        border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    html[data-theme='dark'] .form-check-label input[type="checkbox"]:checked {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    html[data-theme='dark'] .form-error {
+        color: #f87171;
+    }
+
+    /* Validación de formulario */
+    .form-control.is-invalid,
+    .form-select.is-invalid,
+    .form-control:invalid,
+    .form-select:invalid {
+        border-color: #dc2626 !important;
+        background-color: rgba(220, 38, 38, 0.08);
+    }
+
+    html[data-theme='dark'] .form-control.is-invalid,
+    html[data-theme='dark'] .form-select.is-invalid {
+        border-color: #f87171 !important;
+        background-color: rgba(220, 38, 38, 0.12);
+    }
+
+    .card-input-wrapper .form-control.is-invalid {
+        padding-right: 3.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pay-page">
+    <section class="pay-hero">
+        <h1><i class="fas fa-credit-card"></i> Pasarela de Pago NovaGo</h1>
+        <p>Vista central para pagos del cliente con estados claros, resumen de carrito y acceso directo al checkout seguro.</p>
+    </section>
+
+    <section class="pay-layout">
+        <article class="pay-card">
+            <h2 class="pay-title"><i class="fas fa-wallet"></i> Pasarela y checkout integrado</h2>
+            <div class="pay-total">
+                <div class="pay-total-item">
+                    <label>Subtotal</label>
+                    <strong>S/. {{ subtotal|floatformat:2 }}</strong>
+                </div>
+                <div class="pay-total-item">
+                    <label>Envío</label>
+                    <strong>S/. {{ shipping|floatformat:2 }}</strong>
+                </div>
+                <div class="pay-total-item">
+                    <label>Total a pagar</label>
+                    <strong>S/. {{ total|floatformat:2 }}</strong>
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-3">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" novalidate id="checkout_form">
+                {% csrf_token %}
+                
+                <!-- SECCIÓN: DATOS BÁSICOS -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Información de Entrega</h3>
+                    <div class="checkout-grid">
+                        <div class="full">
+                            <label class="pay-form-label" for="id_direccion_entrega">Dirección de entrega</label>
+                            {{ form.direccion_entrega }}
+                            {% if form.direccion_entrega.errors %}
+                                <small class="form-error">{{ form.direccion_entrega.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="pay-form-label" for="id_telefono_contacto">Teléfono de contacto</label>
+                            {{ form.telefono_contacto }}
+                            {% if form.telefono_contacto.errors %}
+                                <small class="form-error">{{ form.telefono_contacto.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: MÉTODO DE PAGO -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Método de Pago</h3>
+                    <div class="checkout-grid">
+                        <div class="full">
+                            <label class="pay-form-label" for="id_metodo_pago">Selecciona un método de pago</label>
+                            {{ form.metodo_pago }}
+                            {% if form.metodo_pago.errors %}
+                                <small class="form-error">{{ form.metodo_pago.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS DINÁMICOS POR MÉTODO DE PAGO -->
+                    
+                    <!-- EFECTIVO -->
+                    <div class="payment-method-fields" data-method="efectivo">
+                        <div class="checkout-grid">
+                            <div class="full">
+                                <label class="pay-form-label" for="id_monto_efectivo">¿Cuánto pagarías en efectivo?</label>
+                                {{ form.monto_efectivo }}
+                                <small class="pay-help-note">Indicia el monto exacto que deseas pagar en efectivo (debe ser igual o mayor al total)</small>
+                                {% if form.monto_efectivo.errors %}
+                                    <small class="form-error">{{ form.monto_efectivo.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TARJETA DE CRÉDITO/DÉBITO -->
+                    <div class="payment-method-fields" data-method="tarjeta">
+                        <div class="checkout-grid">
+                            <div class="full">
+                                <label class="pay-form-label" for="id_numero_tarjeta">Número de Tarjeta</label>
+                                <div class="card-input-wrapper">
+                                    {{ form.numero_tarjeta }}
+                                    <span class="card-type-icon" id="card_type_icon"></span>
+                                </div>
+                                <small class="pay-help-note">Ingresa sin espacios (detección automática de Visa/Mastercard)</small>
+                                {% if form.numero_tarjeta.errors %}
+                                    <small class="form-error">{{ form.numero_tarjeta.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="pay-form-label" for="id_mes_vencimiento">Mes/Año</label>
+                                {{ form.mes_vencimiento }}
+                                {% if form.mes_vencimiento.errors %}
+                                    <small class="form-error">{{ form.mes_vencimiento.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="pay-form-label" for="id_cvv">CVV</label>
+                                {{ form.cvv }}
+                                {% if form.cvv.errors %}
+                                    <small class="form-error">{{ form.cvv.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YAPE / PLIN (campo único compartido) -->
+                    <div class="payment-method-fields" data-method="movil">
+                        <div class="checkout-grid">
+                            <div class="full">
+                                <label class="pay-form-label" for="id_numero_celular">
+                                    Número de Celular para <span id="mobile_method_name">Yape/Plin</span>
+                                </label>
+                                {{ form.numero_celular }}
+                                <small class="pay-help-note">Formato: 9XXXXXXXX (9 dígitos peruanos)</small>
+                                {% if form.numero_celular.errors %}
+                                    <small class="form-error">{{ form.numero_celular.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGO CONTRA ENTREGA -->
+                    <div class="payment-method-fields" data-method="contra_entrega">
+                        <div class="checkout-grid">
+                            <div class="full">
+                                <label class="pay-form-label" for="id_tipo_pos">Tipo de Dispositivo POS</label>
+                                {{ form.tipo_pos }}
+                                <small class="pay-help-note">El cliente pagará en la entrega con POS</small>
+                                {% if form.tipo_pos.errors %}
+                                    <small class="form-error">{{ form.tipo_pos.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: FACTURACIÓN -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Tipo de Facturación</h3>
+                    <div class="checkout-grid">
+                        <div class="full">
+                            <label class="pay-form-label" for="id_tipo_facturacion">¿Qué tipo de comprobante necesitas?</label>
+                            {{ form.tipo_facturacion }}
+                            {% if form.tipo_facturacion.errors %}
+                                <small class="form-error">{{ form.tipo_facturacion.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: OPCIONES ADICIONALES -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Preferencias y Aceptaciones</h3>
+                    <div class="form-check-group">
+                        <label class="form-check-label">
+                            {{ form.acepta_terminos }}
+                            <span>Acepto los términos y condiciones</span>
+                        </label>
+                        {% if form.acepta_terminos.errors %}
+                            <small class="form-error">{{ form.acepta_terminos.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-check-group">
+                        <label class="form-check-label">
+                            {{ form.recibir_promociones }}
+                            <span>Quisiera recibir promociones y descuentos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: OBSERVACIONES -->
+                <div class="form-section">
+                    <div class="checkout-grid">
+                        <div>
+                            <label class="pay-form-label" for="id_referencia">Referencia (opcional)</label>
+                            {{ form.referencia }}
+                            {% if form.referencia.errors %}
+                                <small class="form-error">{{ form.referencia.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="full">
+                            <label class="pay-form-label" for="id_notas">Notas adicionales</label>
+                            {{ form.notas }}
+                            {% if form.notas.errors %}
+                                <small class="form-error">{{ form.notas.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <p class="pay-help-note">Completa los datos de acuerdo a tu método de pago y confirma: el pedido se generará y se descontará stock automáticamente.</p>
+
+                <div class="pay-form-actions">
+                    <button type="submit" class="btn-pay primary" id="submit_btn" {% if not items %}disabled{% endif %}>
+                        <i class="fas fa-lock"></i> Confirmar pedido seguro
+                    </button>
+                    <a href="{% url 'users:portal_cliente_carrito' %}" class="btn-pay soft">
+                        <i class="fas fa-cart-shopping"></i> Volver al carrito
+                    </a>
+                </div>
+            </form>
+
+            <h3 class="pay-title pay-title-spaced"><i class="fas fa-shield-check"></i> Métodos disponibles</h3>
+            <div class="methods-grid">
+                <div class="method-pill"><i class="fas fa-money-bill-wave"></i> Efectivo</div>
+                <div class="method-pill"><i class="fas fa-building-columns"></i> Transferencia</div>
+                <div class="method-pill"><i class="fas fa-credit-card"></i> Tarjeta</div>
+                <div class="method-pill"><i class="fas fa-mobile-screen-button"></i> Yape / Plin</div>
+                <div class="method-pill"><i class="fas fa-handshake"></i> Contra Entrega (POS)</div>
+            </div>
+        </article>
+
+        <article class="pay-card">
+            <h2 class="pay-title"><i class="fas fa-basket-shopping"></i> Resumen del carrito</h2>
+            {% if items %}
+            <div class="order-summary-list mb-3">
+                {% for item in items %}
+                <div class="order-summary-item">
+                    <div>
+                        <strong>{{ item.producto.nombre }}</strong><br>
+                        <small class="state-meta">x{{ item.cantidad }}</small>
+                    </div>
+                    <strong>S/. {{ item.subtotal|floatformat:2 }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-payments mb-3">No hay productos en carrito para generar pedido.</p>
+            {% endif %}
+
+            <h2 class="pay-title"><i class="fas fa-wave-square"></i> Estados de pago recientes</h2>
+            {% if payment_cards %}
+            <div class="state-list">
+                {% for card in payment_cards %}
+                <div class="state-item">
+                    <div>
+                        <strong>Pedido #{{ card.id }}</strong><br>
+                        <small class="state-meta">{{ card.fecha|date:'d/m/Y H:i' }} | S/. {{ card.total|floatformat:2 }}</small>
+                    </div>
+                    <span class="state-badge state-{{ card.estado_key }}">{{ card.estado_label }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-payments">Aún no tienes pedidos con datos de pago.</p>
+            {% endif %}
+        </article>
+    </section>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ==================== DINÁMICA DE MÉTODOS DE PAGO ====================
+        const metodoSelect = document.getElementById('metodo_pago_select');
+        const paymentFields = document.querySelectorAll('.payment-method-fields');
+        const numeroTarjeta = document.getElementById('id_numero_tarjeta');
+        const cardTypeIcon = document.getElementById('card_type_icon');
+        const mesVencimiento = document.getElementById('id_mes_vencimiento');
+        const cvv = document.getElementById('id_cvv');
+        const numeroCelular = document.getElementById('id_numero_celular');
+        const mobileMethodName = document.getElementById('mobile_method_name');
+        const montoEfectivo = document.getElementById('id_monto_efectivo');
+
+        /**
+         * Mostrar/ocultar campos según método de pago seleccionado
+         */
+        function updatePaymentFields() {
+            const selectedMethod = metodoSelect.value;
+            const isMobileMethod = selectedMethod === 'yape' || selectedMethod === 'plin';
+            
+            // Ocultar todos los campos dinámicos
+            paymentFields.forEach(field => {
+                field.style.display = 'none';
+            });
+
+            // Mostrar solo los correspondientes al método seleccionado
+            if (selectedMethod) {
+                const selector = isMobileMethod
+                    ? '[data-method="movil"]'
+                    : `[data-method="${selectedMethod}"]`;
+                const fieldsToShow = document.querySelectorAll(selector);
+                fieldsToShow.forEach(field => {
+                    field.style.display = 'block';
+                });
+
+                if (isMobileMethod && mobileMethodName) {
+                    mobileMethodName.textContent = selectedMethod === 'yape' ? 'Yape' : 'Plin';
+                }
+            }
+
+            // Limpiar validaciones de campos no visibles
+            clearInvisibleFieldValidation();
+        }
+
+        /**
+         * Limpiar validación de campos no visibles
+         */
+        function clearInvisibleFieldValidation() {
+            paymentFields.forEach(field => {
+                if (field.style.display === 'none') {
+                    const inputs = field.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('is-invalid');
+                    });
+                }
+            });
+        }
+
+        /**
+         * Detectar tipo de tarjeta (Visa/Mastercard) automáticamente
+         * Detecta desde los primeros dígitos, no espera a que esté completa
+         */
+        function detectCardType(cardNumber) {
+            const cleanNumber = cardNumber.replace(/\s/g, '');
+            
+            // Patrones mejorados para detección rápida
+            const patterns = {
+                visa: /^4[0-9]{0,}$/,           // Empieza con 4
+                mastercard: /^5[1-5][0-9]{0,}$/ // Empieza con 51-55
+            };
+
+            if (patterns.visa.test(cleanNumber)) {
+                return 'visa';
+            } else if (patterns.mastercard.test(cleanNumber)) {
+                return 'mastercard';
+            }
+            return null;
+        }
+
+        /**
+         * Actualizar ícono de tarjeta según tipo detectado
+         */
+        function updateCardIcon(cardType) {
+            if (!cardTypeIcon) return;
+
+            // Remover clases anteriores
+            cardTypeIcon.classList.remove('visa', 'mastercard', 'empty');
+            cardTypeIcon.innerHTML = '';
+
+            if (cardType === 'visa') {
+                cardTypeIcon.classList.add('visa');
+                cardTypeIcon.innerHTML = '<i class="fab fa-cc-visa"></i>';
+            } else if (cardType === 'mastercard') {
+                cardTypeIcon.classList.add('mastercard');
+                cardTypeIcon.innerHTML = '<i class="fab fa-cc-mastercard"></i>';
+            } else {
+                cardTypeIcon.classList.add('empty');
+                cardTypeIcon.innerHTML = '';
+            }
+        }
+
+        /**
+         * Formatear entrada de tarjeta (espacios cada 4 dígitos)
+         */
+        function formatCardNumber(value) {
+            return value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+        }
+
+        /**
+         * Formatear fecha (MM/YY)
+         */
+        function formatExpiryDate(value) {
+            const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            if (v.length >= 2) {
+                return v.slice(0, 2) + '/' + v.slice(2, 4);
+            }
+            return v;
+        }
+
+        /**
+         * Validar teléfono peruano (9 dígitos)
+         */
+        function validatePeruPhone(phone) {
+            const pattern = /^9\d{8}$/;
+            return pattern.test(phone.replace(/\s/g, ''));
+        }
+
+        /**
+         * Validar CVV (3-4 dígitos)
+         */
+        function validateCVV(cvv) {
+            const pattern = /^\d{3,4}$/;
+            return pattern.test(cvv);
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        
+        // Cambio de método de pago
+        if (metodoSelect) {
+            metodoSelect.addEventListener('change', updatePaymentFields);
+            updatePaymentFields(); // Inicializar en carga
+        }
+
+        // Formateo y detección de tarjeta
+        if (numeroTarjeta) {
+            numeroTarjeta.addEventListener('input', function() {
+                let value = this.value.replace(/\s/g, '');
+                this.value = formatCardNumber(value);
+                
+                // Actualizar ícono de tipo EN TIEMPO REAL
+                const cardType = detectCardType(value);
+                updateCardIcon(cardType);
+            });
+
+            // También detectar al pegar
+            numeroTarjeta.addEventListener('paste', function() {
+                setTimeout(() => {
+                    let value = this.value.replace(/\s/g, '');
+                    this.value = formatCardNumber(value);
+                    const cardType = detectCardType(value);
+                    updateCardIcon(cardType);
+                }, 10);
+            });
+        }
+
+        // Formateo de fecha de vencimiento
+        if (mesVencimiento) {
+            mesVencimiento.addEventListener('input', function() {
+                this.value = formatExpiryDate(this.value);
+                if (this.value.length === 5) {
+                    // Opcional: validar fecha válida
+                    const [month, year] = this.value.split('/');
+                    if (parseInt(month) > 12 || parseInt(month) < 1) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                }
+            });
+        }
+
+        // Validación de CVV
+        if (cvv) {
+            cvv.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 4);
+                if (this.value && !validateCVV(this.value)) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
+
+        // Validación de teléfono peruano
+        if (numeroCelular && metodoSelect) {
+            numeroCelular.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 9);
+                const method = metodoSelect.value;
+                if ((method === 'yape' || method === 'plin') && this.value) {
+                    if (!validatePeruPhone(this.value)) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                }
+            });
+        }
+
+        // Validación de monto en efectivo
+        if (montoEfectivo) {
+            montoEfectivo.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                const totalText = document.querySelector('.pay-total-item strong:last-of-type');
+                if (totalText) {
+                    const total = parseFloat(totalText.textContent.replace('S/. ', ''));
+                    if (value < total) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                }
+            });
+        }
+
+        // ==================== VALIDACIÓN DE CHECKBOX TÉRMINOS ====================
+        const checkboxTerminos = document.getElementById('id_acepta_terminos');
+        const submitBtn = document.getElementById('submit_btn');
+
+        if (checkboxTerminos && submitBtn) {
+            checkboxTerminos.addEventListener('change', function() {
+                if (!this.checked && !submitBtn.disabled) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.55';
+                    submitBtn.style.cursor = 'not-allowed';
+                } else if (this.checked) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+            });
+
+            // Verificar estado inicial
+            if (!checkboxTerminos.checked) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.55';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        }
+    });
+</script>
+{% endblock %}

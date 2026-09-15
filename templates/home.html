@@ -1,74 +1,176 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio - DeliveryApp{% endblock %}
+{% block title %}Inicio - NovaGo Delivery{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="jumbotron bg-primary text-white rounded p-5 mb-4">
-    <h1 class="display-4">
-        <i class="fas fa-motorcycle"></i> Bienvenido a DeliveryApp
-    </h1>
-    <p class="lead">Tu tienda favorita ahora con delivery rápido y seguro.</p>
-    <hr class="my-4 bg-white">
-    <p>Haz tu pedido online y sigue en tiempo real la ubicación de tu motorizado.</p>
-    <a class="btn btn-light btn-lg" href="#" role="button">
-        <i class="fas fa-shopping-cart"></i> Ver Productos
-    </a>
-</div>
+<section class="hero-shell reveal-up is-visible">
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <span class="kicker">NUEVA EXPERIENCIA DE DELIVERY EN CIUDAD</span>
+            <h1 class="hero-title">Tu minimarket de confianza, entregado en minutos.</h1>
+            <p class="hero-description">Compra snacks, bebidas y basicos del hogar con tracking en vivo, pagos seguros y atencion inmediata en cada pedido.</p>
+            <div class="hero-actions">
+                <a class="btn btn-cta btn-lg" href="{% url 'products:product_list' %}">
+                    Pedir ahora
+                </a>
+                <a class="btn btn-outline-dark btn-lg" href="#beneficios">
+                    Ver beneficios
+                </a>
+            </div>
+            <ul class="hero-tags">
+                <li><i class="fas fa-check-circle"></i> Entrega promedio 22 min</li>
+                <li><i class="fas fa-check-circle"></i> Cobertura metropolitana</li>
+                <li><i class="fas fa-check-circle"></i> Soporte 24/7</li>
+            </ul>
+        </div>
+        <div class="hero-panel reveal-up delay-1">
+            <div class="hero-panel-glow"></div>
+            <h3>Estado de tu pedido</h3>
+            
+            <!-- Timeline profesional de delivery -->
+            <div class="delivery-timeline">
+                <!-- Linea de progreso de fondo -->
+                <div class="timeline-progress">
+                    <div class="timeline-progress-bar"></div>
+                </div>
+                
+                <!-- Etapas de entrega -->
+                <div class="timeline-stage stage-1 completed">
+                    <div class="stage-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="stage-label">Pedido<br><small>confirmado</small></div>
+                    <div class="stage-time">19:42</div>
+                </div>
+                
+                <div class="timeline-stage stage-2 active">
+                    <div class="stage-icon">
+                        <i class="fas fa-motorcycle"></i>
+                    </div>
+                    <div class="stage-label">En ruta<br><small>motorizado</small></div>
+                    <div class="stage-time">ETA 08 min</div>
+                </div>
+                
+                <div class="timeline-stage stage-3">
+                    <div class="stage-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="stage-label">Entrega<br><small>en puerta</small></div>
+                    <div class="stage-time">Próximo</div>
+                </div>
+            </div>
+            
+            <!-- Etiqueta de estado en vivo -->
+            <div class="delivery-status-badge">
+                <span class="status-dot"></span>
+                Motorizado en camino hacia tu ubicación
+            </div>
+        </div>
+    </div>
+</section>
 
-<!-- Features -->
-<div class="row text-center mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <i class="fas fa-box fa-3x text-primary mb-3"></i>
-                <h5 class="card-title">Amplio Catálogo</h5>
-                <p class="card-text">Variedad de productos con stock actualizado.</p>
-            </div>
+<section id="beneficios" class="section-space">
+    <div class="section-header reveal-up">
+        <p class="section-label">POR QUE ELEGIR NOVAGO</p>
+        <h2>Diseñado como plataforma comercial real</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-3 reveal-up">
+            <article class="feature-tile">
+                <i class="fas fa-box-open"></i>
+                <h5>Catalogo vivo</h5>
+                <p>Disponibilidad actualizada por tienda para evitar cancelaciones.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3 reveal-up delay-1">
+            <article class="feature-tile">
+                <i class="fas fa-shield-halved"></i>
+                <h5>Pagos confiables</h5>
+                <p>Flujo protegido con validaciones robustas y trazabilidad completa.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3 reveal-up delay-2">
+            <article class="feature-tile">
+                <i class="fas fa-route"></i>
+                <h5>Tracking real</h5>
+                <p>Rastreo GPS en vivo con hitos visibles para el cliente final.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3 reveal-up delay-3">
+            <article class="feature-tile">
+                <i class="fas fa-headset"></i>
+                <h5>Soporte directo</h5>
+                <p>Asistencia centralizada para resolver incidencias sin friccion.</p>
+            </article>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <i class="fas fa-credit-card fa-3x text-success mb-3"></i>
-                <h5 class="card-title">Pagos Seguros</h5>
-                <p class="card-text">Múltiples métodos de pago disponibles.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <i class="fas fa-map-marked-alt fa-3x text-danger mb-3"></i>
-                <h5 class="card-title">Rastreo GPS</h5>
-                <p class="card-text">Sigue tu pedido en tiempo real.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <i class="fas fa-shipping-fast fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">Entrega Rápida</h5>
-                <p class="card-text">Recibe tu pedido en tiempo récord.</p>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 
-<!-- Stats -->
-<div class="row text-center bg-light rounded p-4">
-    <div class="col-md-4">
-        <h2 class="text-primary"><i class="fas fa-users"></i> 1000+</h2>
-        <p>Clientes Satisfechos</p>
+<section class="stats-wrap reveal-up">
+    <div class="row text-center g-3">
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <strong class="metric-value" data-target="14000" data-prefix="+" data-format="k">0</strong>
+                <span>Pedidos/mes</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <strong class="metric-value" data-target="4.9" data-fixed="1" data-suffix="/5">0</strong>
+                <span>Calificacion</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <strong class="metric-value" data-target="120" data-prefix="+">0</strong>
+                <span>Riders activos</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <strong class="metric-value" data-target="99.2" data-fixed="1" data-suffix="%">0</strong>
+                <span>Entregas a tiempo</span>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2 class="text-success"><i class="fas fa-check-circle"></i> 5000+</h2>
-        <p>Pedidos Completados</p>
+</section>
+
+<section class="section-space reveal-up" id="testimonios">
+    <div class="section-header">
+        <p class="section-label">TESTIMONIOS</p>
+        <h2>Lo que dicen nuestros clientes</h2>
     </div>
-    <div class="col-md-4">
-        <h2 class="text-warning"><i class="fas fa-motorcycle"></i> 50+</h2>
-        <p>Motorizados Activos</p>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <article class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p>"La ruta en vivo funciona excelente. Veo exactamente cuando llega mi pedido."</p>
+                <div class="testimonial-user">
+                    <strong>Andrea R.</strong>
+                    <span>Cliente frecuente</span>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p>"El tiempo de entrega es super estable y el pago por transferencia me simplifica todo."</p>
+                <div class="testimonial-user">
+                    <strong>Carlos M.</strong>
+                    <span>Usuario empresarial</span>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p>"Interfaz clara, rapida y sin complicaciones. Se siente como una app real de hoy."</p>
+                <div class="testimonial-user">
+                    <strong>Lucia P.</strong>
+                    <span>Nueva cliente</span>
+                </div>
+            </article>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
