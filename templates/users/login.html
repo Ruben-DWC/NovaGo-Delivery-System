@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar Sesion - NovaGo{% endblock %}
+{% block content %}
+<section class="auth-shell reveal-up is-visible">
+    <div class="auth-card">
+        <div class="auth-head">
+            <span class="auth-pill"><i class="fas fa-lock"></i> Acceso seguro</span>
+            <h1>Iniciar sesion</h1>
+            <p>Ingresa para continuar con tus pedidos y seguimiento en tiempo real.</p>
+        </div>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label class="form-label" for="id_username">Usuario</label>
+                <input type="text" name="username" id="id_username" class="form-control form-control-lg" value="{{ form.username.value|default_if_none:'' }}" required>
+                {% if form.username.errors %}
+                <small class="text-danger">{{ form.username.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="id_password">Contrasena</label>
+                <input type="password" name="password" id="id_password" class="form-control form-control-lg" required>
+                {% if form.password.errors %}
+                <small class="text-danger">{{ form.password.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-cta btn-lg btn-lift">Entrar a NovaGo</button>
+            </div>
+        </form>
+        <div class="auth-foot text-center mt-3">
+            <p>¿No tienes cuenta? <a href="{% url 'users:register' %}">Crear cuenta</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

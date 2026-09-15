@@ -1,0 +1,208 @@
+.logout-shell {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow: hidden;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 106, 61, 0.13), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(52, 116, 219, 0.12), transparent 45%),
+        linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary, #f0f5ff) 100%);
+}
+
+.logout-bg {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 106, 61, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 106, 61, 0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    z-index: 0;
+    opacity: 0.7;
+}
+
+.logout-card {
+    position: relative;
+    z-index: 1;
+    width: min(620px, 100%);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 106, 61, 0.2);
+    border-radius: 24px;
+    padding: 2.25rem;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 24px 60px rgba(28, 35, 55, 0.14);
+    animation: cardSlideIn 0.6s ease-out;
+}
+
+html[data-theme='dark'] .logout-card {
+    background: rgba(17, 25, 40, 0.76);
+    border-color: rgba(255, 157, 120, 0.35);
+    box-shadow: 0 24px 60px rgba(3, 9, 18, 0.7);
+}
+
+.logout-circle {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 1.25rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff6a3d, #ff8d66);
+    box-shadow: 0 14px 36px rgba(255, 106, 61, 0.34);
+}
+
+.logout-title {
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
+    font-weight: 800;
+    color: var(--text);
+    margin: 0.25rem 0 0.65rem;
+}
+
+.logout-subtitle {
+    margin: 0;
+    color: var(--text-secondary, #667799);
+    line-height: 1.65;
+}
+
+.logout-message {
+    margin-top: 1.25rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 106, 61, 0.26);
+    background: var(--brand-light, rgba(255, 106, 61, 0.1));
+    color: var(--brand);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
+html[data-theme='dark'] .logout-message {
+    background: rgba(255, 157, 120, 0.16);
+    border-color: rgba(255, 157, 120, 0.4);
+    color: #ffb39a;
+}
+
+.logout-features {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.feature-item {
+    text-align: left;
+    padding: 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary, #667799);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+html[data-theme='dark'] .feature-item {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #b7c5dc;
+}
+
+.feature-item strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+}
+
+.feature-item strong i {
+    color: var(--brand);
+}
+
+html[data-theme='dark'] .feature-item strong {
+    color: #e9effa;
+}
+
+html[data-theme='dark'] .feature-item strong i {
+    color: #ff9d78;
+}
+
+.logout-timer {
+    margin-top: 1.3rem;
+    color: var(--text-secondary, #667799);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.timer-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    animation: pulseTimer 1s ease-in-out infinite;
+}
+
+.logout-skip {
+    margin-top: 1.15rem;
+    border: 0;
+    border-radius: 12px;
+    padding: 0.78rem 1.1rem;
+    background: var(--brand);
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logout-skip:hover,
+.logout-skip:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(255, 106, 61, 0.35);
+    outline: none;
+}
+
+@media (max-width: 640px) {
+    .logout-card {
+        padding: 1.6rem 1.2rem;
+    }
+
+    .logout-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseTimer {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
