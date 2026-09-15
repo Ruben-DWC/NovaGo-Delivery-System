@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Dashboard - NovaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/client/portal.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>
+                    <i class="fas fa-user-circle"></i> 
+                    Bienvenido, {{ user.first_name|default:user.username }}
+                </h1>
+                <p>Gestiona tus pedidos y sigue tu estado en tiempo real</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-header">
+                    <i class="fas fa-shopping-bag"></i> Hacer Compra
+                </a>
+                <a href="{% url 'users:portal_cliente_perfil' %}" class="btn-header secondary">
+                    <i class="fas fa-cog"></i> Configuración
+                </a>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card stat-card-orders">
+                <div class="stat-top">
+                    <span class="stat-icon-shell"><i class="fas fa-bag-shopping"></i></span>
+                    <span class="stat-kicker">Actividad</span>
+                </div>
+                <div class="stat-value">{{ total_orders }}</div>
+                <div class="stat-label">Pedidos Totales</div>
+            </div>
+            <div class="stat-card stat-card-active secondary">
+                <div class="stat-top">
+                    <span class="stat-icon-shell"><i class="fas fa-route"></i></span>
+                    <span class="stat-kicker">En curso</span>
+                </div>
+                <div class="stat-value">{{ active_orders }}</div>
+                <div class="stat-label">En Progreso</div>
+            </div>
+            <div class="stat-card stat-card-spent danger">
+                <div class="stat-top">
+                    <span class="stat-icon-shell"><i class="fas fa-wallet"></i></span>
+                    <span class="stat-kicker">Consumo</span>
+                </div>
+                <div class="stat-value">S/. {{ total_spent }}</div>
+                <div class="stat-label">Dinero Gastado</div>
+            </div>
+        </div>
+
+        {% if active_order_widget %}
+        <div class="live-order-widget">
+            <div class="live-order-glow"></div>
+            <div class="live-order-main">
+                <p class="live-order-pill">
+                    <i class="fas fa-bolt"></i> Pedido activo ahora
+                </p>
+                <h3>Pedido #{{ active_order_widget.id }} en curso</h3>
+                <p class="live-order-meta">
+                    Estado: <strong>{{ active_order_widget.get_estado_display }}</strong>
+                    <span class="dot-sep">•</span>
+                    ETA estimada: <strong>{{ active_order_eta_minutes }} min</strong>
+                </p>
+            </div>
+            <div class="live-order-actions">
+                <a href="{% url 'users:portal_cliente_rastreo_pedido' active_order_widget.id %}" class="btn-live-track">
+                    <i class="fas fa-location-crosshairs"></i> Seguir en mapa
+                </a>
+                <a href="{% url 'users:portal_cliente_pedido_detalle' active_order_widget.id %}" class="btn-live-soft">
+                    <i class="fas fa-receipt"></i> Ver detalle
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Contenido Principal -->
+        <div class="dashboard-content">
+            <!-- Tabla de Pedidos Recientes -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-clipboard-list"></i> Pedidos Recientes
+                    </h3>
+                    <a href="{% url 'users:portal_cliente_pedidos' %}" class="view-all-link">
+                        Ver todos <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'users:portal_cliente_pedido_detalle' order.id %}" class="order-id">
+                                            #{{ order.id }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {% if order.estado == 'pendiente' or order.estado == 'confirmado' or order.estado == 'en_preparacion' %}pending{% elif order.estado == 'en_camino' %}en-camino{% elif order.estado == 'entregado' %}entregado{% else %}cancelado{% endif %}">
+                                            {{ order.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td><strong>S/. {{ order.total|floatformat:2 }}</strong></td>
+                                    <td>{{ order.fecha_pedido|date:"d/m H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}" class="track-link" title="Rastrear pedido #{{ order.id }}">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Aún no tienes pedidos</p>
+                        <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-header first-order-btn">
+                            <i class="fas fa-shopping-bag"></i> Hacer tu Primer Pedido
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="dashboard-sidebar">
+                <!-- Quick Actions -->
+                <div class="sidebar-card">
+                    <h4 class="sidebar-title">
+                        <i class="fas fa-zap"></i> Acciones Rápidas
+                    </h4>
+                    <div class="quick-actions">
+                        <a href="{% url 'users:portal_cliente_catalogo' %}" class="action-btn">
+                            <i class="fas fa-plus-circle"></i> Nuevo Pedido
+                        </a>
+                        <a href="{% url 'users:portal_cliente_pedidos' %}" class="action-btn secondary">
+                            <i class="fas fa-history"></i> Ver Historial
+                        </a>
+                        <a href="{% url 'users:portal_cliente_carrito' %}" class="action-btn secondary">
+                            <i class="fas fa-cart-shopping"></i> Mi Carrito
+                        </a>
+                        <a href="{% url 'users:portal_cliente_pago' %}" class="action-btn secondary">
+                            <i class="fas fa-credit-card"></i> Pasarela de Pago
+                        </a>
+                        <a href="{% url 'users:portal_cliente_rastreo' %}" class="action-btn secondary">
+                            <i class="fas fa-map-location-dot"></i> Rastrear Pedido
+                        </a>
+                        <a href="{% url 'users:portal_cliente_perfil' %}" class="action-btn secondary">
+                            <i class="fas fa-user"></i> Mi Perfil
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Información Rápida -->
+                <div class="sidebar-card">
+                    <h4 class="sidebar-title">
+                        <i class="fas fa-info-circle"></i> Información
+                    </h4>
+                    <ul class="sidebar-list">
+                        <li>
+                            <span>Correo</span>
+                            <strong class="tiny-strong">{{ user.email }}</strong>
+                        </li>
+                        <li>
+                            <span>Teléfono</span>
+                            <strong class="tiny-strong">{{ user.telefono|default:"No configurado" }}</strong>
+                        </li>
+                        <li>
+                            <span>Dirección</span>
+                            <strong class="tiny-strong">{{ user.direccion|default:"No configurado" }}</strong>
+                        </li>
+                        <li>
+                            <span>Se unió</span>
+                            <strong class="tiny-strong">{{ user.date_joined|date:"d/m/Y" }}</strong>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Beneficios -->
+                <div class="sidebar-card benefits-card">
+                    <h4 class="sidebar-title">
+                        <i class="fas fa-crown"></i> Beneficios NovaGo
+                    </h4>
+                    <ul class="sidebar-list">
+                        <li class="benefit-item">
+                            <span class="benefit-text"><i class="fas fa-bolt"></i> Envío rápido 22 min</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-text"><i class="fas fa-shield-halved"></i> Pagos seguros</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-text"><i class="fas fa-location-crosshairs"></i> Rastreo en vivo</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-text"><i class="fas fa-gift"></i> Promociones exclusivas</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

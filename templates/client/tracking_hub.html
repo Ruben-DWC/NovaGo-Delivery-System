@@ -1,0 +1,544 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rastreo de Pedidos - NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tracking-hub {
+        max-width: 1120px;
+        margin: 1.45rem auto 2.2rem;
+        padding: 0 1rem;
+        position: relative;
+        isolation: isolate;
+    }
+
+    .tracking-hub::before,
+    .tracking-hub::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(42px);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .tracking-hub::before {
+        width: 260px;
+        height: 260px;
+        top: -28px;
+        left: -16px;
+        background: rgba(56, 189, 248, 0.2);
+    }
+
+    .tracking-hub::after {
+        width: 220px;
+        height: 220px;
+        right: 0;
+        bottom: 4px;
+        background: rgba(16, 185, 129, 0.2);
+    }
+
+    .tracking-hero {
+        border-radius: 20px;
+        padding: 1.15rem 1.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 10% 14%, rgba(56, 189, 248, 0.22), transparent 44%),
+            radial-gradient(circle at 84% 86%, rgba(16, 185, 129, 0.22), transparent 36%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 0.95rem;
+    }
+
+    .tracking-hero h1 {
+        margin: 0;
+        font-size: 2.08rem;
+    }
+
+    .tracking-hero p {
+        margin: 0.42rem 0 0;
+        color: #d6e3f8;
+    }
+
+    .sync-strip {
+        margin-top: 0.72rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.23rem 0.58rem;
+        font-size: 0.76rem;
+        color: #dcfce7;
+    }
+
+    .sync-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+        animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    .sync-strip.error .sync-dot {
+        background: #ef4444;
+        animation: none;
+    }
+
+    .tracking-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 0.95rem;
+    }
+
+    .btn-track {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.62rem 0.94rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg-secondary, #f6f8fc);
+    }
+
+    .btn-track.primary {
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+        border-color: rgba(59, 130, 246, 0.62);
+    }
+
+    .btn-track.confirm {
+        background: linear-gradient(120deg, #10b981, #059669);
+        border-color: rgba(16, 185, 129, 0.62);
+        color: #fff;
+    }
+
+    .tracking-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.72rem;
+    }
+
+    .tracking-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 0.84rem;
+        background: var(--bg-secondary, #f6f9ff);
+    }
+
+    .tracking-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .tracking-meta {
+        color: var(--text-secondary, #667799);
+        font-size: 0.9rem;
+    }
+
+    .tracking-order-title {
+        margin: 0 0 0.3rem;
+        color: var(--text);
+        font-size: 1.04rem;
+    }
+
+    .tracking-status-badge {
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.26rem 0.55rem;
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .status-pendiente_asignacion,
+    .status-confirmado,
+    .status-pendiente {
+        background: rgba(59, 130, 246, 0.16);
+        color: #1d4ed8;
+    }
+
+    .status-en_preparacion {
+        background: rgba(245, 158, 11, 0.17);
+        color: #b45309;
+    }
+
+    .status-en_camino {
+        background: rgba(16, 185, 129, 0.18);
+        color: #047857;
+    }
+
+    .status-entregado {
+        background: rgba(34, 197, 94, 0.17);
+        color: #166534;
+    }
+
+    .status-cancelado {
+        background: rgba(239, 68, 68, 0.16);
+        color: #b91c1c;
+    }
+
+    .tracking-progress {
+        margin: 0.65rem 0 0.55rem;
+    }
+
+    .tracking-progress-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.32rem;
+        font-size: 0.78rem;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+    }
+
+    .tracking-progress-track {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.24);
+        overflow: hidden;
+    }
+
+    .tracking-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8 0%, #22c55e 100%);
+        transition: width 0.35s ease;
+    }
+
+    .tracking-actions-row {
+        margin-top: 0.55rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tracking-empty {
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-secondary, #667799);
+    }
+
+    .tracking-empty-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .recent-box {
+        margin-top: 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.9rem;
+    }
+
+    .recent-title {
+        margin: 0 0 0.65rem;
+        color: var(--text);
+        font-size: 0.98rem;
+    }
+
+    .recent-list {
+        display: grid;
+        gap: 0.46rem;
+    }
+
+    .recent-item {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.5rem 0.6rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary, #667799);
+        font-size: 0.84rem;
+    }
+
+    html[data-theme='dark'] .tracking-card,
+    html[data-theme='dark'] .recent-box,
+    html[data-theme='dark'] .recent-item {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .btn-track {
+        background: rgba(15, 23, 42, 0.58);
+        border-color: rgba(203, 213, 225, 0.4);
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .tracking-progress-track {
+        background: rgba(148, 163, 184, 0.2);
+    }
+
+    html[data-theme='dark'] .tracking-order-title,
+    html[data-theme='dark'] .recent-title {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .tracking-meta,
+    html[data-theme='dark'] .tracking-progress-top,
+    html[data-theme='dark'] .recent-item {
+        color: #94a3b8;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .tracking-hero h1 {
+            font-size: 1.82rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tracking-hub">
+    <section class="tracking-hero">
+        <h1><i class="fas fa-map-location-dot"></i> Rastreo de Pedidos</h1>
+        <p>Accede al mapa en tiempo real de tus pedidos activos y revisa tu historial reciente.</p>
+        <div class="sync-strip" id="hubSyncStrip" aria-live="polite">
+            <span class="sync-dot"></span>
+            <span id="hubSyncText">Canal activo · tiempo real por pedido</span>
+        </div>
+    </section>
+
+    <div class="tracking-actions">
+        <a href="{% url 'users:portal_cliente' %}" class="btn-track">
+            <i class="fas fa-house"></i> Volver al Portal
+        </a>
+        <a href="{% url 'users:portal_cliente_pedidos' %}" class="btn-track">
+            <i class="fas fa-clipboard-list"></i> Ver Mis Pedidos
+        </a>
+        <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-track primary">
+            <i class="fas fa-basket-shopping"></i> Ir al Catálogo
+        </a>
+    </div>
+
+    {% if trackable_orders %}
+    <div class="tracking-grid">
+        {% for order in trackable_orders %}
+        <article class="tracking-card" data-order-id="{{ order.id }}">
+            <div class="tracking-row">
+                <div>
+                    <h3 class="tracking-order-title">Pedido #{{ order.id }}</h3>
+                    <span class="tracking-status-badge status-{{ order.estado }}" data-role="estado-badge">
+                        <i class="fas fa-bolt"></i>
+                        <span data-role="estado-text">{{ order.get_estado_display }}</span>
+                    </span>
+                    <div class="tracking-meta">
+                        Total: S/. {{ order.total|floatformat:2 }} | {{ order.fecha_pedido|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-progress">
+                <div class="tracking-progress-top">
+                    <span data-role="progress-label">
+                        {% if order.estado == 'entregado' %}100{% elif order.estado == 'en_camino' %}75{% elif order.estado == 'en_preparacion' %}45{% elif order.estado == 'confirmado' or order.estado == 'pendiente_asignacion' or order.estado == 'pendiente' %}15{% else %}0{% endif %}% completado
+                    </span>
+                    <span>ETA <span data-role="eta-text">--</span> min</span>
+                </div>
+                <div class="tracking-progress-track" aria-label="Progreso del pedido #{{ order.id }}">
+                    <div class="tracking-progress-fill" data-role="progress-fill" data-initial-progress="{% if order.estado == 'entregado' %}100{% elif order.estado == 'en_camino' %}75{% elif order.estado == 'en_preparacion' %}45{% elif order.estado == 'confirmado' or order.estado == 'pendiente_asignacion' or order.estado == 'pendiente' %}15{% else %}0{% endif %}"></div>
+                </div>
+            </div>
+
+            <div class="tracking-actions-row">
+                <a href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}" class="btn-track primary">
+                    <i class="fas fa-location-crosshairs"></i> Ver en mapa
+                </a>
+                <a href="{% url 'users:portal_cliente_confirmacion' order.id %}" class="btn-track confirm">
+                    <i class="fas fa-circle-check"></i> Confirmación
+                </a>
+                <a href="{% url 'users:portal_cliente_pedido_detalle' order.id %}" class="btn-track">
+                    <i class="fas fa-file-lines"></i> Detalle
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="tracking-empty">
+        <div class="tracking-empty-icon">📍</div>
+        No tienes pedidos activos para rastrear en este momento.
+    </div>
+    {% endif %}
+
+    {% if recent_orders %}
+    <section class="recent-box">
+        <h3 class="recent-title"><i class="fas fa-clock-rotate-left"></i> Pedidos recientes</h3>
+        <div class="recent-list">
+            {% for order in recent_orders|slice:":5" %}
+            <div class="recent-item">
+                <span>#{{ order.id }} · {{ order.get_estado_display }}</span>
+                <span>{{ order.fecha_pedido|date:"d/m H:i" }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+    const cards = document.querySelectorAll('.tracking-card[data-order-id]');
+    const syncStrip = document.getElementById('hubSyncStrip');
+    const syncText = document.getElementById('hubSyncText');
+    if (!cards.length) return;
+
+    const statusClassByState = (estado) => `status-${estado || 'pendiente_asignacion'}`;
+
+    const setSyncState = (ok, text) => {
+        if (!syncStrip || !syncText) return;
+        syncText.textContent = text;
+        if (ok) {
+            syncStrip.classList.remove('error');
+        } else {
+            syncStrip.classList.add('error');
+        }
+    };
+
+    cards.forEach((card) => {
+        const progressFill = card.querySelector('[data-role="progress-fill"]');
+        if (!progressFill) return;
+        const initialProgress = Number(progressFill.getAttribute('data-initial-progress') || 0);
+        progressFill.style.width = `${initialProgress}%`;
+    });
+
+    const applyPayloadToCard = (card, payload) => {
+        if (!card || !payload) return;
+        const badge = card.querySelector('[data-role="estado-badge"]');
+        const estadoText = card.querySelector('[data-role="estado-text"]');
+        const progressLabel = card.querySelector('[data-role="progress-label"]');
+        const etaText = card.querySelector('[data-role="eta-text"]');
+        const progressFill = card.querySelector('[data-role="progress-fill"]');
+
+        if (badge) {
+            badge.className = `tracking-status-badge ${statusClassByState(payload.estado)}`;
+        }
+
+        if (estadoText && payload.estado_display) {
+            estadoText.textContent = payload.estado_display;
+        }
+
+        if (progressLabel && typeof payload.progress_percent === 'number') {
+            progressLabel.textContent = `${payload.progress_percent}% completado`;
+        }
+
+        if (etaText && typeof payload.eta_minutes === 'number') {
+            etaText.textContent = String(payload.eta_minutes);
+        }
+
+        if (progressFill && typeof payload.progress_percent === 'number') {
+            progressFill.style.width = `${payload.progress_percent}%`;
+        }
+    };
+
+    const socketByOrder = new Map();
+
+    const connectOrderSocket = (card) => {
+        const orderId = card.getAttribute('data-order-id');
+        if (!orderId) return;
+
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = `${protocol}://${window.location.host}/ws/orders/${orderId}/status/`;
+        let reconnectTimer = null;
+        let reconnectAttempt = 0;
+
+        const openSocket = () => {
+            const ws = new WebSocket(wsUrl);
+            socketByOrder.set(orderId, { ws, reconnectTimer });
+
+            ws.addEventListener('open', () => {
+                reconnectAttempt = 0;
+                setSyncState(true, 'Canal activo · tiempo real por pedido');
+                ws.send(JSON.stringify({ type: 'order.request_snapshot' }));
+            });
+
+            ws.addEventListener('message', (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type !== 'order.status') return;
+                    applyPayloadToCard(card, data.payload || {});
+                    setSyncState(true, 'Canal activo · tiempo real por pedido');
+                } catch (error) {
+                    setSyncState(false, 'Mensaje en vivo inválido');
+                }
+            });
+
+            ws.addEventListener('close', () => {
+                reconnectAttempt += 1;
+                const waitMs = Math.min(2000 * reconnectAttempt, 10000);
+                reconnectTimer = window.setTimeout(() => {
+                    openSocket();
+                }, waitMs);
+                socketByOrder.set(orderId, { ws: null, reconnectTimer });
+                setSyncState(false, 'Reconectando canal en vivo...');
+            });
+
+            ws.addEventListener('error', () => {
+                setSyncState(false, 'Canal en vivo con problemas');
+            });
+        };
+
+        openSocket();
+    };
+
+    cards.forEach((card) => connectOrderSocket(card));
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        cards.forEach((card) => {
+            const orderId = card.getAttribute('data-order-id');
+            if (!orderId) return;
+            const socketMeta = socketByOrder.get(orderId);
+            if (socketMeta && socketMeta.ws && socketMeta.ws.readyState === WebSocket.OPEN) {
+                socketMeta.ws.send(JSON.stringify({ type: 'order.request_snapshot' }));
+            }
+        });
+    });
+
+    window.addEventListener('beforeunload', () => {
+        socketByOrder.forEach((meta) => {
+            if (meta.reconnectTimer) {
+                clearTimeout(meta.reconnectTimer);
+            }
+            if (meta.ws && meta.ws.readyState === WebSocket.OPEN) {
+                meta.ws.close();
+            }
+        });
+    });
+})();
+</script>
+{% endblock %}

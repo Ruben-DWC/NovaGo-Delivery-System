@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Entregas - NovaGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .moto-history-page {
+        max-width: 1180px;
+        margin: 1.35rem auto 2.1rem;
+        padding: 0 1rem;
+    }
+
+    .moto-history-hero {
+        border-radius: 20px;
+        padding: 1.15rem 1.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 8% 12%, rgba(56, 189, 248, 0.24), transparent 40%),
+            radial-gradient(circle at 88% 86%, rgba(16, 185, 129, 0.2), transparent 38%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 0.95rem;
+    }
+
+    .moto-history-hero h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .moto-history-hero p {
+        margin: 0.36rem 0 0;
+        color: #dbe3f2;
+    }
+
+    .moto-kpi-grid {
+        margin-top: 0.84rem;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.6rem;
+    }
+
+    .moto-kpi {
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 12px;
+        padding: 0.6rem 0.65rem;
+        background: rgba(255, 255, 255, 0.09);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+    }
+
+    .moto-filter-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.82rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .moto-filter-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto auto auto;
+        gap: 0.55rem;
+        align-items: end;
+    }
+
+    .moto-filter-group label {
+        display: block;
+        font-size: 0.74rem;
+        margin-bottom: 0.2rem;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .moto-filter-group input,
+    .moto-filter-group select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        color: var(--text);
+        padding: 0.5rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .moto-filter-btn {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        color: var(--text);
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.5rem 0.64rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        justify-content: center;
+    }
+
+    .moto-filter-btn.primary {
+        border-color: rgba(59, 130, 246, 0.58);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    .moto-kpi label {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #d1e7ff;
+        margin-bottom: 0.2rem;
+        font-weight: 700;
+    }
+
+    .moto-kpi strong {
+        font-size: 1.05rem;
+    }
+
+    .moto-quick-filters {
+        margin-top: 0.74rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .moto-chip {
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        border-radius: 999px;
+        padding: 0.36rem 0.68rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #f8fafc;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+    }
+
+    .moto-chip.active {
+        background: linear-gradient(120deg, #f97316, #ea580c);
+        border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .moto-chip:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .moto-history-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.72rem;
+    }
+
+    .moto-order-card {
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.86rem;
+    }
+
+    .moto-order-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.65rem;
+    }
+
+    .moto-order-id {
+        margin: 0;
+        color: var(--text);
+        font-size: 1rem;
+    }
+
+    .moto-order-badge {
+        padding: 0.28rem 0.56rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .status-confirmado,
+    .status-pendiente_asignacion { background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+    .status-en_preparacion { background: rgba(245, 158, 11, 0.17); color: #b45309; }
+    .status-en_camino { background: rgba(16, 185, 129, 0.18); color: #047857; }
+    .status-entregado { background: rgba(34, 197, 94, 0.19); color: #166534; }
+    .status-cancelado { background: rgba(239, 68, 68, 0.17); color: #b91c1c; }
+
+    .moto-order-meta {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin-bottom: 0.72rem;
+    }
+
+    .moto-meta-item {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.53rem 0.58rem;
+    }
+
+    .moto-meta-item label {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 0.7rem;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 700;
+    }
+
+    .moto-meta-item strong {
+        color: var(--text);
+        font-size: 0.9rem;
+    }
+
+    .moto-progress-track {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.23);
+        overflow: hidden;
+        margin-bottom: 0.7rem;
+    }
+
+    .moto-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8 0%, #22c55e 100%);
+    }
+
+    .progress-0 { width: 0%; }
+    .progress-15 { width: 15%; }
+    .progress-45 { width: 45%; }
+    .progress-75 { width: 75%; }
+    .progress-100 { width: 100%; }
+
+    .moto-order-actions {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+    }
+
+    .moto-btn {
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.5rem 0.65rem;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .moto-btn.primary {
+        border-color: rgba(59, 130, 246, 0.58);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    .moto-btn.success {
+        border-color: rgba(16, 185, 129, 0.58);
+        background: linear-gradient(120deg, #10b981, #059669);
+        color: #fff;
+    }
+
+    .moto-btn.whatsapp {
+        border-color: rgba(34, 197, 94, 0.58);
+        background: linear-gradient(120deg, #22c55e, #16a34a);
+        color: #fff;
+    }
+
+    .moto-btn.disabled {
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .moto-empty {
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--text-secondary, #667799);
+    }
+
+    html[data-theme='dark'] .moto-order-card,
+    html[data-theme='dark'] .moto-meta-item,
+    html[data-theme='dark'] .moto-filter-card {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .moto-progress-track {
+        background: rgba(148, 163, 184, 0.2);
+    }
+
+    html[data-theme='dark'] .moto-btn {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(203, 213, 225, 0.43);
+        color: #e2e8f0;
+    }
+
+    .moto-pagination {
+        margin-top: 0.85rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+    }
+
+    .moto-page-link {
+        min-width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 0 0.6rem;
+    }
+
+    .moto-page-link.active {
+        border-color: rgba(59, 130, 246, 0.58);
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        color: #fff;
+    }
+
+    html[data-theme='dark'] .moto-page-link {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(203, 213, 225, 0.43);
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .moto-filter-group input,
+    html[data-theme='dark'] .moto-filter-group select,
+    html[data-theme='dark'] .moto-filter-btn {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(203, 213, 225, 0.43);
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 992px) {
+        .moto-kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .moto-order-meta {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .moto-filter-form {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .moto-kpi-grid,
+        .moto-order-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .moto-filter-form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="moto-history-page">
+    <section class="moto-history-hero">
+        <h2><i class="fas fa-clock-rotate-left"></i> Historial de entregas</h2>
+        <p>Revisa tus pedidos asignados, su estado y el detalle operativo de cada entrega.</p>
+
+        <div class="moto-kpi-grid">
+            <div class="moto-kpi">
+                <label>Total</label>
+                <strong>{{ orders_total }}</strong>
+            </div>
+            <div class="moto-kpi">
+                <label>Activos</label>
+                <strong>{{ orders_active }}</strong>
+            </div>
+            <div class="moto-kpi">
+                <label>Entregados</label>
+                <strong>{{ orders_delivered }}</strong>
+            </div>
+            <div class="moto-kpi">
+                <label>Cancelados</label>
+                <strong>{{ orders_cancelled }}</strong>
+            </div>
+        </div>
+
+        <div class="moto-quick-filters">
+            <a class="moto-chip {% if not filter_estado %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=">
+                <i class="fas fa-layer-group"></i> Todos ({{ status_totals.all }})
+            </a>
+            <a class="moto-chip {% if filter_estado == 'en_camino' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=en_camino">
+                <i class="fas fa-route"></i> En camino ({{ status_totals.en_camino }})
+            </a>
+            <a class="moto-chip {% if filter_estado == 'entregado' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=entregado">
+                <i class="fas fa-circle-check"></i> Entregados ({{ status_totals.entregado }})
+            </a>
+            <a class="moto-chip {% if filter_estado == 'cancelado' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=cancelado">
+                <i class="fas fa-circle-xmark"></i> Cancelados ({{ status_totals.cancelado }})
+            </a>
+        </div>
+    </section>
+
+    <section class="moto-filter-card">
+        <form method="get" class="moto-filter-form" novalidate>
+            <div class="moto-filter-group">
+                <label for="historial-q">Buscar cliente/teléfono</label>
+                <input id="historial-q" type="text" name="q" value="{{ filter_q }}" placeholder="Ej: cliente_demo o 999...">
+            </div>
+            <div class="moto-filter-group">
+                <label for="historial-estado">Estado</label>
+                <select id="historial-estado" name="estado">
+                    <option value="">Todos</option>
+                    {% for value, label in estado_options %}
+                    <option value="{{ value }}" {% if filter_estado == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="moto-filter-group">
+                <label for="historial-periodo">Periodo</label>
+                <select id="historial-periodo" name="periodo">
+                    <option value="">Todo</option>
+                    <option value="hoy" {% if filter_periodo == 'hoy' %}selected{% endif %}>Hoy</option>
+                    <option value="7d" {% if filter_periodo == '7d' %}selected{% endif %}>Últimos 7 días</option>
+                    <option value="30d" {% if filter_periodo == '30d' %}selected{% endif %}>Últimos 30 días</option>
+                </select>
+            </div>
+            <div class="moto-filter-group">
+                <label for="historial-sort">Ordenar por</label>
+                <select id="historial-sort" name="sort">
+                    {% for value, label in sort_options %}
+                    <option value="{{ value }}" {% if filter_sort == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="moto-filter-group">
+                <label for="historial-page-size">Ver</label>
+                <select id="historial-page-size" name="page_size">
+                    {% for value, label in page_size_options %}
+                    <option value="{{ value }}" {% if filter_page_size == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="moto-filter-btn primary">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <a href="{% url 'tracking:motorizado_historial' %}" class="moto-filter-btn">
+                <i class="fas fa-rotate-left"></i> Limpiar
+            </a>
+            <button type="button" id="export-csv-btn" class="moto-filter-btn">
+                <i class="fas fa-file-csv"></i> Exportar CSV
+            </button>
+        </form>
+    </section>
+
+    {% if orders %}
+    <section class="moto-history-grid">
+        {% for order in orders %}
+        <article class="moto-order-card">
+            <div class="moto-order-top">
+                <h3 class="moto-order-id">Pedido #{{ order.id }}</h3>
+                <span class="moto-order-badge status-{{ order.estado }}">{{ order.get_estado_display }}</span>
+            </div>
+
+            <div class="moto-order-meta">
+                <div class="moto-meta-item">
+                    <label>Cliente</label>
+                    <strong>{{ order.cliente.get_full_name|default:order.cliente.username }}</strong>
+                </div>
+                <div class="moto-meta-item">
+                    <label>Teléfono</label>
+                    <strong>{{ order.telefono_contacto|default:'No definido' }}</strong>
+                </div>
+                <div class="moto-meta-item">
+                    <label>Total</label>
+                    <strong>S/. {{ order.total|floatformat:2 }}</strong>
+                </div>
+                <div class="moto-meta-item">
+                    <label>Fecha</label>
+                    <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
+                </div>
+            </div>
+
+            <div class="moto-progress-track" aria-label="Progreso del pedido">
+                <div class="moto-progress-fill {% if order.estado == 'entregado' %}progress-100{% elif order.estado == 'en_camino' %}progress-75{% elif order.estado == 'en_preparacion' %}progress-45{% elif order.estado == 'confirmado' or order.estado == 'pendiente_asignacion' %}progress-15{% else %}progress-0{% endif %}"></div>
+            </div>
+
+            <div class="moto-order-actions">
+                <a class="moto-btn" href="{% url 'tracking:motorizado_pedido_detalle' order.id %}">
+                    <i class="fas fa-file-lines"></i> Ver detalle
+                </a>
+                <a class="moto-btn primary" href="{% url 'tracking:motorizado_rastreo_pedido' order.id %}">
+                    <i class="fas fa-map-location-dot"></i> Ver ruta
+                </a>
+                {% if order.estado in active_states %}
+                    {% if order.telefono_contacto %}
+                    <a class="moto-btn success" href="tel:{{ order.telefono_contacto }}">
+                        <i class="fas fa-phone"></i> Llamar
+                    </a>
+                    <a class="moto-btn whatsapp" href="https://wa.me/{{ order.telefono_contacto|cut:' ' }}" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    {% else %}
+                    <span class="moto-btn disabled">
+                        <i class="fas fa-phone"></i> Sin teléfono
+                    </span>
+                    {% endif %}
+                {% else %}
+                <span class="moto-btn disabled">
+                    <i class="fas fa-phone"></i> Sin acción directa
+                </span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+
+    {% if is_paginated %}
+    <nav class="moto-pagination" aria-label="Paginación historial motorizado">
+        {% if page_obj.has_previous %}
+        <a class="moto-page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior" title="Página anterior">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        {% for page_number in paginator.page_range %}
+            {% if page_number == page_obj.number %}
+            <span class="moto-page-link active">{{ page_number }}</span>
+            {% elif page_number >= page_obj.number|add:-2 and page_number <= page_obj.number|add:2 %}
+            <a class="moto-page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_number }}">{{ page_number }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a class="moto-page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Página siguiente" title="Página siguiente">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <section class="moto-empty">
+        <p>
+            {% if has_filters %}
+            No hay resultados con los filtros seleccionados.
+            {% else %}
+            No tienes pedidos asignados en tu historial todavía.
+            {% endif %}
+        </p>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+    (function () {
+        const exportBtn = document.getElementById('export-csv-btn');
+        if (!exportBtn) {
+            return;
+        }
+
+        function toCsvValue(value) {
+            const text = (value || '').toString().replace(/\s+/g, ' ').trim();
+            return '"' + text.replace(/"/g, '""') + '"';
+        }
+
+        exportBtn.addEventListener('click', function () {
+            const cards = document.querySelectorAll('.moto-order-card');
+            if (!cards.length) {
+                return;
+            }
+
+            const rows = [['Pedido', 'Estado', 'Cliente', 'Telefono', 'Total', 'Fecha']];
+
+            cards.forEach(function (card) {
+                const pedido = card.querySelector('.moto-order-id')?.textContent || '';
+                const estado = card.querySelector('.moto-order-badge')?.textContent || '';
+                const cliente = card.querySelector('.moto-meta-item:nth-child(1) strong')?.textContent || '';
+                const telefono = card.querySelector('.moto-meta-item:nth-child(2) strong')?.textContent || '';
+                const total = card.querySelector('.moto-meta-item:nth-child(3) strong')?.textContent || '';
+                const fecha = card.querySelector('.moto-meta-item:nth-child(4) strong')?.textContent || '';
+                rows.push([pedido, estado, cliente, telefono, total, fecha]);
+            });
+
+            const csv = rows.map(function (row) {
+                return row.map(toCsvValue).join(',');
+            }).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+            link.href = url;
+            link.download = 'historial_motorizado_' + date + '.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+    })();
+</script>
+{% endblock %}
