@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Motorizado - NovaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/motorizado/dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    .motorizado-jornada-banner {
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        color: white;
+    }
+    
+    .motorizado-jornada-banner.activa {
+        background: linear-gradient(135deg, #88dd00, #55aa00);
+    }
+    
+    .motorizado-jornada-banner.inactiva {
+        background: linear-gradient(135deg, #666, #444);
+    }
+    
+    .motorizado-jornada-banner div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .motorizado-jornada-banner h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .jornada-indicator {
+        font-size: 1.2rem;
+    }
+    
+    .btn-jornada {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-jornada:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-iniciar {
+        background: #2196f3;
+    }
+    
+    .btn-finalizar {
+        background: #d32f2f;
+    }
+    
+    .btn-finalizar:hover {
+        background: #b71c1c;
+    }
+
+    .moto-user-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.65rem;
+        align-items: center;
+        padding: 0.66rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+    }
+
+    .moto-user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .moto-user-avatar-fallback {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+        border: 2px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .moto-user-name {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .moto-user-role {
+        margin: 0.14rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-weight: 700;
+    }
+
+    html[data-theme='dark'] .moto-user-card {
+        background: rgba(15, 23, 42, 0.58);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .moto-user-name {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .moto-user-role {
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="motorizado-page">
+    <div class="motorizado-container">
+        <!-- Banner de Estado de Jornada -->
+        <div class="motorizado-jornada-banner {% if perfil_motorizado.jornada_activa %}activa{% else %}inactiva{% endif %}">
+            <div>
+                <div>
+                    <h3>
+                        <span class="jornada-indicator">{% if perfil_motorizado.jornada_activa %}🟢{% else %}🔴{% endif %}</span>
+                        {% if perfil_motorizado.jornada_activa %}
+                        <strong>Jornada Activa</strong>
+                        {% if perfil_motorizado.fecha_inicio_jornada %}
+                        - Iniciada a las {{ perfil_motorizado.fecha_inicio_jornada|date:"H:i" }}
+                        {% endif %}
+                        {% else %}
+                        <strong>Jornada Inactiva</strong>
+                        {% endif %}
+                    </h3>
+                </div>
+                <div>
+                    {% if perfil_motorizado.jornada_activa %}
+					<button class="btn-jornada btn-finalizar" onclick="finalizarJornada()" {% if not can_finalize_jornada %}disabled title="Finaliza o entrega tus pedidos activos antes de cerrar jornada"{% endif %}>
+                        <i class="fas fa-stop-circle"></i> Finalizar Jornada
+                    </button>
+                    {% else %}
+                    <button class="btn-jornada btn-iniciar" onclick="iniciarJornada()">
+                        <i class="fas fa-play-circle"></i> Iniciar Jornada
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="motorizado-header">
+            <h1>
+                <i class="fas fa-motorcycle"></i> 
+                Bienvenido, {{ user.first_name|default:user.username }}
+            </h1>
+            <p>Gestiona tus entregas del día en tiempo real</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="motorizado-stats">
+            <div class="stat-box">
+                <span class="stat-icon"><i class="fas fa-boxes-stacked"></i></span>
+                <div class="stat-number">{{ active_orders_count }}</div>
+                <div class="stat-label">Entregas Activas</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon"><i class="fas fa-circle-check"></i></span>
+                <div class="stat-number">{{ completed_today }}</div>
+                <div class="stat-label">Completadas Hoy</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon"><i class="fas fa-star"></i></span>
+                <div class="stat-number">{{ rating|default:"4.9" }}</div>
+                <div class="stat-label">Calificación</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon"><i class="fas fa-wallet"></i></span>
+                <div class="stat-number">{{ total_earned|default:"S/.0.00" }}</div>
+                <div class="stat-label">Ganado</div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="motorizado-content">
+            <!-- Entregas Activas -->
+            <div class="deliveries-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-route"></i> Entregas Activas
+                    </h2>
+                    <span class="active-count">
+                        {{ active_orders_count }} activas
+                    </span>
+                </div>
+
+                <div class="mini-map-card">
+                    <div class="mini-map-header">
+                        <div>
+                            <h3 class="mini-map-title">
+                                <i class="fas fa-map-location-dot"></i> Ruta GPS en Vivo
+                            </h3>
+                            <p class="mini-map-subtitle">Base NovaGo: {{ novago_store_name }}</p>
+                        </div>
+                        <div class="mini-map-controls">
+                            {% if active_orders %}
+                            <label for="active-order-select" class="mini-map-control-label">Pedido activo</label>
+                            <select id="active-order-select" class="mini-map-select">
+                                {% for order in active_orders %}
+                                <option value="{{ order.id }}" {% if order.id == active_order_id %}selected{% endif %}>
+                                    #{{ order.id }} - {{ order.cliente.first_name|default:order.cliente.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                            <button type="button" id="map-refresh-btn" class="mini-map-ghost-btn">
+                                <i class="fas fa-rotate"></i> Refrescar
+                            </button>
+                            <button type="button" id="map-center-btn" class="mini-map-ghost-btn">
+                                <i class="fas fa-crosshairs"></i> Centrar
+                            </button>
+                            <button type="button" id="gps-update-btn" class="mini-map-gps-btn">
+                                <i class="fas fa-location-crosshairs"></i> Usar mi GPS
+                            </button>
+                            <button type="button" id="gps-auto-toggle" class="mini-map-ghost-btn" aria-pressed="false">
+                                <i class="fas fa-wave-square"></i> Auto GPS OFF
+                            </button>
+                            <label for="gps-auto-interval" class="mini-map-control-label">Intervalo</label>
+                            <select id="gps-auto-interval" class="mini-map-select mini-map-select-compact">
+                                <option value="10">10s</option>
+                                <option value="15" selected>15s</option>
+                                <option value="20">20s</option>
+                                <option value="30">30s</option>
+                            </select>
+                            <span class="mini-map-status" id="gps-signal-status">
+                                <i class="fas fa-satellite-dish"></i> Esperando datos
+                            </span>
+                        </div>
+                    </div>
+                    <div
+                        id="map-track"
+                        class="mini-map-canvas"
+                        aria-label="Mapa de seguimiento de entrega"
+                        data-api-url="{% url 'tracking:motorizado_map_data' %}"
+                        data-update-location-url="{% url 'tracking:update_location' %}"
+                        data-active-order-id="{{ active_order_id }}"
+                        data-store-lat="{{ novago_store_lat }}"
+                        data-store-lng="{{ novago_store_lng }}"
+                    ></div>
+                    <div class="mini-map-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">Distancia</span>
+                            <span class="metric-value" id="current-distance">
+                                <i class="fas fa-location-dot icon"></i> 0.00 km
+                            </span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Tiempo estimado</span>
+                            <span class="metric-value" id="current-eta">
+                                <i class="fas fa-clock icon"></i> ETA 0 min
+                            </span>
+                        </div>
+                        <div class="metric-item metric-item-wide">
+                            <span class="metric-label">Ultima actualizacion</span>
+                            <span class="metric-value" id="current-last-update">
+                                <i class="fas fa-wave-square icon"></i> Sin señal GPS
+                            </span>
+                        </div>
+                        <div class="metric-item metric-item-wide">
+                            <span class="metric-label">Estado de pedido activo</span>
+                            <span class="metric-value" id="current-order-state">
+                                <i class="fas fa-box icon"></i> Sin pedido seleccionado
+                            </span>
+                        </div>
+                        <div class="metric-item metric-item-wide">
+                            <span class="metric-label">Auto GPS</span>
+                            <span class="metric-value" id="auto-gps-status">
+                                <i class="fas fa-wave-square icon"></i> Inactivo
+                            </span>
+                            <span class="metric-value" id="auto-gps-counters">
+                                <i class="fas fa-paper-plane icon"></i> Envios: 0 | Fallos: 0
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if active_orders %}
+                    {% for order in active_orders %}
+                    <div class="delivery-card active">
+                        <div class="delivery-header">
+                            <div class="delivery-id">Pedido #{{ order.id }}</div>
+                            <span class="delivery-status {% if order.estado == 'en_camino' %}en-camino{% elif order.estado == 'en_preparacion' %}pendiente{% elif order.estado == 'confirmado' %}pendiente{% else %}completado{% endif %}">
+                                <i class="fas {% if order.estado == 'en_camino' %}fa-bicycle{% elif order.estado == 'en_preparacion' %}fa-utensils{% elif order.estado == 'confirmado' %}fa-check{% else %}fa-circle-check{% endif %}"></i>
+                                {{ order.get_estado_display|upper }}
+                            </span>
+                        </div>
+
+                        <div class="delivery-details">
+                            <div class="detail-line">
+                                <span class="detail-label"><i class="fas fa-user"></i> Cliente</span>
+                                <span class="detail-value">{{ order.cliente.first_name|default:order.cliente.username }}</span>
+                            </div>
+                            <div class="detail-line">
+                                <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Dirección</span>
+                                <span class="detail-value" title="{{ order.direccion_entrega }}">
+                                    {{ order.direccion_entrega|truncatewords:3 }}
+                                </span>
+                            </div>
+                            <div class="detail-line">
+                                <span class="detail-label"><i class="fas fa-phone"></i> Contacto</span>
+                                <span class="detail-value">{{ order.telefono_contacto }}</span>
+                            </div>
+                            <div class="detail-line">
+                                <span class="detail-label"><i class="fas fa-box"></i> Items</span>
+                                <span class="detail-value">{{ order.items.count }}</span>
+                            </div>
+                        </div>
+
+                        <div class="delivery-actions">
+                            <a href="{% url 'tracking:track_order' order.id %}" class="action-btn primary">
+                                <i class="fas fa-map"></i> Ver Ruta
+                            </a>
+                            <a href="tel:{{ order.telefono_contacto }}" class="action-btn secondary">
+                                <i class="fas fa-phone"></i> Llamar
+                            </a>
+                            {% if order.estado == 'confirmado' %}
+                            <button type="button" class="action-btn secondary" onclick="marcarEnPreparacion({{ order.id }})">
+                                <i class="fas fa-utensils"></i> En preparacion
+                            </button>
+                            {% endif %}
+                            {% if order.estado != 'en_camino' and order.estado != 'entregado' and order.estado != 'cancelado' %}
+                            <button type="button" class="action-btn primary" onclick="marcarEnCamino({{ order.id }})">
+                                <i class="fas fa-motorcycle"></i> Iniciar ruta
+                            </button>
+                            {% endif %}
+                            {% if order.estado != 'entregado' and order.estado != 'cancelado' %}
+                            <button type="button" class="action-btn success" onclick="marcarEntregado({{ order.id }})">
+                                <i class="fas fa-circle-check"></i> Marcar entregado
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        <!-- Formulario de ubicación -->
+                        <form method="post" action="{% url 'tracking:update_location' %}" class="location-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="pedido_id" value="{{ order.id }}">
+                            <div class="form-group">
+                                <input type="text" name="latitud" placeholder="Latitud" required title="Ej: -12.0464">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="longitud" placeholder="Longitud" required title="Ej: -77.0428">
+                            </div>
+                            <button type="submit" class="action-btn primary location-update-btn">
+                                <i class="fas fa-location-arrow"></i> Actualizar
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-circle-check"></i></div>
+                        <p>¡Excelente! No tienes entregas activas por ahora.</p>
+                        <p class="empty-note">Pronto tendrás nuevas ordenes</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="motorizado-sidebar">
+                <div class="sidebar-card">
+                    <div class="moto-user-card">
+                        {% if user.foto_perfil %}
+                        <img src="{{ user.foto_perfil.url }}" alt="Avatar" class="moto-user-avatar">
+                        {% else %}
+                        <span class="moto-user-avatar-fallback">{{ user.username|first|upper }}</span>
+                        {% endif %}
+                        <div>
+                            <p class="moto-user-name">{{ user.get_full_name|default:user.username }}</p>
+                            <p class="moto-user-role">{{ user.get_role_display }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entregas Completadas -->
+                <div class="sidebar-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-check-circle"></i> Completadas Hoy
+                    </h3>
+                    {% if completed_orders %}
+                        <div class="completed-list">
+                            {% for order in completed_orders|slice:":5" %}
+                            <div class="completed-item">
+                                <span class="completed-id">#{{ order.id }}</span>
+                                <span class="completed-date">{{ order.fecha_entrega|date:"H:i" }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="empty-completed-text">
+                            Sin entregas completadas hoy
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Información Rápida -->
+                <div class="sidebar-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i> Mi Información
+                    </h3>
+                    <div class="sidebar-text">
+                        <div class="sidebar-row">
+                            <strong class="sidebar-strong">Teléfono</strong><br>
+                            {{ user.telefono|default:"No configurado" }}
+                        </div>
+                        <div class="sidebar-row">
+                            <strong class="sidebar-strong">Email</strong><br>
+                            {{ user.email }}
+                        </div>
+                        <div class="sidebar-row sidebar-row-last">
+                            <strong class="sidebar-strong">En línea desde</strong><br>
+                            {{ user.date_joined|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soporte -->
+                <div class="sidebar-card support-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-headset"></i> ¿Necesitas ayuda?
+                    </h3>
+                    <div class="support-center">
+                        <a href="tel:+51999999999" class="support-link">
+                            <i class="fas fa-phone"></i> Soporte
+                        </a>
+                        <a href="https://wa.me/51999999999" class="support-link support-link-whatsapp">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{% static 'js/delivery-map.js' %}"></script>
+
+<div class="moto-toast" id="motoToast" role="status" aria-live="polite">
+    <span class="moto-toast-icon"><i class="fas fa-circle-info"></i></span>
+    <span id="motoToastText">Operación completada.</span>
+</div>
+
+<script>
+    function showMotoToast(message, type = 'info') {
+        const toast = document.getElementById('motoToast');
+        const text = document.getElementById('motoToastText');
+        if (!toast || !text) return;
+
+        text.textContent = message;
+        toast.classList.remove('is-error', 'is-success');
+        if (type === 'error') toast.classList.add('is-error');
+        if (type === 'success') toast.classList.add('is-success');
+        toast.classList.add('show');
+
+        window.clearTimeout(showMotoToast._timerId);
+        showMotoToast._timerId = window.setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3200);
+    }
+
+    function getCsrfTokenFromCookie() {
+        const cookie = document.cookie
+            .split(';')
+            .map((item) => item.trim())
+            .find((item) => item.startsWith('csrftoken='));
+        return cookie ? decodeURIComponent(cookie.split('=')[1]) : '';
+    }
+
+    /**
+     * Controla el estado de jornada del motorizado
+     */
+    function iniciarJornada() {
+        if (!confirm('¿Deseas iniciar tu jornada laboral?')) return;
+        
+        fetch('{% url "tracking:iniciar_jornada" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfTokenFromCookie(),
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                showMotoToast(`Jornada iniciada. ${data.asignados} pedido(s) asignado(s).`, 'success');
+                location.reload();
+            } else {
+                showMotoToast(data.error || 'No se pudo iniciar jornada.', 'error');
+            }
+        })
+        .catch(e => showMotoToast('Error al iniciar jornada: ' + e, 'error'));
+    }
+
+    function finalizarJornada() {
+        const activeOrdersCount = {{ active_orders_count|default:0 }};
+        if (activeOrdersCount > 0) {
+            showMotoToast(`No puedes finalizar jornada con ${activeOrdersCount} pedido(s) activo(s).`, 'error');
+            return;
+        }
+
+        if (!confirm('⚠️ ¿Deseas finalizar tu jornada?\n\nAsegúrate de haber entregado todos los pedidos activos.')) return;
+        
+        fetch('{% url "tracking:finalizar_jornada" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfTokenFromCookie(),
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                showMotoToast('Jornada finalizada correctamente.', 'success');
+                location.reload();
+            } else {
+                showMotoToast(data.error || 'No se pudo finalizar jornada.', 'error');
+            }
+        })
+        .catch(e => showMotoToast('Error al finalizar jornada: ' + e, 'error'));
+    }
+
+    function marcarEntregado(pedidoId) {
+        if (!confirm('¿Marcar este pedido como entregado?')) return;
+        
+        fetch('{% url "tracking:marcar_entregado" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCsrfTokenFromCookie(),
+            },
+            body: 'pedido_id=' + pedidoId
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                showMotoToast('Pedido marcado como entregado.', 'success');
+                location.reload();
+            } else {
+                showMotoToast(data.error || 'No se pudo marcar entregado.', 'error');
+            }
+        })
+        .catch(e => showMotoToast('Error: ' + e, 'error'));
+    }
+
+    function marcarEnPreparacion(pedidoId) {
+        if (!confirm('¿Mover este pedido a estado En preparacion?')) return;
+
+        fetch('{% url "tracking:marcar_en_preparacion" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCsrfTokenFromCookie(),
+            },
+            body: 'pedido_id=' + pedidoId
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                showMotoToast('Pedido movido a En preparación.', 'success');
+                location.reload();
+            } else {
+                showMotoToast(data.error || 'No se pudo actualizar estado.', 'error');
+            }
+        })
+        .catch(e => showMotoToast('Error: ' + e, 'error'));
+    }
+
+    function marcarEnCamino(pedidoId) {
+        if (!confirm('¿Mover este pedido a estado En camino?')) return;
+
+        fetch('{% url "tracking:marcar_en_camino" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCsrfTokenFromCookie(),
+            },
+            body: 'pedido_id=' + pedidoId
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                showMotoToast('Pedido movido a En camino.', 'success');
+                location.reload();
+            } else {
+                showMotoToast(data.error || 'No se pudo actualizar estado.', 'error');
+            }
+        })
+        .catch(e => showMotoToast('Error: ' + e, 'error'));
+    }
+</script>
+{% endblock %}
+

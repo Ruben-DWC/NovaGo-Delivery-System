@@ -1,0 +1,54 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Editar Usuario - NovaGo{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .admin-user-form-page { padding: 1.2rem; max-width: 760px; }
+    .admin-user-form-title { margin: 0 0 0.8rem; color: var(--text); font-size: 1.35rem; }
+    .admin-user-form {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f5f9ff);
+        padding: 1rem;
+        display: grid;
+        gap: 0.75rem;
+        box-shadow: 0 18px 36px -32px rgba(15, 23, 42, 0.5);
+    }
+    html[data-theme='dark'] .admin-user-form { background: rgba(15, 23, 42, 0.64); border-color: rgba(148, 163, 184, 0.24); }
+    .admin-user-form p { margin: 0; display: grid; gap: 0.35rem; }
+    .admin-user-form input, .admin-user-form select, .admin-user-form textarea { width: 100%; padding: 0.58rem; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+    .admin-user-form-actions { display: flex; gap: 0.6rem; }
+    .admin-user-form-save {
+        padding: 0.56rem 0.78rem;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(120deg, #16a34a, #15803d);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .admin-user-form-cancel {
+        padding: 0.56rem 0.78rem;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        text-decoration: none;
+        color: var(--text);
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<section class="admin-user-form-page">
+    <h1 class="admin-user-form-title"><i class="fas fa-user-gear"></i> Editar usuario</h1>
+    <form method="post" class="admin-user-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="admin-user-form-actions">
+            <button type="submit" class="admin-user-form-save">Guardar cambios</button>
+            <a href="{% url 'users:admin_users' %}" class="admin-user-form-cancel">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

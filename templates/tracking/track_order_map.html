@@ -1,0 +1,998 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rastrear Pedido {{ pedido.id }} | NovaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.css" />
+
+<style>
+    .track-page {
+        min-height: 100vh;
+        padding: 1.4rem 0 2.2rem;
+        background:
+            radial-gradient(circle at 6% 12%, rgba(56, 189, 248, 0.15), transparent 34%),
+            radial-gradient(circle at 92% 84%, rgba(16, 185, 129, 0.12), transparent 36%),
+            var(--bg);
+    }
+
+    .track-container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .track-hero {
+        border-radius: 20px;
+        padding: 1.15rem 1.2rem;
+        border: 1px solid rgba(59, 130, 246, 0.34);
+        background:
+            radial-gradient(circle at 10% 14%, rgba(56, 189, 248, 0.22), transparent 44%),
+            radial-gradient(circle at 84% 86%, rgba(16, 185, 129, 0.22), transparent 36%),
+            linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+        color: #f8fafc;
+        margin-bottom: 0.95rem;
+    }
+
+    .track-hero-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .track-hero h1 {
+        margin: 0;
+        font-size: 1.72rem;
+    }
+
+    .track-hero p {
+        margin: 0.4rem 0 0;
+        color: #d6e3f8;
+    }
+
+    .status-chip {
+        border-radius: 999px;
+        padding: 0.28rem 0.58rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.12);
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .sync-pill {
+        margin-top: 0.68rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.24rem 0.56rem;
+        font-size: 0.76rem;
+        color: #dcfce7;
+    }
+
+    .sync-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+    }
+
+    .sync-pill.error .sync-dot {
+        background: #ef4444;
+    }
+
+    .status-flash {
+        animation: statusFlash 0.9s ease;
+    }
+
+    .track-layout {
+        display: grid;
+        grid-template-columns: 1.55fr 0.95fr;
+        gap: 1rem;
+    }
+
+    .map-shell {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: var(--bg-secondary, #f6f9ff);
+    }
+
+    .map-shell.highlight-route {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 24px 40px -28px rgba(59, 130, 246, 0.55);
+        transition: box-shadow 0.35s ease;
+    }
+
+    .map-shell.highlight-delivered {
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 24px 40px -28px rgba(16, 185, 129, 0.55);
+        transition: box-shadow 0.35s ease;
+    }
+
+    #map-track {
+        width: 100%;
+        height: 500px;
+    }
+
+    .map-kpis {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+        padding: 0.8rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .kpi {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        padding: 0.62rem 0.68rem;
+        text-align: center;
+    }
+
+    .kpi label {
+        display: block;
+        font-size: 0.73rem;
+        color: var(--text-secondary, #667799);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.24rem;
+        font-weight: 700;
+    }
+
+    .kpi strong {
+        font-size: 1.06rem;
+        color: var(--text);
+    }
+
+    .track-sidebar {
+        display: grid;
+        gap: 0.9rem;
+        align-content: start;
+    }
+
+    .track-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f6f9ff);
+        padding: 0.85rem;
+    }
+
+    .card-title {
+        margin: 0 0 0.68rem;
+        font-size: 1.02rem;
+        color: var(--text);
+    }
+
+    .status-timeline {
+        display: grid;
+        gap: 0.65rem;
+    }
+
+    .timeline-item {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.55rem 0.62rem;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.55rem;
+        align-items: start;
+    }
+
+    .timeline-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        font-size: 0.72rem;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: #64748b;
+    }
+
+    .timeline-item.done .timeline-dot,
+    .timeline-item.current .timeline-dot {
+        background: linear-gradient(120deg, #10b981, #059669);
+        border-color: rgba(16, 185, 129, 0.65);
+        color: #fff;
+    }
+
+    .timeline-item.current .timeline-dot {
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+    }
+
+    .timeline-item.pulse-step {
+        animation: pulseStep 0.85s ease;
+    }
+
+    .timeline-label {
+        margin: 0;
+        font-weight: 700;
+        color: var(--text);
+        font-size: 0.9rem;
+    }
+
+    .timeline-time {
+        margin: 0.18rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.8rem;
+    }
+
+    .details-grid {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        padding: 0.52rem 0.6rem;
+    }
+
+    .detail-row.total {
+        border-color: rgba(249, 115, 22, 0.45);
+        background: linear-gradient(120deg, rgba(249, 115, 22, 0.13), rgba(245, 158, 11, 0.13));
+    }
+
+    .motorizado-card {
+        border: 1px solid rgba(16, 185, 129, 0.36);
+        border-radius: 14px;
+        background: linear-gradient(120deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+        padding: 0.78rem;
+    }
+
+    .motorizado-name {
+        margin: 0;
+        color: var(--text);
+        font-weight: 800;
+    }
+
+    .motorizado-meta {
+        margin: 0.2rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.84rem;
+    }
+
+    .actions-row {
+        margin-top: 0.82rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .track-btn {
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.83rem;
+        padding: 0.52rem 0.66rem;
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .track-btn.primary {
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
+        border-color: rgba(59, 130, 246, 0.6);
+        color: #fff;
+    }
+
+    .track-btn.confirm {
+        background: linear-gradient(120deg, #10b981, #059669);
+        border-color: rgba(16, 185, 129, 0.6);
+        color: #fff;
+    }
+
+    .track-toast {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 1200;
+        width: min(360px, calc(100vw - 2rem));
+        border-radius: 13px;
+        border: 1px solid rgba(16, 185, 129, 0.38);
+        background: linear-gradient(120deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.96));
+        color: #e2e8f0;
+        padding: 0.72rem 0.78rem;
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .track-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast-title {
+        margin: 0 0 0.24rem;
+        font-size: 0.89rem;
+        font-weight: 800;
+        color: #86efac;
+    }
+
+    .toast-body {
+        margin: 0;
+        font-size: 0.84rem;
+    }
+
+    html[data-theme='dark'] .map-shell,
+    html[data-theme='dark'] .track-card,
+    html[data-theme='dark'] .kpi,
+    html[data-theme='dark'] .timeline-item,
+    html[data-theme='dark'] .detail-row {
+        background: rgba(15, 23, 42, 0.68);
+        border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    html[data-theme='dark'] .card-title,
+    html[data-theme='dark'] .timeline-label,
+    html[data-theme='dark'] .kpi strong,
+    html[data-theme='dark'] .motorizado-name {
+        color: #e2e8f0;
+    }
+
+    html[data-theme='dark'] .timeline-time,
+    html[data-theme='dark'] .kpi label,
+    html[data-theme='dark'] .motorizado-meta {
+        color: #94a3b8;
+    }
+
+    html[data-theme='dark'] .track-btn {
+        background: rgba(15, 23, 42, 0.58);
+        border-color: rgba(203, 213, 225, 0.38);
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 1024px) {
+        .track-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        #map-track {
+            height: 360px;
+        }
+
+        .map-kpis {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @keyframes statusFlash {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.045);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulseStep {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.26);
+        }
+        100% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="track-page">
+    <div class="track-container">
+        {% if forbidden %}
+        <div class="alert alert-danger">No tienes permisos para ver este rastreo.</div>
+        {% else %}
+        <section class="track-hero">
+            <div class="track-hero-head">
+                <h1><i class="fas fa-map-marker-alt"></i> Rastrear Pedido #{{ pedido.id }}</h1>
+                <span class="status-chip"><i class="fas fa-bolt"></i> <span id="statusDisplay">{{ pedido.get_estado_display }}</span></span>
+            </div>
+            <p>Mapa en vivo con trayectoria, ETA y cambios de estado en tiempo real.</p>
+            <div class="sync-pill" id="syncPill" aria-live="polite">
+                <span class="sync-dot"></span>
+                <span id="syncText">Conectando canal en vivo...</span>
+            </div>
+        </section>
+
+        <div class="track-layout">
+            <section class="map-shell">
+                <div
+                    id="map-track"
+                    data-order-id="{{ pedido.id }}"
+                    data-snapshot-url="{% url 'tracking:order_tracking_snapshot' pedido.id %}"
+                ></div>
+                <div class="map-kpis">
+                    <div class="kpi">
+                        <label>Distancia</label>
+                        <strong id="distanceText">-- km</strong>
+                    </div>
+                    <div class="kpi">
+                        <label>Tiempo estimado</label>
+                        <strong id="etaText">ETA -- min</strong>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="track-sidebar">
+                <div class="track-card">
+                    <h3 class="card-title"><i class="fas fa-clock"></i> Estado del Pedido</h3>
+                    <div class="status-timeline">
+                        <div class="timeline-item" id="stepConfirmado">
+                            <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                            <div>
+                                <p class="timeline-label">Pedido Confirmado</p>
+                                <p class="timeline-time">Validado por NovaGo</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" id="stepPreparacion">
+                            <div class="timeline-dot"><i class="fas fa-utensils"></i></div>
+                            <div>
+                                <p class="timeline-label">En Preparación</p>
+                                <p class="timeline-time">Armando tu pedido</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" id="stepCamino">
+                            <div class="timeline-dot"><i class="fas fa-motorcycle"></i></div>
+                            <div>
+                                <p class="timeline-label">Motorizado en Ruta</p>
+                                <p class="timeline-time">Seguimiento GPS activo</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" id="stepEntregado">
+                            <div class="timeline-dot"><i class="fas fa-house"></i></div>
+                            <div>
+                                <p class="timeline-label">Entrega Completada</p>
+                                <p class="timeline-time">Pendiente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="track-card">
+                    <h3 class="card-title"><i class="fas fa-box"></i> Detalles</h3>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span>Subtotal</span>
+                            <strong>S/. {{ pedido.subtotal|floatformat:2 }}</strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Envío</span>
+                            <strong>S/. {{ pedido.costo_envio|floatformat:2 }}</strong>
+                        </div>
+                        <div class="detail-row total">
+                            <span><strong>Total</strong></span>
+                            <strong>S/. {{ pedido.total|floatformat:2 }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {% if pedido.motorizado %}
+                <div class="motorizado-card">
+                    <p class="motorizado-name"><i class="fas fa-motorcycle"></i> {{ pedido.motorizado.get_full_name|default:"Motorizado" }}</p>
+                    <p class="motorizado-meta">Responsable actual de la entrega</p>
+                    <div class="actions-row">
+                        <a href="tel:+51999999999" class="track-btn"> <i class="fas fa-phone"></i> Llamar </a>
+                        <a href="https://wa.me/51999999999" class="track-btn"> <i class="fab fa-whatsapp"></i> WhatsApp </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="actions-row">
+                    <a href="{% if user.role == 'cliente' %}{% url 'users:portal_cliente_rastreo' %}{% elif user.role == 'motorizado' %}{% url 'tracking:motorizado_historial' %}{% else %}{% url 'tracking:motorizado_dashboard' %}{% endif %}" class="track-btn primary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                    {% if user.role == 'cliente' %}
+                    <a href="{% url 'users:portal_cliente_pedido_detalle' pedido.id %}" class="track-btn confirm">
+                        <i class="fas fa-file-lines"></i> Ver detalle
+                    </a>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<aside class="track-toast" id="statusToast" role="status" aria-live="polite">
+    <p class="toast-title"><i class="fas fa-sparkles"></i> Estado actualizado</p>
+    <p class="toast-body" id="toastBody">Tu pedido cambió de estado.</p>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(() => {
+    const mapNode = document.getElementById('map-track');
+    if (!mapNode || typeof L === 'undefined') return;
+
+    const pedidoId = mapNode.getAttribute('data-order-id');
+    const snapshotUrl = mapNode.getAttribute('data-snapshot-url');
+    const syncPill = document.getElementById('syncPill');
+    const syncText = document.getElementById('syncText');
+    const statusDisplay = document.getElementById('statusDisplay');
+    const distanceText = document.getElementById('distanceText');
+    const etaText = document.getElementById('etaText');
+    const mapShell = document.querySelector('.map-shell');
+    const statusToast = document.getElementById('statusToast');
+    const toastBody = document.getElementById('toastBody');
+
+    if (!pedidoId || !snapshotUrl) return;
+
+    const stateMap = {
+        pendiente: 1,
+        pendiente_asignacion: 1,
+        confirmado: 1,
+        en_preparacion: 2,
+        en_camino: 3,
+        entregado: 4,
+        cancelado: 0,
+    };
+    const labelMap = {
+        pendiente: 'Pendiente',
+        pendiente_asignacion: 'Pendiente de Asignación',
+        confirmado: 'Confirmado',
+        en_preparacion: 'En Preparación',
+        en_camino: 'En Camino',
+        entregado: 'Entregado',
+        cancelado: 'Cancelado',
+    };
+
+    const setSyncState = (ok, text) => {
+        if (!syncPill || !syncText) return;
+        syncText.textContent = text;
+        if (ok) {
+            syncPill.classList.remove('error');
+        } else {
+            syncPill.classList.add('error');
+        }
+    };
+
+    const map = L.map('map-track', { zoomControl: true }).setView([-12.0262, -76.9212], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors, &copy; CartoDB',
+        maxZoom: 19,
+    }).addTo(map);
+
+    const markerIcons = {
+        store: L.divIcon({
+            className: 'map-pin map-pin-store',
+            html: '<div style="background:#0ea5e9;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-store"></i></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+        }),
+        rider: L.divIcon({
+            className: 'map-pin map-pin-rider',
+            html: '<div style="background:#f97316;color:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-motorcycle"></i></div>',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+        }),
+        destination: L.divIcon({
+            className: 'map-pin map-pin-destination',
+            html: '<div style="background:#22c55e;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-house"></i></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+        }),
+    };
+
+    const markers = {
+        store: null,
+        rider: null,
+        destination: null,
+    };
+    let routeLine = null;
+    let routeAnimLine = null;
+    let historyLine = null;
+    let orderSocket = null;
+    let reconnectTimer = null;
+    let reconnectAttempt = 0;
+    let lastStatus = null;
+    let toastTimer = null;
+    let lastRouteKey = '';
+    let lastResolvedRoutePoints = null;
+    let routeFetchToken = 0;
+    let routeAnimationFrame = null;
+    let riderAnimFrame = null;
+
+    const easeInOutCubic = (t) => (t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+    const animateMarkerTo = (marker, targetLatLng, duration = 900) => {
+        if (!marker || !targetLatLng) return;
+
+        if (riderAnimFrame) {
+            cancelAnimationFrame(riderAnimFrame);
+            riderAnimFrame = null;
+        }
+
+        const start = marker.getLatLng();
+        const startLat = start.lat;
+        const startLng = start.lng;
+        const deltaLat = targetLatLng[0] - startLat;
+        const deltaLng = targetLatLng[1] - startLng;
+
+        if (Math.abs(deltaLat) < 0.000001 && Math.abs(deltaLng) < 0.000001) {
+            marker.setLatLng(targetLatLng);
+            return;
+        }
+
+        const startTs = performance.now();
+
+        const step = (timestamp) => {
+            const elapsed = timestamp - startTs;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeInOutCubic(progress);
+            const nextLat = startLat + (deltaLat * eased);
+            const nextLng = startLng + (deltaLng * eased);
+            marker.setLatLng([nextLat, nextLng]);
+
+            if (progress < 1) {
+                riderAnimFrame = requestAnimationFrame(step);
+            } else {
+                riderAnimFrame = null;
+            }
+        };
+
+        riderAnimFrame = requestAnimationFrame(step);
+    };
+
+    const setMarker = (key, lat, lng, icon, title, options = {}) => {
+        const smooth = Boolean(options.smooth);
+        if (!markers[key]) {
+            markers[key] = L.marker([lat, lng], { icon, title }).addTo(map);
+        } else {
+            if (smooth && key === 'rider') {
+                animateMarkerTo(markers[key], [lat, lng]);
+            } else {
+                markers[key].setLatLng([lat, lng]);
+            }
+        }
+    };
+
+    const paintTimeline = (estado) => {
+        const currentStep = stateMap[estado] || 1;
+        const steps = [
+            document.getElementById('stepConfirmado'),
+            document.getElementById('stepPreparacion'),
+            document.getElementById('stepCamino'),
+            document.getElementById('stepEntregado'),
+        ];
+
+        steps.forEach((stepNode, index) => {
+            if (!stepNode) return;
+            const stepNum = index + 1;
+            stepNode.classList.remove('done', 'current');
+            if (estado === 'cancelado') return;
+            if (stepNum < currentStep) stepNode.classList.add('done');
+            if (stepNum === currentStep) stepNode.classList.add('current');
+            if (estado === 'entregado' && stepNum === 4) stepNode.classList.add('done', 'current');
+
+            if ((stepNum === currentStep && estado !== 'cancelado') || (estado === 'entregado' && stepNum === 4)) {
+                stepNode.classList.add('pulse-step');
+                window.setTimeout(() => stepNode.classList.remove('pulse-step'), 900);
+            }
+        });
+    };
+
+    const showStatusToast = (previousStatus, currentStatus) => {
+        if (!statusToast || !toastBody) return;
+        const prevLabel = labelMap[previousStatus] || previousStatus || 'Estado anterior';
+        const currLabel = labelMap[currentStatus] || currentStatus || 'Nuevo estado';
+        toastBody.textContent = `Tu pedido pasó de "${prevLabel}" a "${currLabel}".`;
+        statusToast.classList.add('show');
+        if (toastTimer) {
+            clearTimeout(toastTimer);
+        }
+        toastTimer = window.setTimeout(() => {
+            statusToast.classList.remove('show');
+        }, 3800);
+    };
+
+    const flashStatusVisuals = (estado) => {
+        if (statusDisplay) {
+            statusDisplay.classList.add('status-flash');
+            window.setTimeout(() => statusDisplay.classList.remove('status-flash'), 900);
+        }
+
+        if (!mapShell) return;
+
+        if (estado === 'en_camino') {
+            mapShell.classList.add('highlight-route');
+            window.setTimeout(() => mapShell.classList.remove('highlight-route'), 1400);
+        }
+
+        if (estado === 'entregado') {
+            mapShell.classList.add('highlight-delivered');
+            window.setTimeout(() => mapShell.classList.remove('highlight-delivered'), 1600);
+        }
+    };
+
+    const stopRouteAnimation = () => {
+        if (routeAnimationFrame) {
+            cancelAnimationFrame(routeAnimationFrame);
+            routeAnimationFrame = null;
+        }
+    };
+
+    const renderRouteStatic = (points) => {
+        stopRouteAnimation();
+        if (routeAnimLine) {
+            map.removeLayer(routeAnimLine);
+            routeAnimLine = null;
+        }
+        if (routeLine) {
+            map.removeLayer(routeLine);
+        }
+        routeLine = L.polyline(points, {
+            color: '#f97316',
+            weight: 4,
+            opacity: 0.88,
+            lineJoin: 'round',
+            lineCap: 'round',
+        }).addTo(map);
+    };
+
+    const renderRouteAnimated = (points) => {
+        stopRouteAnimation();
+
+        if (routeLine) {
+            map.removeLayer(routeLine);
+        }
+        if (routeAnimLine) {
+            map.removeLayer(routeAnimLine);
+        }
+
+        routeLine = L.polyline(points, {
+            color: '#f97316',
+            weight: 4,
+            opacity: 0.2,
+            lineJoin: 'round',
+            lineCap: 'round',
+        }).addTo(map);
+
+        routeAnimLine = L.polyline([points[0]], {
+            color: '#f97316',
+            weight: 5,
+            opacity: 0.95,
+            lineJoin: 'round',
+            lineCap: 'round',
+        }).addTo(map);
+
+        let index = 1;
+        const animatedPoints = [points[0]];
+
+        const step = () => {
+            if (index >= points.length) {
+                routeAnimationFrame = null;
+                return;
+            }
+
+            const chunk = Math.max(1, Math.floor(points.length / 60));
+            for (let i = 0; i < chunk && index < points.length; i += 1) {
+                animatedPoints.push(points[index]);
+                index += 1;
+            }
+            routeAnimLine.setLatLngs(animatedPoints);
+            routeAnimationFrame = requestAnimationFrame(step);
+        };
+
+        routeAnimationFrame = requestAnimationFrame(step);
+    };
+
+    const fetchRoadRoute = async (waypoints) => {
+        const coords = waypoints.map((point) => `${point[1]},${point[0]}`).join(';');
+        const routeUrl = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
+        const response = await fetch(routeUrl, { method: 'GET', cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error('route fetch failed');
+        }
+
+        const data = await response.json();
+        const geometry = data?.routes?.[0]?.geometry?.coordinates;
+        if (!Array.isArray(geometry) || geometry.length < 2) {
+            throw new Error('invalid route geometry');
+        }
+
+        return geometry.map((coord) => [Number(coord[1]), Number(coord[0])]);
+    };
+
+    const applyRoutePath = async (storePoint, riderPoint, destinationPoint, shouldAnimate) => {
+        const fallbackPoints = [storePoint, riderPoint, destinationPoint];
+        const currentKey = fallbackPoints
+            .map((point) => `${point[0].toFixed(5)},${point[1].toFixed(5)}`)
+            .join('|');
+
+        if (currentKey === lastRouteKey && lastResolvedRoutePoints) {
+            if (shouldAnimate) {
+                renderRouteAnimated(lastResolvedRoutePoints);
+            } else {
+                renderRouteStatic(lastResolvedRoutePoints);
+            }
+            return;
+        }
+
+        lastRouteKey = currentKey;
+        const fetchToken = ++routeFetchToken;
+
+        try {
+            const resolvedPoints = await fetchRoadRoute(fallbackPoints);
+            if (fetchToken !== routeFetchToken) {
+                return;
+            }
+            lastResolvedRoutePoints = resolvedPoints;
+            if (shouldAnimate) {
+                renderRouteAnimated(resolvedPoints);
+            } else {
+                renderRouteStatic(resolvedPoints);
+            }
+        } catch (error) {
+            if (fetchToken !== routeFetchToken) {
+                return;
+            }
+            lastResolvedRoutePoints = fallbackPoints;
+            if (shouldAnimate) {
+                renderRouteAnimated(fallbackPoints);
+            } else {
+                renderRouteStatic(fallbackPoints);
+            }
+        }
+    };
+
+    const applySnapshot = async (payload) => {
+        if (!payload || !payload.ok) return;
+
+        const store = payload.store || {};
+        const motorizado = payload.motorizado || {};
+        const destination = payload.destination || {};
+
+        const statusChanged = Boolean(lastStatus && payload.order_status && lastStatus !== payload.order_status);
+
+        setMarker('store', Number(store.lat), Number(store.lng), markerIcons.store, store.name || 'Local');
+        setMarker('rider', Number(motorizado.lat), Number(motorizado.lng), markerIcons.rider, 'Motorizado', {
+            smooth: !statusChanged,
+        });
+        setMarker('destination', Number(destination.lat), Number(destination.lng), markerIcons.destination, 'Destino');
+
+        const storePoint = [Number(store.lat), Number(store.lng)];
+        const riderPoint = [Number(motorizado.lat), Number(motorizado.lng)];
+        const destinationPoint = [Number(destination.lat), Number(destination.lng)];
+
+        const shouldAnimateRoute = payload.order_status === 'en_camino' && statusChanged;
+        await applyRoutePath(storePoint, riderPoint, destinationPoint, shouldAnimateRoute);
+
+        const history = Array.isArray(payload.tracking_history) ? payload.tracking_history : [];
+        if (historyLine) map.removeLayer(historyLine);
+        if (history.length >= 2) {
+            historyLine = L.polyline(
+                history.map((point) => [Number(point.lat), Number(point.lng)]),
+                { color: '#06b6d4', weight: 3, dashArray: '8 6', opacity: 0.75 }
+            ).addTo(map);
+        }
+
+        const bounds = L.latLngBounds([
+            storePoint,
+            riderPoint,
+            destinationPoint,
+        ]);
+        map.fitBounds(bounds, { padding: [42, 42], maxZoom: 15 });
+
+        if (distanceText) distanceText.textContent = `${Number(payload.distance_km || 0).toFixed(2)} km`;
+        if (etaText) etaText.textContent = `ETA ${payload.eta_min || '--'} min`;
+        if (statusDisplay) statusDisplay.textContent = labelMap[payload.order_status] || payload.order_status || 'Actualizando';
+
+        if (statusChanged) {
+            showStatusToast(lastStatus, payload.order_status);
+            flashStatusVisuals(payload.order_status);
+        }
+        if (!lastStatus && payload.order_status) {
+            flashStatusVisuals(payload.order_status);
+        }
+
+        lastStatus = payload.order_status || lastStatus;
+        paintTimeline(payload.order_status);
+    };
+
+    const fetchSnapshot = async () => {
+        try {
+            const response = await fetch(snapshotUrl, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                cache: 'no-store',
+            });
+            if (!response.ok) return;
+            const payload = await response.json();
+            await applySnapshot(payload);
+            setSyncState(true, 'Snapshot actualizado');
+        } catch (error) {
+            setSyncState(false, 'Sin snapshot disponible');
+        }
+    };
+
+    const connectSocket = () => {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = `${protocol}://${window.location.host}/ws/tracking/order/${pedidoId}/`;
+
+        try {
+            orderSocket = new WebSocket(wsUrl);
+        } catch (error) {
+            setSyncState(false, 'Error al abrir canal en vivo');
+            return;
+        }
+
+        orderSocket.addEventListener('open', () => {
+            reconnectAttempt = 0;
+            setSyncState(true, 'Tiempo real activo por WebSocket');
+            orderSocket.send(JSON.stringify({ type: 'tracking.request_snapshot' }));
+        });
+
+        orderSocket.addEventListener('message', (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (message.type !== 'tracking.snapshot' && message.type !== 'tracking.location') return;
+                applySnapshot(message.payload || {});
+                setSyncState(true, 'Tiempo real activo por WebSocket');
+            } catch (error) {
+                setSyncState(false, 'Mensaje en vivo inválido');
+            }
+        });
+
+        orderSocket.addEventListener('close', () => {
+            reconnectAttempt += 1;
+            const waitMs = Math.min(2000 * reconnectAttempt, 10000);
+            setSyncState(false, 'Reconectando canal en vivo...');
+            reconnectTimer = window.setTimeout(connectSocket, waitMs);
+        });
+
+        orderSocket.addEventListener('error', () => {
+            setSyncState(false, 'Canal en vivo con problemas');
+        });
+    };
+
+    fetchSnapshot();
+    connectSocket();
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        if (orderSocket && orderSocket.readyState === WebSocket.OPEN) {
+            orderSocket.send(JSON.stringify({ type: 'tracking.request_snapshot' }));
+        } else {
+            fetchSnapshot();
+        }
+    });
+
+    window.addEventListener('beforeunload', () => {
+        if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+        }
+        stopRouteAnimation();
+        if (riderAnimFrame) {
+            cancelAnimationFrame(riderAnimFrame);
+        }
+        if (orderSocket && orderSocket.readyState === WebSocket.OPEN) {
+            orderSocket.close();
+        }
+    });
+})();
+</script>
+{% endblock %}

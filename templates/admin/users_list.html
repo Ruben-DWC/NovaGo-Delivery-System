@@ -1,0 +1,344 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ page_title }} - NovaGo{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .admin-users-page {
+        padding: 1.2rem;
+        background:
+            radial-gradient(circle at 10% 5%, rgba(14, 165, 233, 0.08), transparent 32%),
+            radial-gradient(circle at 92% 94%, rgba(249, 115, 22, 0.08), transparent 30%);
+    }
+
+    .admin-users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.9rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.9rem;
+    }
+
+    .admin-users-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 1.42rem;
+        letter-spacing: 0.01em;
+    }
+
+    .admin-users-subtitle {
+        margin: 0.26rem 0 0;
+        color: var(--text-secondary, #667799);
+        font-size: 0.88rem;
+    }
+
+    .admin-users-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-users-btn {
+        text-decoration: none;
+        padding: 0.52rem 0.72rem;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        color: var(--text);
+        font-weight: 700;
+        background: var(--bg);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .admin-users-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px -20px rgba(15, 23, 42, 0.75);
+    }
+
+    .admin-users-btn.primary {
+        border: none;
+        background: linear-gradient(120deg, #0ea5e9, #0284c7);
+        color: #fff;
+    }
+
+    .admin-users-scope {
+        margin-bottom: 0.85rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .scope-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.38rem 0.68rem;
+        text-decoration: none;
+        color: var(--text-secondary, #667799);
+        background: var(--bg);
+        font-weight: 700;
+        font-size: 0.78rem;
+        transition: all 0.2s ease;
+    }
+
+    .scope-chip.active {
+        color: #fff;
+        border-color: rgba(14, 165, 233, 0.6);
+        background: linear-gradient(120deg, #0ea5e9, #0284c7);
+    }
+
+    .admin-users-kpis {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 0.56rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .users-kpi {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg-secondary, #f5f9ff);
+        padding: 0.58rem 0.64rem;
+        animation: rise-in 260ms ease both;
+    }
+
+    .users-kpi label {
+        display: block;
+        margin-bottom: 0.18rem;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--text-secondary, #667799);
+        font-weight: 700;
+    }
+
+    .users-kpi strong {
+        color: var(--text);
+        font-size: 1rem;
+    }
+
+    .admin-users-filters {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 0.55rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .admin-users-bulk {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr auto;
+        gap: 0.55rem;
+        margin-bottom: 0.85rem;
+        align-items: end;
+    }
+
+    .bulk-label {
+        display: block;
+        margin-bottom: 0.22rem;
+        color: var(--text-secondary, #667799);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .admin-users-control {
+        padding: 0.56rem;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--text);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .admin-users-control:focus {
+        outline: none;
+        border-color: rgba(14, 165, 233, 0.62);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    }
+
+    .admin-users-table-wrap {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg-secondary, #f5f9ff);
+        overflow: auto;
+    }
+
+    .admin-users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-users-table th,
+    .admin-users-table td {
+        text-align: left;
+        padding: 0.62rem;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .admin-users-table th {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--text-secondary, #667799);
+    }
+
+    .admin-users-empty {
+        padding: 0.8rem;
+    }
+
+    .admin-users-pagination {
+        margin-top: 0.7rem;
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    @keyframes rise-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1100px) {
+        .admin-users-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 920px) {
+        .admin-users-filters,
+        .admin-users-bulk { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+        .admin-users-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<section class="admin-users-page">
+    <div class="admin-users-header">
+        <div>
+            <h1 class="admin-users-title"><i class="fas fa-users-cog"></i> {{ page_title }}</h1>
+            <p class="admin-users-subtitle">{{ page_description }}</p>
+        </div>
+        <div class="admin-users-actions">
+            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=csv" class="admin-users-btn">Exportar CSV</a>
+            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=xlsx" class="admin-users-btn primary">Exportar XLSX</a>
+        </div>
+    </div>
+
+    <nav class="admin-users-scope" aria-label="Gestiones de usuarios">
+        <a href="{% url 'users:admin_users' %}" class="scope-chip {% if scope == 'all' %}active{% endif %}">Todos</a>
+        <a href="{% url 'users:admin_clients' %}" class="scope-chip {% if scope == 'clientes' %}active{% endif %}">Clientes</a>
+        <a href="{% url 'users:admin_employees' %}" class="scope-chip {% if scope == 'empleados' %}active{% endif %}">Empleados</a>
+        <a href="{% url 'users:admin_roles' %}" class="scope-chip">Roles</a>
+    </nav>
+
+    <section class="admin-users-kpis">
+        <article class="users-kpi"><label>Total</label><strong>{{ stats_total }}</strong></article>
+        <article class="users-kpi"><label>Activos</label><strong>{{ stats_active }}</strong></article>
+        <article class="users-kpi"><label>Inactivos</label><strong>{{ stats_inactive }}</strong></article>
+        <article class="users-kpi"><label>Clientes</label><strong>{{ stats_clientes }}</strong></article>
+        <article class="users-kpi"><label>Motorizados</label><strong>{{ stats_motorizados }}</strong></article>
+        <article class="users-kpi"><label>Admins</label><strong>{{ stats_admins }}</strong></article>
+    </section>
+
+    <form method="get" class="admin-users-filters">
+        <input type="hidden" name="scope" value="{{ scope }}">
+        <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar usuario" class="admin-users-control" aria-label="Buscar usuario">
+        <select name="role" class="admin-users-control" title="Filtrar por rol" aria-label="Filtrar por rol">
+            <option value="">Todos los roles</option>
+            <option value="cliente" {% if filter_role == 'cliente' %}selected{% endif %}>Cliente</option>
+            <option value="motorizado" {% if filter_role == 'motorizado' %}selected{% endif %}>Motorizado</option>
+            <option value="admin" {% if filter_role == 'admin' %}selected{% endif %}>Administrador</option>
+        </select>
+        <select name="active" class="admin-users-control" title="Filtrar por estado" aria-label="Filtrar por estado">
+            <option value="">Todos</option>
+            <option value="1" {% if filter_active == '1' %}selected{% endif %}>Activos</option>
+            <option value="0" {% if filter_active == '0' %}selected{% endif %}>Inactivos</option>
+        </select>
+        <button type="submit" class="admin-users-control">Filtrar</button>
+    </form>
+
+    <form method="post" action="{% url 'users:admin_users_bulk_action' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next_query" value="{{ request.GET.urlencode }}">
+        <div class="admin-users-bulk">
+            <div>
+                <label for="bulk-action" class="bulk-label">Accion masiva</label>
+                <select id="bulk-action" name="action" class="admin-users-control" aria-label="Accion masiva en usuarios">
+                    <option value="">Selecciona accion</option>
+                    <option value="activate">Activar usuarios</option>
+                    <option value="deactivate">Desactivar usuarios</option>
+                    <option value="change_role">Cambiar rol</option>
+                </select>
+            </div>
+            <div>
+                <label for="bulk-role" class="bulk-label">Nuevo rol</label>
+                <select id="bulk-role" name="bulk_role" class="admin-users-control" aria-label="Nuevo rol para accion masiva">
+                    <option value="">-- Opcional --</option>
+                    <option value="cliente">Cliente</option>
+                    <option value="motorizado">Motorizado</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <button type="submit" class="admin-users-control">Aplicar accion</button>
+        </div>
+
+        <div class="admin-users-table-wrap">
+            <table class="admin-users-table">
+                <thead>
+                    <tr>
+                        <th><input id="users-select-all" type="checkbox" aria-label="Seleccionar todos los usuarios"></th>
+                        <th>Usuario</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in admin_users %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_users" value="{{ item.id }}" class="bulk-user-item" aria-label="Seleccionar usuario {{ item.username }}"></td>
+                        <td>{{ item.get_full_name|default:item.username }}</td>
+                        <td>{{ item.email|default:'-' }}</td>
+                        <td>{{ item.get_role_display }}</td>
+                        <td>{% if item.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+                        <td>{{ item.fecha_registro|date:'d/m/Y' }}</td>
+                        <td><a href="{% url 'users:admin_user_update' item.id %}">Editar</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="admin-users-empty">No se encontraron usuarios.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+    {% if is_paginated %}
+    <div class="admin-users-pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<script>
+    (function () {
+        const selectAll = document.getElementById('users-select-all');
+        if (!selectAll) {
+            return;
+        }
+        selectAll.addEventListener('change', function () {
+            document.querySelectorAll('.bulk-user-item').forEach(function (item) {
+                item.checked = selectAll.checked;
+            });
+        });
+    })();
+</script>
+{% endblock %}
