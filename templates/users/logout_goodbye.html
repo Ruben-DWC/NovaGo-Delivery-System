@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hasta luego - NovaGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/logout-goodbye.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="logout-shell" data-home-url="{{ home_url }}">
+    <div class="logout-bg"></div>
+
+    <section class="logout-card" aria-live="polite">
+        <div class="logout-circle">
+            <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
+        </div>
+
+        <h1 class="logout-title">Cerrando sesión</h1>
+        <p class="logout-subtitle">
+            {% if role == 'motorizado' %}
+                Tu turno se cerró correctamente. Gracias por completar tus rutas de hoy.
+            {% else %}
+                Tu sesión fue cerrada con éxito. Te esperamos cuando quieras volver.
+            {% endif %}
+        </p>
+
+        <div class="logout-message">
+            {% if role == 'motorizado' %}
+                <i class="fas fa-circle-check" aria-hidden="true"></i> Estado guardado y sesión finalizada.
+            {% else %}
+                <i class="fas fa-shield-halved" aria-hidden="true"></i> Salida segura completada.
+            {% endif %}
+        </div>
+
+        <div class="logout-features">
+            {% if role != 'motorizado' %}
+            <div class="feature-item">
+                <strong><i class="fas fa-bolt" aria-hidden="true"></i> Entregas rápidas</strong>
+                Tiempo promedio de despacho en 22 minutos.
+            </div>
+            <div class="feature-item">
+                <strong><i class="fas fa-lock" aria-hidden="true"></i> Operación segura</strong>
+                Protección activa en pagos y seguimiento.
+            </div>
+            {% else %}
+            <div class="feature-item">
+                <strong><i class="fas fa-chart-column" aria-hidden="true"></i> Rendimiento</strong>
+                <span id="daily-stats">Resumen del día cargando...</span>
+            </div>
+            <div class="feature-item">
+                <strong><i class="fas fa-star" aria-hidden="true"></i> Calificación</strong>
+                <span id="user-rating">Valoración actualizando...</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="logout-timer" role="status">
+            <span>Redireccionando en</span>
+            <span class="timer-number" id="timer">3</span>
+            <span>segundos</span>
+        </div>
+
+        <button type="button" class="logout-skip" id="skip-redirect">
+            <i class="fas fa-house"></i> Ir ahora al inicio
+        </button>
+    </section>
+</div>
+<script src="{% static 'js/users/logout-goodbye.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,595 @@
+{% extends 'base.html' %}
+{% block title %}Mi Perfil - NovaGo{% endblock %}
+{% block extra_css %}
+<style>
+	@import url('https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css');
+
+	.profile-page {
+		max-width: 1120px;
+		margin: 1.4rem auto 2.2rem;
+		padding: 0 1rem;
+	}
+
+	.profile-hero {
+		border-radius: 20px;
+		padding: 1.15rem 1.2rem;
+		border: 1px solid rgba(59, 130, 246, 0.34);
+		background:
+			radial-gradient(circle at 10% 14%, rgba(56, 189, 248, 0.22), transparent 44%),
+			radial-gradient(circle at 84% 86%, rgba(16, 185, 129, 0.22), transparent 36%),
+			linear-gradient(120deg, #0b1220 0%, #16243e 58%, #1f2937 100%);
+		color: #f8fafc;
+		margin-bottom: 0.95rem;
+	}
+
+	.profile-hero h2 {
+		margin: 0;
+		font-size: 1.55rem;
+	}
+
+	.profile-hero p {
+		margin: 0.4rem 0 0;
+		color: #d6e3f8;
+	}
+
+	.profile-layout {
+		display: grid;
+		grid-template-columns: 0.9fr 1.45fr;
+		gap: 0.9rem;
+	}
+
+	.profile-card {
+		border: 1px solid var(--line);
+		border-radius: 16px;
+		background: var(--bg-secondary, #f6f9ff);
+		padding: 0.9rem;
+	}
+
+	.profile-avatar-wrap {
+		text-align: center;
+		margin-bottom: 0.7rem;
+	}
+
+	.profile-avatar {
+		width: 118px;
+		height: 118px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 3px solid rgba(59, 130, 246, 0.35);
+		box-shadow: 0 12px 22px -20px rgba(15, 23, 42, 0.82);
+	}
+
+	.is-hidden {
+		display: none !important;
+	}
+
+	.profile-avatar-fallback {
+		width: 118px;
+		height: 118px;
+		margin: 0 auto;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		background: linear-gradient(120deg, #3b82f6, #0ea5e9);
+		color: #fff;
+		font-size: 2.2rem;
+		font-weight: 800;
+		border: 3px solid rgba(59, 130, 246, 0.35);
+	}
+
+	.profile-name {
+		margin: 0;
+		text-align: center;
+		font-size: 1.04rem;
+		color: var(--text);
+	}
+
+	.profile-role {
+		margin: 0.25rem 0 0;
+		text-align: center;
+		color: var(--text-secondary, #667799);
+		font-size: 0.86rem;
+	}
+
+	.profile-last-updated {
+		margin: 0.3rem 0 0;
+		text-align: center;
+		font-size: 0.76rem;
+		color: var(--text-secondary, #667799);
+	}
+
+	.kpi-grid {
+		margin-top: 0.82rem;
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.kpi-item {
+		border: 1px solid var(--line);
+		border-radius: 10px;
+		background: var(--bg);
+		padding: 0.52rem 0.62rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.kpi-item label {
+		margin: 0;
+		color: var(--text-secondary, #667799);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.kpi-item strong {
+		color: var(--text);
+	}
+
+	.history-card {
+		margin-top: 0.85rem;
+		border: 1px dashed var(--line);
+		border-radius: 12px;
+		padding: 0.66rem;
+		background: var(--bg);
+	}
+
+	.history-card h4 {
+		margin: 0 0 0.5rem;
+		font-size: 0.82rem;
+		font-weight: 800;
+		color: var(--text);
+	}
+
+	.history-list {
+		margin: 0;
+		display: grid;
+		gap: 0.38rem;
+	}
+
+	.history-item {
+		border-top: 1px dashed var(--line);
+		padding-top: 0.38rem;
+		font-size: 0.76rem;
+		color: var(--text-secondary, #667799);
+	}
+
+	.history-item:first-child {
+		border-top: 0;
+		padding-top: 0;
+	}
+
+	.history-fields {
+		font-size: 0.72rem;
+		color: var(--text-secondary, #667799);
+	}
+
+	.profile-help-note,
+	.profile-empty-history-note {
+		color: var(--text-secondary, #667799);
+	}
+
+	.form-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.72rem;
+	}
+
+	.form-col-full {
+		grid-column: 1 / -1;
+	}
+
+	.form-label {
+		display: block;
+		margin-bottom: 0.34rem;
+		color: var(--text);
+		font-weight: 700;
+		font-size: 0.82rem;
+	}
+
+	.field-errors {
+		margin-top: 0.3rem;
+		font-size: 0.76rem;
+		color: #dc2626;
+	}
+
+	.form-actions {
+		margin-top: 0.9rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.52rem;
+	}
+
+	.profile-btn {
+		border-radius: 10px;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.84rem;
+		padding: 0.55rem 0.72rem;
+		border: 1px solid var(--line);
+		color: var(--text);
+		background: var(--bg);
+	}
+
+	.profile-btn.primary {
+		border-color: rgba(16, 185, 129, 0.62);
+		background: linear-gradient(120deg, #10b981, #059669);
+		color: #fff;
+	}
+
+	.cropper-preview-wrap {
+		margin-top: 0.6rem;
+		display: grid;
+		place-items: center;
+	}
+
+	.cropper-preview-circle {
+		width: 132px;
+		height: 132px;
+		border-radius: 50%;
+		overflow: hidden;
+		border: 2px solid rgba(59, 130, 246, 0.45);
+		background: #0b1220;
+	}
+
+	.cropper-preview-circle img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.current-avatar-inline {
+		margin-top: 0.35rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.42rem;
+		padding: 0.2rem 0.45rem;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: var(--bg);
+		font-size: 0.76rem;
+		color: var(--text-secondary, #667799);
+	}
+
+	.current-avatar-inline img {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1px solid rgba(59, 130, 246, 0.4);
+	}
+
+	.crop-image-wrap {
+		max-height: 420px;
+		background: #0f172a;
+	}
+
+	.crop-image-wrap img {
+		display: block;
+		max-width: 100%;
+	}
+
+	html[data-theme='dark'] .profile-card,
+	html[data-theme='dark'] .kpi-item {
+		background: rgba(15, 23, 42, 0.68);
+		border-color: rgba(148, 163, 184, 0.26);
+	}
+
+	html[data-theme='dark'] .profile-name,
+	html[data-theme='dark'] .form-label,
+	html[data-theme='dark'] .kpi-item strong {
+		color: #e2e8f0;
+	}
+
+	html[data-theme='dark'] .profile-role,
+	html[data-theme='dark'] .kpi-item label,
+	html[data-theme='dark'] .profile-last-updated,
+	html[data-theme='dark'] .history-item,
+	html[data-theme='dark'] .history-fields {
+		color: #94a3b8;
+	}
+
+	html[data-theme='dark'] .profile-help-note,
+	html[data-theme='dark'] .profile-empty-history-note {
+		color: #cbd5e1 !important;
+	}
+
+	html[data-theme='dark'] .profile-btn {
+		background: rgba(15, 23, 42, 0.58);
+		border-color: rgba(203, 213, 225, 0.38);
+		color: #e2e8f0;
+	}
+
+	html[data-theme='dark'] .history-card {
+		background: rgba(15, 23, 42, 0.58);
+		border-color: rgba(148, 163, 184, 0.3);
+	}
+
+	@media (max-width: 992px) {
+		.profile-layout {
+			grid-template-columns: 1fr;
+		}
+
+		.form-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+{% endblock %}
+{% block content %}
+<div class="profile-page">
+	<section class="profile-hero">
+		<h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+		<p>Gestiona tu información personal, foto de perfil y datos de contacto.</p>
+	</section>
+
+	<section class="profile-layout">
+		<article class="profile-card">
+			<div class="profile-avatar-wrap">
+				{% if profile_user.foto_perfil %}
+				<img src="{{ profile_user.foto_perfil.url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Foto de perfil" class="profile-avatar" id="profilePreviewAvatar">
+				{% else %}
+				<div class="profile-avatar-fallback" id="profilePreviewFallback">{{ profile_user.username|first|upper }}</div>
+				<img src="" alt="Foto de perfil" class="profile-avatar is-hidden" id="profilePreviewAvatar">
+				{% endif %}
+			</div>
+			<h3 class="profile-name">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+			<p class="profile-role">{{ profile_user.get_role_display }}</p>
+			<p class="profile-last-updated">
+				{% if profile_last_updated_at %}
+				Última actualización: {{ profile_last_updated_at|date:'d/m/Y H:i' }}
+				{% else %}
+				Aún no hay cambios registrados
+				{% endif %}
+			</p>
+
+			{% if profile_user.role == 'cliente' %}
+			<div class="kpi-grid">
+				<div class="kpi-item">
+					<label>Total pedidos</label>
+					<strong>{{ profile_orders_total }}</strong>
+				</div>
+				<div class="kpi-item">
+					<label>Activos</label>
+					<strong>{{ profile_orders_active }}</strong>
+				</div>
+				<div class="kpi-item">
+					<label>Entregados</label>
+					<strong>{{ profile_orders_delivered }}</strong>
+				</div>
+				<div class="kpi-item">
+					<label>Total gastado</label>
+					<strong>S/. {{ profile_total_spent|floatformat:2 }}</strong>
+				</div>
+			</div>
+			{% endif %}
+
+			<div class="history-card">
+				<h4><i class="fas fa-clock-rotate-left"></i> Historial reciente</h4>
+				{% if profile_recent_updates %}
+				<div class="history-list">
+					{% for update in profile_recent_updates %}
+					<div class="history-item">
+						<strong>{{ update.actualizado_en|date:'d/m/Y H:i' }}</strong>
+						{% if update.campos_modificados %}
+						<div class="history-fields">
+							Campos: {% for item in update.campos_modificados %}{{ item.label }}{% if not forloop.last %}, {% endif %}{% endfor %}
+						</div>
+						{% endif %}
+					</div>
+					{% endfor %}
+				</div>
+				{% else %}
+				<p class="mb-0 small profile-empty-history-note">Tus cambios aparecerán aquí para trazabilidad básica.</p>
+				{% endif %}
+			</div>
+		</article>
+
+		<article class="profile-card">
+			<form method="post" enctype="multipart/form-data" novalidate>
+				{% csrf_token %}
+				{% if form.non_field_errors %}
+				<div class="alert alert-danger">{{ form.non_field_errors }}</div>
+				{% endif %}
+
+				<div class="form-grid">
+					<div>
+						<label class="form-label" for="{{ form.first_name.id_for_label }}">Nombres</label>
+						{{ form.first_name }}
+						{% if form.first_name.errors %}
+						<div class="field-errors">{{ form.first_name.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div>
+						<label class="form-label" for="{{ form.last_name.id_for_label }}">Apellidos</label>
+						{{ form.last_name }}
+						{% if form.last_name.errors %}
+						<div class="field-errors">{{ form.last_name.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div>
+						<label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+						{{ form.email }}
+						{% if form.email.errors %}
+						<div class="field-errors">{{ form.email.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div>
+						<label class="form-label" for="{{ form.telefono.id_for_label }}">Teléfono</label>
+						{{ form.telefono }}
+						{% if form.telefono.errors %}
+						<div class="field-errors">{{ form.telefono.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div>
+						<label class="form-label" for="{{ form.fecha_nacimiento.id_for_label }}">Fecha de nacimiento</label>
+						{{ form.fecha_nacimiento }}
+						{% if form.fecha_nacimiento.errors %}
+						<div class="field-errors">{{ form.fecha_nacimiento.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div>
+						<label class="form-label" for="{{ form.foto_perfil.id_for_label }}">Foto de perfil</label>
+						<input
+							type="file"
+							name="{{ form.foto_perfil.html_name }}"
+							id="{{ form.foto_perfil.id_for_label }}"
+							class="form-control"
+							accept="image/png,image/jpeg,image/webp"
+						>
+						{% if profile_user.foto_perfil %}
+						<div class="current-avatar-inline">
+							<img src="{{ profile_user.foto_perfil.url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Avatar actual">
+							<span>Imagen actual cargada</span>
+						</div>
+						{% endif %}
+						{{ form.avatar_cropped_data }}
+						<small class="profile-help-note">Selecciona una foto y luego ajusta el recorte circular.</small>
+						{% if form.foto_perfil.errors %}
+						<div class="field-errors">{{ form.foto_perfil.errors|striptags }}</div>
+						{% endif %}
+						{% if form.avatar_cropped_data.errors %}
+						<div class="field-errors">{{ form.avatar_cropped_data.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div class="form-col-full">
+						<label class="form-label" for="{{ form.direccion.id_for_label }}">Dirección</label>
+						{{ form.direccion }}
+						{% if form.direccion.errors %}
+						<div class="field-errors">{{ form.direccion.errors|striptags }}</div>
+						{% endif %}
+					</div>
+					<div class="form-col-full">
+						<label class="form-label" for="{{ form.bio.id_for_label }}">Biografía</label>
+						{{ form.bio }}
+						{% if form.bio.errors %}
+						<div class="field-errors">{{ form.bio.errors|striptags }}</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="profile-btn primary"><i class="fas fa-floppy-disk"></i> Guardar cambios</button>
+					{% if profile_user.role == 'cliente' %}
+					<a href="{% url 'users:portal_cliente' %}" class="profile-btn"><i class="fas fa-house"></i> Volver al portal</a>
+					{% endif %}
+				</div>
+			</form>
+		</article>
+	</section>
+</div>
+
+<div class="modal fade" id="avatarCropModal" tabindex="-1" aria-labelledby="avatarCropModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="avatarCropModalLabel">Recorta tu foto de perfil</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			</div>
+			<div class="modal-body">
+				<div class="crop-image-wrap">
+					<img id="avatarCropImage" src="" alt="Recorte de avatar">
+				</div>
+				<div class="cropper-preview-wrap">
+					<div class="cropper-preview-circle">
+						<img id="avatarCroppedPreview" src="" alt="Vista previa del recorte">
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="profile-btn" data-bs-dismiss="modal">Cancelar</button>
+				<button type="button" class="profile-btn primary" id="applyAvatarCrop">Aplicar recorte</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+(() => {
+	const input = document.getElementById('id_foto_perfil');
+	const croppedInput = document.getElementById('id_avatar_cropped_data');
+	const preview = document.getElementById('profilePreviewAvatar');
+	const modalEl = document.getElementById('avatarCropModal');
+	const cropImage = document.getElementById('avatarCropImage');
+	const cropPreview = document.getElementById('avatarCroppedPreview');
+	const applyCropBtn = document.getElementById('applyAvatarCrop');
+	const fallback = document.getElementById('profilePreviewFallback');
+	if (!input || !preview || !modalEl || !cropImage || !cropPreview || !applyCropBtn || !croppedInput) return;
+
+	const modal = new bootstrap.Modal(modalEl);
+	let cropper = null;
+	let currentObjectUrl = null;
+
+	const buildCircularPng = (canvas) => {
+		const finalCanvas = document.createElement('canvas');
+		const size = 320;
+		finalCanvas.width = size;
+		finalCanvas.height = size;
+		const ctx = finalCanvas.getContext('2d');
+		ctx.clearRect(0, 0, size, size);
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+		ctx.closePath();
+		ctx.clip();
+		ctx.drawImage(canvas, 0, 0, size, size);
+		ctx.restore();
+		return finalCanvas.toDataURL('image/png');
+	};
+
+	input.addEventListener('change', () => {
+		const file = input.files && input.files[0];
+		if (!file) return;
+		croppedInput.value = '';
+		if (currentObjectUrl) {
+			URL.revokeObjectURL(currentObjectUrl);
+		}
+		currentObjectUrl = URL.createObjectURL(file);
+		cropImage.src = currentObjectUrl;
+		cropPreview.src = currentObjectUrl;
+		modal.show();
+
+		if (cropper) {
+			cropper.destroy();
+		}
+
+		cropper = new Cropper(cropImage, {
+			aspectRatio: 1,
+			viewMode: 1,
+			dragMode: 'move',
+			autoCropArea: 0.92,
+			background: false,
+			responsive: true,
+			preview: '.cropper-preview-circle',
+		});
+	});
+
+	applyCropBtn.addEventListener('click', () => {
+		if (!cropper) return;
+		const canvas = cropper.getCroppedCanvas({
+			width: 320,
+			height: 320,
+			imageSmoothingQuality: 'high',
+		});
+		if (!canvas) return;
+
+		const roundedDataUrl = buildCircularPng(canvas);
+		croppedInput.value = roundedDataUrl;
+		input.value = '';
+		preview.src = roundedDataUrl;
+		preview.classList.remove('is-hidden');
+		if (fallback) fallback.classList.add('is-hidden');
+		modal.hide();
+	});
+
+	modalEl.addEventListener('hidden.bs.modal', () => {
+		if (cropper) {
+			cropper.destroy();
+			cropper = null;
+		}
+	});
+})();
+</script>
+{% endblock %}

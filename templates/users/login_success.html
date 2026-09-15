@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Inicio de sesion exitoso - NovaGo{% endblock %}
+{% block content %}
+<section class="success-screen reveal-up is-visible" data-success-redirect data-seconds="{{ seconds }}" data-destination="{{ destination }}">
+    <div class="success-card">
+        <div class="success-icon success-login">
+            <i class="fas fa-circle-check"></i>
+        </div>
+        <p class="success-kicker">ACCESO CORRECTO</p>
+        <h1>Bienvenido a NovaGo</h1>
+        <p>
+            Inicio de sesion exitoso. En unos segundos te llevamos a tu panel correspondiente.
+        </p>
+        <div class="success-meta">
+            <span><strong>Rol:</strong> {{ role|title }}</span>
+            <span><strong>Redireccion:</strong> <span data-countdown>{{ seconds }}</span>s</span>
+        </div>
+        <a class="btn btn-cta btn-lg mt-3" href="{{ destination }}">Continuar ahora</a>
+    </div>
+</section>
+{% endblock %}

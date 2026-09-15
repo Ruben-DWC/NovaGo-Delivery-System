@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - NovaGo{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible">
+	<div class="section-header">
+		<p class="section-label">MI ESPACIO</p>
+		<h2>Dashboard cliente</h2>
+	</div>
+
+	<div class="row g-3 mb-4">
+		<div class="col-md-4">
+			<div class="metric-card">
+				<strong>{{ total_orders }}</strong>
+				<span>Pedidos totales</span>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="metric-card">
+				<strong>{{ active_orders }}</strong>
+				<span>Pedidos activos</span>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="metric-card">
+				<strong>{{ user.get_role_display }}</strong>
+				<span>Perfil actual</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row g-4">
+		<div class="col-lg-8">
+			<article class="hero-shell">
+				<h5 class="mb-3">Ultimos pedidos</h5>
+				{% if recent_orders %}
+				<div class="table-responsive">
+					<table class="table align-middle mb-0">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Estado</th>
+								<th>Total</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for order in recent_orders %}
+							<tr>
+								<td>{{ order.id }}</td>
+								<td>{{ order.get_estado_display }}</td>
+								<td>S/ {{ order.total }}</td>
+								<td><a class="btn btn-sm btn-outline-dark" href="{% url 'orders:order_detail' order.id %}">Ver</a></td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% else %}
+				<div class="alert alert-info mb-0">Aun no tienes pedidos. Empieza explorando el catalogo.</div>
+				{% endif %}
+			</article>
+		</div>
+		<div class="col-lg-4">
+			<article class="feature-tile h-100">
+				<h5>Acciones rapidas</h5>
+				<div class="d-grid gap-2 mt-3">
+					<a class="btn btn-cta btn-lift" href="{% url 'products:product_list' %}">Ver catalogo</a>
+					<a class="btn btn-outline-dark" href="{% url 'orders:cart' %}">Ir al carrito</a>
+					<a class="btn btn-outline-dark" href="{% url 'orders:order_list' %}">Ver mis pedidos</a>
+				</div>
+			</article>
+		</div>
+	</div>
+</section>
+{% endblock %}
