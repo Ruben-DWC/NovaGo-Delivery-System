@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![GitFlow](https://img.shields.io/badge/GitFlow-Standard-orange.svg)](https://nvie.com/posts/a-successful-git-branching-model/)
 [![License](https://img.shields.io/badge/Academic-UTP_2026--II-red.svg)](https://www.utp.edu.pe)
+[![Icons](https://img.shields.io/badge/Icons-Phosphor_v2.1-purple.svg)](https://phosphoricons.com/)
 
 > **Universidad Tecnológica del Perú (UTP)**  
 > **Facultad de Ingeniería de Sistemas e Informática**  
@@ -13,13 +14,13 @@
 
 ---
 
-## 1. Descripción del Proyecto
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/info-duotone.svg" width="24" height="24" align="center" /> 1. Descripción del Proyecto
 
 Sistema web integral de delivery y gestión de despachos con seguimiento telemático GPS en tiempo real, control riguroso de inventario, pasarela de pagos con conciliación y auditoría administrativa de pedidos. Desarrollado con Django y Python bajo una arquitectura MVT modular y un ciclo de vida gestionado rigurosamente mediante Git y GitHub.
 
 ---
 
-## Propuesta de Valor de NovaGo
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/storefront-duotone.svg" width="24" height="24" align="center" /> Propuesta de Valor de NovaGo
 
 **NovaGo** no compite como marketplace multi-tienda (como DiDi o PedidosYa). NovaGo es un **minimarket digital con delivery propio**.
 
@@ -50,7 +51,7 @@ NovaGo resuelve la falta de coordinación entre inventario, pedidos, pagos y ent
 2. **Motorizados**: revisan pedidos asignados, reportan ubicación y estado de entrega.
 3. **Administradores**: gestionan productos, stock, pedidos, pagos y usuarios.
 
-## Definición del Proyecto (Rubro)
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/shopping-bag-duotone.svg" width="24" height="24" align="center" /> Definición del Proyecto (Rubro)
 
 **NovaGo** se define como una **tienda de conveniencia (minimarket) con delivery propio**.
 
@@ -94,7 +95,7 @@ Con este alcance se prioriza demostrar buenas prácticas de desarrollo y Git (ra
 - [Estructura del Proyecto](#-estructura-del-proyecto
 - [Comandos Útiles](#-comandos-útiles
 
-## Estado Actual del Desarrollo
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/pulse-duotone.svg" width="24" height="24" align="center" /> Estado Actual del Desarrollo
 
 ### Implementado
 
@@ -112,25 +113,25 @@ Con este alcance se prioriza demostrar buenas prácticas de desarrollo y Git (ra
 2. Mayor profundidad en visualización de mapa (ruta interactiva en interfaz).
 3. Cobertura de pruebas automatizadas por módulo.
 
-## 🗺️ Roadmap de Integración
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/map-trifold-duotone.svg" width="24" height="24" align="center" /> Roadmap de Integración
 
-### Fase 1 (base funcional) ✅
+### Fase 1 (Base Funcional) <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/check-circle-duotone.svg" width="20" height="20" align="center" />
 
 - Branding + landing + autenticación + catálogo + carrito + checkout + pedidos + tracking básico.
 
-### Fase 2 (consolidación operativa) 🚧
+### Fase 2 (Consolidación Operativa) <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/hourglass-medium-duotone.svg" width="20" height="20" align="center" />
 
 - Integración visual de mapa en vivo en tracking.
 - Estados de pedido más guiados (workflow operativo).
 - Mejoras de panel cliente y motorizado con indicadores.
 
-### Fase 3 (calidad y demostración final) 📅
+### Fase 3 (Calidad y Demostración Final) <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/calendar-check-duotone.svg" width="20" height="20" align="center" />
 
 - Suite de tests (unitarios e integración).
 - Hardening de validaciones de negocio.
 - Evidencias de rendimiento y usabilidad para exposición.
 
-## 🧪 Cómo Demostrar que NovaGo es Diferente
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/sparkle-duotone.svg" width="24" height="24" align="center" /> Diferenciación y Propuesta de Valor Técnica
 
 Para la sustentación, recomendamos mostrar evidencias concretas:
 
@@ -140,9 +141,9 @@ Para la sustentación, recomendamos mostrar evidencias concretas:
 4. **UX coherente**: tema claro/oscuro, diseño responsive y rutas funcionales.
 5. **Mantenibilidad**: separación de vistas, forms, urls y servicios para evolución sencilla.
 
-## Características
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/package-duotone.svg" width="24" height="24" align="center" /> Características del Sistema
 
-### Para Clientes
+### <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/user-circle-duotone.svg" width="20" height="20" align="center" /> Para Clientes
 
 - Catálogo de productos con stock en tiempo real
 - Carrito de compras
@@ -150,20 +151,20 @@ Para la sustentación, recomendamos mostrar evidencias concretas:
 - Seguimiento GPS del motorizado
 - Historial de pedidos
 
-### Para Motorizados
+### <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/moped-duotone.svg" width="20" height="20" align="center" /> Para Motorizados
 
 - Lista de pedidos asignados
 - Compartir ubicación en tiempo real
 - Actualizar estado de entregas
 
-### Panel Administrativo
+### <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/shield-check-duotone.svg" width="20" height="20" align="center" /> Panel Administrativo
 
 - Gestión de usuarios
 - Control de stock
 - Gestión de pagos
 - Reportes básicos
 
-## Tecnologías
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/cpu-duotone.svg" width="24" height="24" align="center" /> Stack Tecnológico
 
 - **Backend**: Python 3.13 + Django 6.x
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
@@ -171,7 +172,7 @@ Para la sustentación, recomendamos mostrar evidencias concretas:
 - **Control de Versiones**: Git + GitHub
 - **Mapas**: tracking GPS propio + integración de mapa interactivo (Leaflet.js planificado para vista avanzada)
 
-## Instalación
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/terminal-window-duotone.svg" width="24" height="24" align="center" /> Instalación y Despliegue Local
 
 ### Prerrequisitos
 
@@ -230,7 +231,7 @@ python manage.py runserver
 - Frontend: <http://localhost:8000>
 - Admin: <http://localhost:8000/admin>
 
-## Conceptos de Git Aplicados
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/git-branch-duotone.svg" width="24" height="24" align="center" /> Conceptos de Git Aplicados
 
 Este proyecto está diseñado para demostrar los conceptos de la **Primera Unidad** del curso:
 
@@ -485,7 +486,7 @@ git push origin v1.0.0
 git tag
 ```
 
-## Estructura del Proyecto
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/tree-structure-duotone.svg" width="24" height="24" align="center" /> Estructura Modular del Proyecto
 
 ``
 delivery_system/
@@ -519,7 +520,7 @@ delivery_system/
 └── README.md                 # Este archivo
 ``
 
-## Comandos Útiles
+## <img src="https://unpkg.com/@phosphor-icons/core@2.1.1/assets/duotone/command-duotone.svg" width="24" height="24" align="center" /> Comandos Frecuentes
 
 ### Django
 
