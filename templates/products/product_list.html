@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Catalogo - NovaGo{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products/catalog.css' %}">
+{% endblock %}
+{% block content %}
+<section class="section-space reveal-up is-visible catalog-page">
+    <div class="catalog-hero">
+        <p class="section-label">CATALOGO</p>
+        <h2>Productos disponibles</h2>
+        <p class="catalog-subtitle">Selecciona tus favoritos, agrega al carrito y sigue tu pedido en tiempo real.</p>
+    </div>
+
+    <form class="row g-2 mb-4 catalog-search" method="get" action="{% url search_url_name %}">
+        <div class="col-md-9">
+            <input type="search" class="form-control form-control-lg" name="q" value="{{ search_query }}" placeholder="Busca snacks, bebidas o basicos...">
+        </div>
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-cta btn-lg btn-lift">Buscar</button>
+        </div>
+    </form>
+
+    <div class="mb-4 d-flex flex-wrap gap-2 catalog-filters">
+        <a class="btn btn-outline-dark {% if not active_category %}active{% endif %}" href="{% url catalog_url_name %}">Todos</a>
+        {% for category in categories %}
+            <a class="btn btn-outline-dark {% if active_category == category.id %}active{% endif %}" href="{% url catalog_category_url_name category.id %}">{{ category.nombre }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <article class="catalog-card h-100">
+                <a href="{% url product_detail_url_name product.id %}" class="catalog-image-wrap" aria-label="Ver detalle de {{ product.nombre }}">
+                    {% if product.imagen %}
+                    <img class="catalog-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}">
+                    {% else %}
+                    <img class="catalog-image" src="https://picsum.photos/seed/novago-{{ product.id }}/640/420" alt="{{ product.nombre }}">
+                    {% endif %}
+                    {% if product.destacado %}
+                    <span class="catalog-badge">Destacado</span>
+                    {% endif %}
+                </a>
+
+                <div class="catalog-body">
+                    <div class="catalog-top">
+                        <h5>{{ product.nombre }}</h5>
+                        <span class="catalog-category">{{ product.categoria.nombre|default:'General' }}</span>
+                    </div>
+                    <p class="catalog-description">{{ product.descripcion|truncatechars:80 }}</p>
+
+                    <div class="catalog-meta">
+                        <p class="catalog-price">S/ {{ product.precio }}</p>
+                        {% if product.stock > 0 %}
+                        <p class="catalog-stock in-stock">Stock {{ product.stock }}</p>
+                        {% else %}
+                        <p class="catalog-stock out-stock">Sin stock</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-dark" href="{% url product_detail_url_name product.id %}">Ver detalle</a>
+                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <button class="btn btn-cta btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>Agregar al carrito</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No se encontraron productos para tu búsqueda.</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <div class="pagination justify-content-center catalog-pagination">
+            {% if page_obj.has_previous %}
+            <span class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}">Anterior</a></span>
+            {% endif %}
+            <span class="page-item active"><span class="page-link">{{ page_obj.number }}</span></span>
+            {% if page_obj.has_next %}
+            <span class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}">Siguiente</a></span>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
+</section>
+{% endblock %}
