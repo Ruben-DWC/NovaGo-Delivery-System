@@ -1,42 +1,144 @@
 {% extends 'base.html' %}
-{% block title %}Catalogo - NovaGo{% endblock %}
+{% block title %}Catálogo - NovaGo{% endblock %}
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products/catalog.css' %}">
+<style>
+    .catalog-toolbar {
+        background: var(--surface-card, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .category-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        text-decoration: none;
+        background: #f8fafc;
+    }
+    .category-pill:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+        transform: translateY(-1px);
+    }
+    .category-pill.active {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+    .category-badge-count {
+        background: rgba(0,0,0,0.08);
+        border-radius: 9999px;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .category-pill.active .category-badge-count {
+        background: rgba(255,255,255,0.25);
+    }
+    .qty-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+    }
+    .qty-btn {
+        background: #f1f5f9;
+        border: none;
+        padding: 0.25rem 0.6rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: #475569;
+    }
+    .qty-btn:hover { background: #e2e8f0; }
+    .qty-input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+</style>
 {% endblock %}
 {% block content %}
 <section class="section-space reveal-up is-visible catalog-page">
-    <div class="catalog-hero">
-        <p class="section-label">CATALOGO</p>
-        <h2>Productos disponibles</h2>
-        <p class="catalog-subtitle">Selecciona tus favoritos, agrega al carrito y sigue tu pedido en tiempo real.</p>
+    <div class="catalog-hero mb-4">
+        <p class="section-label">CATÁLOGO DE PRODUCTOS</p>
+        <h2>Explora y Ordena en NovaGo</h2>
+        <p class="catalog-subtitle">Productos frescos preparados al momento. Selecciona, personaliza y sigue tu entrega en vivo.</p>
     </div>
 
-    <form class="row g-2 mb-4 catalog-search" method="get" action="{% url search_url_name %}">
-        <div class="col-md-9">
-            <input type="search" class="form-control form-control-lg" name="q" value="{{ search_query }}" placeholder="Busca snacks, bebidas o basicos...">
-        </div>
-        <div class="col-md-3 d-grid">
-            <button type="submit" class="btn btn-cta btn-lg btn-lift">Buscar</button>
-        </div>
-    </form>
+    <!-- Barra de herramientas: Búsqueda, Filtros y Ordenamiento -->
+    <div class="catalog-toolbar">
+        <form class="row g-3 align-items-center" method="get" action="{% url search_url_name %}">
+            {% if active_category %}
+            <input type="hidden" name="categoria" value="{{ active_category }}">
+            {% endif %}
+            <div class="col-lg-5 col-md-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="search" class="form-control border-start-0" name="q" value="{{ search_query }}" placeholder="Buscar por nombre o ingredientes...">
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="" {% if not active_sort %}selected{% endif %}>Ordenar por: Recomendados</option>
+                    <option value="precio_asc" {% if active_sort == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                    <option value="precio_desc" {% if active_sort == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                    <option value="nombre_asc" {% if active_sort == 'nombre_asc' %}selected{% endif %}>Nombre: A - Z</option>
+                    <option value="recientes" {% if active_sort == 'recientes' %}selected{% endif %}>Más Recientes</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-sm-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">S/ Min</span>
+                    <input type="number" step="0.5" class="form-control" name="min_price" value="{{ min_price }}" placeholder="0">
+                </div>
+            </div>
+            <div class="col-lg-2 col-sm-2 d-grid">
+                <button type="submit" class="btn btn-primary btn-lift">Filtrar</button>
+            </div>
+        </form>
 
-    <div class="mb-4 d-flex flex-wrap gap-2 catalog-filters">
-        <a class="btn btn-outline-dark {% if not active_category %}active{% endif %}" href="{% url catalog_url_name %}">Todos</a>
-        {% for category in categories %}
-            <a class="btn btn-outline-dark {% if active_category == category.id %}active{% endif %}" href="{% url catalog_category_url_name category.id %}">{{ category.nombre }}</a>
-        {% endfor %}
+        <hr class="my-3 opacity-25">
+
+        <!-- Píldoras de Categorías con Conteo -->
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small fw-semibold me-1">Categorías:</span>
+            <a class="category-pill {% if not active_category %}active{% endif %}" href="{% url catalog_url_name %}{% if active_sort %}?sort={{ active_sort }}{% endif %}">
+                Todos <span class="category-badge-count">{{ total_all_products }}</span>
+            </a>
+            {% for category in categories %}
+                <a class="category-pill {% if active_category == category.id %}active{% endif %}" href="{% url catalog_category_url_name category.id %}{% if active_sort %}?sort={{ active_sort }}{% endif %}">
+                    {{ category.nombre }} <span class="category-badge-count">{{ category.total_productos }}</span>
+                </a>
+            {% endfor %}
+        </div>
     </div>
 
+    <!-- Grilla de Productos -->
     <div class="row g-4">
         {% for product in products %}
         <div class="col-sm-6 col-lg-4 col-xl-3">
-            <article class="catalog-card h-100">
+            <article class="catalog-card h-100 shadow-sm border-0">
                 <a href="{% url product_detail_url_name product.id %}" class="catalog-image-wrap" aria-label="Ver detalle de {{ product.nombre }}">
                     {% if product.imagen %}
-                    <img class="catalog-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}">
+                    <img class="catalog-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}" loading="lazy">
                     {% else %}
-                    <img class="catalog-image" src="https://picsum.photos/seed/novago-{{ product.id }}/640/420" alt="{{ product.nombre }}">
+                    <img class="catalog-image" src="https://picsum.photos/seed/novago-{{ product.id }}/640/420" alt="{{ product.nombre }}" loading="lazy">
                     {% endif %}
                     {% if product.destacado %}
                     <span class="catalog-badge">Destacado</span>
@@ -45,47 +147,58 @@
 
                 <div class="catalog-body">
                     <div class="catalog-top">
-                        <h5>{{ product.nombre }}</h5>
-                        <span class="catalog-category">{{ product.categoria.nombre|default:'General' }}</span>
+                        <h5 class="fw-bold text-truncate" title="{{ product.nombre }}">{{ product.nombre }}</h5>
+                        <span class="catalog-category badge bg-light text-secondary border">{{ product.categoria.nombre|default:'General' }}</span>
                     </div>
-                    <p class="catalog-description">{{ product.descripcion|truncatechars:80 }}</p>
+                    <p class="catalog-description text-muted small">{{ product.descripcion|truncatechars:75 }}</p>
 
-                    <div class="catalog-meta">
-                        <p class="catalog-price">S/ {{ product.precio }}</p>
+                    <div class="catalog-meta d-flex justify-content-between align-items-center mb-3">
+                        <p class="catalog-price mb-0 fw-bold fs-5 text-primary">S/ {{ product.precio }}</p>
                         {% if product.stock > 0 %}
-                        <p class="catalog-stock in-stock">Stock {{ product.stock }}</p>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Stock {{ product.stock }}</span>
                         {% else %}
-                        <p class="catalog-stock out-stock">Sin stock</p>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Agotado</span>
                         {% endif %}
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a class="btn btn-outline-dark" href="{% url product_detail_url_name product.id %}">Ver detalle</a>
-                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="quantity" value="1">
-                        <button class="btn btn-cta btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>Agregar al carrito</button>
+                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="d-flex gap-2">
+                            {% csrf_token %}
+                            <div class="qty-control">
+                                <button type="button" class="qty-btn" aria-label="Disminuir cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)>1) el.value=parseInt(el.value)-1;">-</button>
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input" aria-label="Cantidad para {{ product.nombre }}" readonly>
+                                <button type="button" class="qty-btn" aria-label="Aumentar cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)<{{ product.stock }}) el.value=parseInt(el.value)+1;">+</button>
+                            </div>
+                            <button class="btn btn-primary flex-grow-1 btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart me-1"></i> Agregar
+                            </button>
                         </form>
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url product_detail_url_name product.id %}">Ver detalles</a>
                     </div>
                 </div>
             </article>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">No se encontraron productos para tu búsqueda.</div>
+        <div class="col-12 text-center py-5">
+            <div class="alert alert-light border shadow-sm p-5 d-inline-block">
+                <i class="fas fa-search fa-3x text-muted mb-3 d-block"></i>
+                <h4 class="fw-bold">No se encontraron productos</h4>
+                <p class="text-muted mb-3">Prueba con otros términos de búsqueda o cambia la categoría seleccionada.</p>
+                <a href="{% url catalog_url_name %}" class="btn btn-outline-primary">Ver todos los productos</a>
+            </div>
         </div>
         {% endfor %}
     </div>
 
     {% if is_paginated %}
-    <nav class="mt-4">
+    <nav class="mt-5">
         <div class="pagination justify-content-center catalog-pagination">
             {% if page_obj.has_previous %}
-            <span class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}">Anterior</a></span>
+            <span class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}">&laquo; Anterior</a></span>
             {% endif %}
-            <span class="page-item active"><span class="page-link">{{ page_obj.number }}</span></span>
+            <span class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></span>
             {% if page_obj.has_next %}
-            <span class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}">Siguiente</a></span>
+            <span class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}">Siguiente &raquo;</a></span>
             {% endif %}
         </div>
     </nav>
