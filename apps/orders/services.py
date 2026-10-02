@@ -162,6 +162,31 @@ class OrderService:
         CartService.clear(request)
         return order
 
+    @staticmethod
+    @transaction.atomic
+    def cancel_order(order, reason=""):
+        """
+        Cancela un pedido y reintegra el stock de cada producto al inventario.
+        Resuelve Issue #1: Corrección de stock en pedidos cancelados.
+        """
+        if order.estado in ['entregado', 'cancelado']:
+            raise ValueError(f"No se puede cancelar un pedido en estado {order.estado}.")
+
+        for item in order.items.select_related('producto'):
+            item.producto.aumentar_stock(item.cantidad)
+
+        order.estado = 'cancelado'
+        if reason:
+            order.notas = f"{order.notas} | Motivo cancelacion: {reason}".strip(" | ")
+        order.save(update_fields=['estado', 'notas'])
+
+        if hasattr(order, 'pago') and order.pago.estado == 'pendiente':
+            order.pago.estado = 'fallido'
+            order.pago.save(update_fields=['estado'])
+
+        JornadaService.broadcast_order_status(order)
+        return order
+
 
 class AutoAsignmentService:
     """
