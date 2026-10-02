@@ -19,11 +19,20 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView, RedirectView
+from apps.users import views as user_views
+from apps.tracking import views as tracking_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/home/')),
     path('home/', TemplateView.as_view(template_name='home.html'), name='home'),
+    
+    # Rutas Canónicas de Portales (Consolidación de Arquitectura de Rutas Avance 2)
+    path('portal/', user_views.PortalDispatcherRedirectView.as_view(), name='portal_root'),
+    path('portal/admin/', user_views.AdminDashboardView.as_view(), name='canonical_portal_admin'),
+    path('portal/cliente/', user_views.ClientPortalView.as_view(), name='canonical_portal_cliente'),
+    path('portal/motorizado/', tracking_views.MotorizadoDashboardView.as_view(), name='canonical_portal_motorizado'),
+    
     path('users/', include('apps.users.urls')),
     path('products/', include('apps.products.urls')),
     path('orders/', include('apps.orders.urls')),

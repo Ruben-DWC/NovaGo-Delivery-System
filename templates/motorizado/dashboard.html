@@ -333,25 +333,25 @@
                         </div>
 
                         <div class="delivery-actions">
-                            <a href="{% url 'tracking:track_order' order.id %}" class="action-btn primary">
-                                <i class="fas fa-map"></i> Ver Ruta
+                            <a href="{% url 'tracking:track_order' order.id %}" class="action-btn primary" title="Abrir navegacion GPS y ruta interactiva">
+                                <i class="ph-duotone ph-map-pin-line fs-5"></i> Ver Ruta
                             </a>
-                            <a href="tel:{{ order.telefono_contacto }}" class="action-btn secondary">
-                                <i class="fas fa-phone"></i> Llamar
+                            <a href="tel:{{ order.telefono_contacto }}" class="action-btn secondary" title="Llamar directamente al cliente">
+                                <i class="ph-duotone ph-phone-call fs-5"></i> Llamar
                             </a>
                             {% if order.estado == 'confirmado' %}
-                            <button type="button" class="action-btn secondary" onclick="marcarEnPreparacion({{ order.id }})">
-                                <i class="fas fa-utensils"></i> En preparacion
+                            <button type="button" class="action-btn secondary" onclick="marcarEnPreparacion({{ order.id }})" title="Marcar orden en cocina/preparacion">
+                                <i class="ph-duotone ph-cooking-pot fs-5"></i> En preparacion
                             </button>
                             {% endif %}
                             {% if order.estado != 'en_camino' and order.estado != 'entregado' and order.estado != 'cancelado' %}
-                            <button type="button" class="action-btn primary" onclick="marcarEnCamino({{ order.id }})">
-                                <i class="fas fa-motorcycle"></i> Iniciar ruta
+                            <button type="button" class="action-btn primary" onclick="marcarEnCamino({{ order.id }})" title="Iniciar desplazamiento hacia direccion de cliente">
+                                <i class="ph-duotone ph-moped fs-5"></i> Iniciar ruta
                             </button>
                             {% endif %}
                             {% if order.estado != 'entregado' and order.estado != 'cancelado' %}
-                            <button type="button" class="action-btn success" onclick="marcarEntregado({{ order.id }})">
-                                <i class="fas fa-circle-check"></i> Marcar entregado
+                            <button type="button" class="action-btn success" onclick="marcarEntregado({{ order.id }})" title="Confirmar entrega final del pedido">
+                                <i class="ph-duotone ph-check-circle fs-5"></i> Marcar entregado
                             </button>
                             {% endif %}
                         </div>
