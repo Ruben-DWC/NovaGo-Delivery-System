@@ -14,17 +14,43 @@ class ProductListView(ListView):
 		queryset = (
 			Producto.objects.select_related('categoria')
 			.filter(activo=True)
-			.order_by('-destacado', '-fecha_creacion')
 		)
 
 		categoria_id = self.kwargs.get('categoria_id')
 		query = self.request.GET.get('q', '').strip()
+		sort = self.request.GET.get('sort', '').strip()
+		min_price = self.request.GET.get('min_price', '').strip()
+		max_price = self.request.GET.get('max_price', '').strip()
 
 		if categoria_id:
 			queryset = queryset.filter(categoria_id=categoria_id, categoria__activa=True)
 
 		if query:
 			queryset = queryset.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+
+		if min_price:
+			try:
+				queryset = queryset.filter(precio__gte=float(min_price))
+			except (ValueError, TypeError):
+				pass
+
+		if max_price:
+			try:
+				queryset = queryset.filter(precio__lte=float(max_price))
+			except (ValueError, TypeError):
+				pass
+
+		# Ordenamiento dinámico
+		if sort == 'precio_asc':
+			queryset = queryset.order_by('precio')
+		elif sort == 'precio_desc':
+			queryset = queryset.order_by('-precio')
+		elif sort == 'nombre_asc':
+			queryset = queryset.order_by('nombre')
+		elif sort == 'recientes':
+			queryset = queryset.order_by('-fecha_creacion')
+		else:
+			queryset = queryset.order_by('-destacado', '-fecha_creacion')
 
 		return queryset
 
@@ -41,9 +67,20 @@ class ProductListView(ListView):
 			context['catalog_category_url_name'] = 'products:product_list_by_category'
 			context['product_detail_url_name'] = 'products:product_detail'
 			context['search_url_name'] = 'products:product_search'
-		context['categories'] = Categoria.objects.filter(activa=True).order_by('nombre')
+
+		# Categorías con conteo de productos activos
+		from django.db.models import Count
+		categories_with_count = Categoria.objects.filter(activa=True).annotate(
+			total_productos=Count('productos', filter=Q(productos__activo=True))
+		).order_by('nombre')
+
+		context['categories'] = categories_with_count
+		context['total_all_products'] = Producto.objects.filter(activo=True).count()
 		context['active_category'] = self.kwargs.get('categoria_id')
 		context['search_query'] = self.request.GET.get('q', '').strip()
+		context['active_sort'] = self.request.GET.get('sort', '').strip()
+		context['min_price'] = self.request.GET.get('min_price', '').strip()
+		context['max_price'] = self.request.GET.get('max_price', '').strip()
 		return context
 
 

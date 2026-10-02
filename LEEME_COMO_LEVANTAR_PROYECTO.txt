@@ -1,0 +1,70 @@
+================================================================================
+  NOVAGO DELIVERY SYSTEM - GUÍA RÁPIDA PARA LEVANTAR EL PROYECTO
+================================================================================
+
+Este archivo contiene el código fuente completo del sistema web NovaGo Delivery System
+(Django 5/6 + SQLite + Phosphor Icons) para ser ejecutado en cualquier ordenador.
+
+--------------------------------------------------------------------------------
+1. REQUISITOS PREVIOS
+--------------------------------------------------------------------------------
+- Python 3.10 o superior instalado (recomendado Python 3.11, 3.12 o 3.13).
+- pip (gestor de paquetes de Python).
+
+--------------------------------------------------------------------------------
+2. PASOS PARA EJECUTAR EN TU ORDENADOR
+--------------------------------------------------------------------------------
+
+Paso 1: Abrir una terminal en la carpeta descomprimida del proyecto:
+        cd ruta/a/delivery_system
+
+Paso 2: Crear un entorno virtual (recomendado):
+        - En Windows:
+            python -m venv venv
+            venv\Scripts\activate
+
+        - En Linux / macOS:
+            python3 -m venv venv
+            source venv/bin/activate
+
+Paso 3: Instalar las librerías necesarias:
+        pip install -r requirements.txt
+
+Paso 4: (Opcional - La base de datos db.sqlite3 ya viene con datos y usuarios listos):
+        python manage.py migrate
+
+Paso 5: Iniciar el servidor local:
+        python manage.py runserver
+
+Paso 6: Abrir en tu navegador web:
+        http://127.0.0.1:8000/
+
+--------------------------------------------------------------------------------
+3. CUENTAS Y CREDENCIALES DE PRUEBA PRECONFIGURADAS
+--------------------------------------------------------------------------------
+
+A) ADMINISTRADOR / SUPERUSER:
+   - Usuario: admin_hdd
+   - Clave:   Admin2026!
+   - Panel:   http://127.0.0.1:8000/users/portal/admin/
+   - Django:  http://127.0.0.1:8000/admin/
+
+B) CLIENTE:
+   - Usuario: cliente_demo
+   - Clave:   Cliente2026!
+   - Panel:   http://127.0.0.1:8000/users/portal/cliente/
+
+C) MOTORIZADO / REPARTIDOR:
+   - Usuario: moto_demo
+   - Clave:   Moto2026!
+   - Panel:   http://127.0.0.1:8000/tracking/portal/motorizado/
+
+--------------------------------------------------------------------------------
+4. RUTAS PRINCIPALES DEL SISTEMA
+--------------------------------------------------------------------------------
+- Inicio / Catálogo Público: http://127.0.0.1:8000/home/
+- Login Unificado:           http://127.0.0.1:8000/users/login/
+- Catálogo de Productos:     http://127.0.0.1:8000/products/
+- Carrito de Compras:        http://127.0.0.1:8000/orders/carrito/
+- Rastrear Pedido:           http://127.0.0.1:8000/tracking/rastrear/1/
+================================================================================

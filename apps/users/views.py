@@ -1529,3 +1529,13 @@ class RegisterSuccessView(LoginRequiredMixin, TemplateView):
         context['was_reactivated'] = was_reactivated
         context['seconds'] = 3
         return context
+
+
+class PortalDispatcherRedirectView(LoginRequiredMixin, View):
+    """
+    Despachador central de rutas /portal/ que redirige automáticamente
+    al usuario autenticado a su portal correspondiente según su rol.
+    """
+    def get(self, request, *args, **kwargs):
+        return redirect(resolve_destination_by_role(request.user))
+
