@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6">
-                <select class="form-select" name="sort" onchange="this.form.submit()">
+                <select class="form-select" name="sort" onchange="this.form.submit()" title="Criterio de ordenamiento" aria-label="Criterio de ordenamiento">
                     <option value="" {% if not active_sort %}selected{% endif %}>Ordenar por: Recomendados</option>
                     <option value="precio_asc" {% if active_sort == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
                     <option value="precio_desc" {% if active_sort == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
