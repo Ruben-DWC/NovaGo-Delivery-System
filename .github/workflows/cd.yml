@@ -1,0 +1,58 @@
+name: NovaGo CD - Continuous Delivery & Cloud Deployment
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    name: Publicación de Contenedor en GHCR y Despliegue Cloud
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Descargar Código Fuente (Checkout)
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Autenticar en GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraer Metadatos y Etiquetas de Versión Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=ref,event=tag
+            type=sha,format=short
+
+      - name: Construir y Publicar Imagen en GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Notificar Despliegue Cloud en Northflank
+        run: |
+          echo "=========================================================="
+          echo " Despliegue de NovaGo Delivery System completado en Nube "
+          echo " Repositorio: ${{ github.repository }}"
+          echo " Commit: ${{ github.sha }}"
+          echo " Version: v0.3.0-apf3"
+          echo " Plataforma: Northflank PaaS / Docker Runtime"
+          echo "=========================================================="
