@@ -6,3 +6,10 @@ channels==4.3.2
 daphne==4.2.1
 openpyxl==3.1.5
 reportlab==4.2.5
+dj-database-url==2.3.0
+psycopg2-binary==2.9.10
+whitenoise==6.9.0
+gunicorn==23.0.0
+pytest==8.3.4
+pytest-django==4.9.0
+flake8==7.1.1
