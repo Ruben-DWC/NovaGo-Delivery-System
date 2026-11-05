@@ -175,7 +175,7 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 
@@ -195,3 +195,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'  # Resolucion unificada: co
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
+
+WHITENOISE_MANIFEST_STRICT = False
