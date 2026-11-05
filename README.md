@@ -1,15 +1,21 @@
 # NovaGo - Sistema de Delivery & Despacho de Encomiendas
 
+[![CI/CD Pipeline](https://github.com/Ruben-DWC/NovaGo-Delivery-System/actions/workflows/ci.yml/badge.svg)](https://github.com/Ruben-DWC/NovaGo-Delivery-System/actions)
+[![Release](https://img.shields.io/badge/Release-v0.3.0--apf3-blue.svg)](https://github.com/Ruben-DWC/NovaGo-Delivery-System/releases)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage_Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Package Manager](https://img.shields.io/badge/Packaging-uv_(Astral)_%26_pip-blueviolet.svg)](https://github.com/astral-sh/uv)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_16_Alpine-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Django](https://img.shields.io/badge/Django-6.0-green.svg)](https://www.djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![GitFlow](https://img.shields.io/badge/GitFlow-Standard-orange.svg)](https://nvie.com/posts/a-successful-git-branching-model/)
-[![License](https://img.shields.io/badge/Academic-UTP_2026--II-red.svg)](https://www.utp.edu.pe)
-[![Icons](https://img.shields.io/badge/Icons-Phosphor_v2.1-purple.svg)](https://phosphoricons.com/)
 
 > **Universidad Tecnológica del Perú (UTP)**  
 > **Facultad de Ingeniería de Sistemas e Informática**  
 > **Curso:** Herramientas de Desarrollo (`100000S66T`) - Ciclo 2026-II  
-> **Estudiante:** Ruben Walter Vivas Jimenez (Código: `U18209770` | Correo: `u22224908@utp.edu.pe`)  
+> **Docente Oficial:** MBA Mg. Ing. Rene Alonso Nieto Valencia  
+> **Equipo de Desarrollo (Modalidad Dúo Oficial UTP):**  
+> 1. **Ruben Walter Vivas Jimenez** (Código: `U18209770` | Correo: `u22224908@utp.edu.pe` | GitHub: [`@Ruben-DWC`](https://github.com/Ruben-DWC)) - *Líder Backend & Cloud Architecture*  
+> 2. **Conislla Lavado Cesar Jesus** (Código: `U23264049` | Correo: `u23264049@utp.edu.pe` | GitHub: [`@umaten`](https://github.com/umaten)) - *Responsable QA, CI/CD & Telemetría*  
 > **Repositorio Oficial:** [https://github.com/Ruben-DWC/NovaGo-Delivery-System](https://github.com/Ruben-DWC/NovaGo-Delivery-System)
 
 ---
@@ -561,13 +567,63 @@ git checkout -- archivo.py
 git diff develop..main
 ```
 
-## Equipo de Desarrollo
+## Equipo de Desarrollo (Modalidad Dúo Oficial UTP)
 
-- **Miembro 1**: Feature/Usuarios y Autenticación
-- **Miembro 2**: Feature/Productos y Stock
-- **Miembro 3**: Feature/Pedidos y Carrito
-- **Miembro 4**: Feature/Pagos
-- **Miembro 5**: Feature/GPS Tracking
+| Integrante | Código UTP | Correo Institucional | Rol Técnico Principal | Responsabilidades Clave |
+|---|---|---|---|---|
+| **Ruben Walter Vivas Jimenez** | `U18209770` | `u22224908@utp.edu.pe` | Líder Backend & Cloud Architecture | Arquitectura Docker multi-stage, `docker-compose.yml`, soporte dual SQLite/PostgreSQL 16, GitFlow central y releases. |
+| **Conislla Lavado Cesar Jesus** | `U23264049` | `u23264049@utp.edu.pe` | Responsable QA, CI/CD & Telemetría | Endpoint `/health/`, suite de 14 pruebas Pytest, workflows de GitHub Actions (`ci.yml`, `cd.yml`) y gestión de incidencias. |
+
+## 🚀 Despliegue y Ejecución Rápida (APF3)
+
+### Opción 1: Ejecución con uv (Recomendada - 10x a 50x más rápida)
+`uv` es el gestor moderno de paquetes de Python desarrollado en Rust por Astral:
+```bash
+# Instalar dependencias a velocidad ultrarrápida
+uv pip install -r requirements.txt
+
+# Aplicar migraciones
+uv run python manage.py migrate
+
+# Iniciar servidor de desarrollo
+uv run python manage.py runserver
+```
+
+### Opción 2: Ejecución Tradicional con pip
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+### Opción 3: Orquestación con Docker & Docker Compose
+```bash
+# Construir y levantar servicios web y base de datos PostgreSQL 16
+docker compose up -d --build
+
+# Verificar estado y logs de salud
+docker compose ps
+docker compose logs -f web
+
+# Validar endpoint de disponibilidad
+curl http://localhost:8000/health/
+```
+
+### Endpoint de Monitoreo y Telemetría (`/health/`)
+NovaGo expone un endpoint de salud HTTP 200 en `/health/` que devuelve telemetría en tiempo real:
+```json
+{
+  "status": "healthy",
+  "app_name": "NovaGo Delivery System",
+  "version": "0.3.0-apf3",
+  "environment": "production-container",
+  "database": {
+    "status": "connected",
+    "latency_ms": 12.4
+  }
+}
+```
 
 ## Convenciones del Proyecto
 
