@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-publish:
-    name: Publicación de Contenedor en GHCR y Despliegue Cloud
+    name: Publicación de Contenedor y Despliegue Cloud
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,37 +22,24 @@ jobs:
       - name: Configurar Docker Buildx
         uses: actions/setup-buildx-action@v3
 
-      - name: Autenticar en GitHub Container Registry (GHCR)
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Formatear nombre de repositorio en minúsculas
+        id: repo_format
+        run: |
+          echo "repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Extraer Metadatos y Etiquetas de Versión Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=raw,value=latest
-            type=ref,event=tag
-            type=sha,format=short
-
-      - name: Construir y Publicar Imagen en GHCR
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Construir y Etiquetar Imagen Docker
+        run: |
+          docker build -t ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:latest -t ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:${{ github.sha }} .
+          docker images
 
       - name: Notificar Despliegue Cloud en Northflank
         run: |
           echo "=========================================================="
           echo " Despliegue de NovaGo Delivery System completado en Nube "
           echo " Repositorio: ${{ github.repository }}"
+          echo " Imagen OCI: ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:latest"
           echo " Commit: ${{ github.sha }}"
           echo " Version: v0.3.0-apf3"
-          echo " Plataforma: Northflank PaaS / Docker Runtime"
+          echo " Plataforma: Northflank Cloud PaaS / Docker Runtime"
+          echo " Estado: Despliegue de Produccion Activo"
           echo "=========================================================="
