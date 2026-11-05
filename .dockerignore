@@ -1,0 +1,40 @@
+# Git y control de versiones
+.git
+.gitignore
+.github
+
+# Entornos virtuales locales
+.venv
+venv
+ENV/
+env/
+
+# Base de datos local SQLite y backups
+db.sqlite3
+db.sqlite3-journal
+*.backup
+*.backup.docx
+
+# Archivos temporales y caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos estáticos recolectados y subidas locales
+staticfiles/
+media/vouchers/*
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentación institucional pesada
+*.docx
+*.pdf
+report_assets/
