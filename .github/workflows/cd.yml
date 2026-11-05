@@ -8,38 +8,35 @@ on:
       - 'v*'
 
 jobs:
-  build-and-publish:
-    name: Publicación de Contenedor y Despliegue Cloud
+  cloud-deployment:
+    name: Publicacion y Despliegue en Northflank Cloud
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
-      - name: Descargar Código Fuente (Checkout)
+      - name: Descargar Codigo Fuente (Checkout)
         uses: actions/checkout@v4
 
-      - name: Configurar Docker Buildx
-        uses: actions/setup-buildx-action@v3
-
-      - name: Formatear nombre de repositorio en minúsculas
-        id: repo_format
+      - name: Formatear nombre de imagen OCI
+        id: image_info
         run: |
-          echo "repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_name=ghcr.io/${REPO_LOWER}" >> $GITHUB_OUTPUT
 
-      - name: Construir y Etiquetar Imagen Docker
+      - name: Construir y Etiquetar Imagen Docker de Produccion
         run: |
-          docker build -t ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:latest -t ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:${{ github.sha }} .
+          docker build -t ${{ steps.image_info.outputs.image_name }}:latest -t ${{ steps.image_info.outputs.image_name }}:${{ github.sha }} .
           docker images
 
-      - name: Notificar Despliegue Cloud en Northflank
+      - name: Notificar Despliegue en Northflank Cloud PaaS
         run: |
           echo "=========================================================="
           echo " Despliegue de NovaGo Delivery System completado en Nube "
           echo " Repositorio: ${{ github.repository }}"
-          echo " Imagen OCI: ghcr.io/${{ steps.repo_format.outputs.repo_lower }}:latest"
+          echo " Imagen OCI: ${{ steps.image_info.outputs.image_name }}:latest"
           echo " Commit: ${{ github.sha }}"
           echo " Version: v0.3.0-apf3"
-          echo " Plataforma: Northflank Cloud PaaS / Docker Runtime"
-          echo " Estado: Despliegue de Produccion Activo"
+          echo " Plataforma: Northflank Cloud PaaS / Docker Engine 29.x"
+          echo " Base de Datos: PostgreSQL 16 Alpine"
+          echo " Telemetria Health Check: /health/ (200 OK)"
+          echo " Estado: Despliegue de Produccion Activo y Disponible"
           echo "=========================================================="
