@@ -20,9 +20,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView, RedirectView
 from apps.users import views as user_views
+from config import views as config_views
 from apps.tracking import views as tracking_views
 
 urlpatterns = [
+    path('health/', config_views.healthcheck_view, name='healthcheck'),
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/home/')),
     path('home/', TemplateView.as_view(template_name='home.html'), name='home'),

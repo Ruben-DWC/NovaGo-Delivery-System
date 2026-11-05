@@ -39,8 +39,7 @@ class RolePortalAccessTests(TestCase):
 	def test_motorizado_cannot_access_portal_cliente(self):
 		self.client.force_login(self.motorizado)
 		response = self.client.get(reverse('users:portal_cliente'))
-		self.assertEqual(response.status_code, 302)
-		self.assertRedirects(response, reverse('home'))
+		self.assertEqual(response.status_code, 403)
 
 	def test_motorizado_can_access_portal_motorizado(self):
 		self.client.force_login(self.motorizado)
@@ -50,8 +49,7 @@ class RolePortalAccessTests(TestCase):
 	def test_cliente_cannot_access_portal_motorizado(self):
 		self.client.force_login(self.cliente)
 		response = self.client.get(reverse('users:portal_motorizado'), follow=True)
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response.redirect_chain[-1][0], reverse('home'))
+		self.assertEqual(response.status_code, 403)
 
 	def test_admin_can_access_portal_admin(self):
 		self.client.force_login(self.admin_user)
@@ -61,8 +59,7 @@ class RolePortalAccessTests(TestCase):
 	def test_cliente_cannot_access_portal_admin(self):
 		self.client.force_login(self.cliente)
 		response = self.client.get(reverse('users:portal_admin'))
-		self.assertEqual(response.status_code, 302)
-		self.assertRedirects(response, reverse('home'))
+		self.assertEqual(response.status_code, 403)
 
 	def test_admin_can_apply_bulk_user_activation(self):
 		self.cliente.is_active = False
