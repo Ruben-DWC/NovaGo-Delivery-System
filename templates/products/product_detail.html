@@ -17,11 +17,7 @@
                     {% endif %}
                 </div>
                 <div class="detail-image-wrap">
-                    {% if product.imagen %}
-                    <img class="detail-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}">
-                    {% else %}
-                    <img class="detail-image" src="https://picsum.photos/seed/novago-detail-{{ product.id }}/1100/700" alt="{{ product.nombre }}">
-                    {% endif %}
+                    <img class="detail-image" src="{{ product.imagen_url }}" alt="{{ product.nombre }}">
                 </div>
                 <h2>{{ product.nombre }}</h2>
                 <p class="detail-description">{{ product.descripcion }}</p>

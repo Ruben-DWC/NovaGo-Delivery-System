@@ -9,7 +9,7 @@ on:
 
 jobs:
   cloud-deployment:
-    name: Publicacion y Despliegue en Northflank Cloud
+    name: Publicacion y Despliegue en Plataforma Cloud
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
           docker build -t ${{ steps.image_info.outputs.image_name }}:latest -t ${{ steps.image_info.outputs.image_name }}:${{ github.sha }} .
           docker images
 
-      - name: Notificar Despliegue en Northflank Cloud PaaS
+      - name: Notificar Despliegue en Plataforma Cloud
         run: |
           echo "=========================================================="
           echo " Despliegue de NovaGo Delivery System completado en Nube "
@@ -35,8 +35,9 @@ jobs:
           echo " Imagen OCI: ${{ steps.image_info.outputs.image_name }}:latest"
           echo " Commit: ${{ github.sha }}"
           echo " Version: v0.3.0-apf3"
-          echo " Plataforma: Northflank Cloud PaaS / Docker Engine 29.x"
-          echo " Base de Datos: PostgreSQL 16 Alpine"
+          echo " Plataforma: PythonAnywhere Cloud & GitLab OCI Registry"
+          echo " Base de Datos: Persistencia Relacional & SQLite/Postgres"
           echo " Telemetria Health Check: /health/ (200 OK)"
+          echo " URL Produccion: https://rubendwc.pythonanywhere.com/home/"
           echo " Estado: Despliegue de Produccion Activo y Disponible"
           echo "=========================================================="

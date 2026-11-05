@@ -23,11 +23,7 @@
                 {% for item in items %}
                 <article class="cart-item-card">
                     <a class="cart-item-media" href="{% url 'products:product_detail' item.producto.id %}" aria-label="Ver detalle de {{ item.producto.nombre }}">
-                        {% if item.producto.imagen %}
-                        <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
-                        {% else %}
-                        <img src="https://picsum.photos/seed/cart-{{ item.producto.id }}/320/240" alt="{{ item.producto.nombre }}">
-                        {% endif %}
+                        <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}">
                     </a>
 
                     <div class="cart-item-content">

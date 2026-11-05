@@ -135,11 +135,7 @@
         <div class="col-sm-6 col-lg-4 col-xl-3">
             <article class="catalog-card h-100 shadow-sm border-0">
                 <a href="{% url product_detail_url_name product.id %}" class="catalog-image-wrap" aria-label="Ver detalle de {{ product.nombre }}">
-                    {% if product.imagen %}
-                    <img class="catalog-image" src="{{ product.imagen.url }}" alt="{{ product.nombre }}" loading="lazy">
-                    {% else %}
-                    <img class="catalog-image" src="https://picsum.photos/seed/novago-{{ product.id }}/640/420" alt="{{ product.nombre }}" loading="lazy">
-                    {% endif %}
+                    <img class="catalog-image" src="{{ product.imagen_url }}" alt="{{ product.nombre }}" loading="lazy">
                     {% if product.destacado %}
                     <span class="catalog-badge">Destacado</span>
                     {% endif %}
