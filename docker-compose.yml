@@ -1,0 +1,66 @@
+# ==============================================================================
+# Orquestación de Contenedores Docker Compose para NovaGo Delivery System
+# Servicio Web Django (Daphne/Gunicorn) + Base de Datos Relacional PostgreSQL 16
+# Avance de Proyecto Final 03 (APF3) - Herramientas de Desarrollo UTP
+# Autor: Ruben Walter Vivas Jimenez (Ruben-DWC / u22224908@utp.edu.pe)
+# ==============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: novago_postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-novago_db}
+      POSTGRES_USER: ${POSTGRES_USER:-novago_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-NovaGoSecure2026!}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novago_user -d novago_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - novago_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: novago_web_app
+    restart: always
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             daphne -b 0.0.0.0 -p 8000 config.asgi:application"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-novago-apf3-production-key-2026-utp
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - DATABASE_URL=postgres://novago_user:NovaGoSecure2026!@db:5432/novago_db
+      - DJANGO_SETTINGS_MODULE=config.settings
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - novago_network
+
+volumes:
+  postgres_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+
+networks:
+  novago_network:
+    driver: bridge

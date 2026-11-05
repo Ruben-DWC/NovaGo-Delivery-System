@@ -1,17 +1,23 @@
 """
 Constantes de configuración y políticas operativas de NovaGo Delivery System.
-Versión unificada y conciliada colaborativamente para el Avance 2 (APF2).
+Módulo de Arquitectura, Contenedores Docker y Despliegue Cloud (APF3).
+Autor: Ruben Walter Vivas Jimenez (Ruben-DWC / u22224908@utp.edu.pe)
 """
 from decimal import Decimal
 
-# Versión y metadatos del sistema (Consolidación APF2)
-APP_VERSION = "0.2.0-apf2"
+# Versión y metadatos del sistema (Avance 3 - Infraestructura Cloud & Docker)
+APP_VERSION = "0.3.0-apf3-infra"
 APP_NAME = "NovaGo Delivery System"
-APP_ENV = "development"
+APP_ENV = "production-ready"
 CANONICAL_PORTAL_PREFIX = "/portal/"
 
-# Tarifas base y parámetros de delivery (Consenso Comercial y Operativo)
+# Infraestructura de Contenedores y Plataforma Cloud
+DEPLOYMENT_PLATFORM = "Northflank Cloud PaaS / Docker Engine 29.x"
+CLOUD_DATABASE_ENGINE = "PostgreSQL 16 Relational Engine"
+CI_CD_ORCHESTRATOR = "GitHub Actions Automation (CI/CD)"
+
+# Tarifas base y parámetros de delivery
 DELIVERY_FEE_BASE = Decimal("5.00")
-DELIVERY_FREE_THRESHOLD = Decimal("50.00")  # Beneficio comercial acordado para clientes
+DELIVERY_FREE_THRESHOLD = Decimal("50.00")
 DEFAULT_ETA_MINUTES = 25
-MAX_ACTIVE_ORDERS_PER_RIDER = 3  # Capacidad operativa ampliada para motorizados
+MAX_ACTIVE_ORDERS_PER_RIDER = 3
