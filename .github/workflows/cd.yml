@@ -1,6 +1,6 @@
 name: NovaGo CD - Continuous Delivery & Cloud Deployment
 
-on:
+'on':
   push:
     branches:
       - main
