@@ -1,16 +1,20 @@
 name: NovaGo CD - Continuous Delivery & Cloud Deployment
 
-on:
+'on':
   push:
     branches:
       - main
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   cloud-deployment:
     name: Publicacion y Despliegue en Plataforma Cloud
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Descargar Codigo Fuente (Checkout)
@@ -24,7 +28,7 @@ jobs:
 
       - name: Construir y Etiquetar Imagen Docker de Produccion
         run: |
-          docker build -t ${{ steps.image_info.outputs.image_name }}:latest -t ${{ steps.image_info.outputs.image_name }}:${{ github.sha }} .
+          docker build -t "${{ steps.image_info.outputs.image_name }}:latest" -t "${{ steps.image_info.outputs.image_name }}:${{ github.sha }}" .
           docker images
 
       - name: Notificar Despliegue en Plataforma Cloud
@@ -35,9 +39,10 @@ jobs:
           echo " Imagen OCI: ${{ steps.image_info.outputs.image_name }}:latest"
           echo " Commit: ${{ github.sha }}"
           echo " Version: v0.3.0-apf3"
-          echo " Plataforma: PythonAnywhere Cloud & GitLab OCI Registry"
+          echo " Plataforma: PythonAnywhere Cloud & GitHub Container Registry (GHCR)"
           echo " Base de Datos: Persistencia Relacional & SQLite/Postgres"
           echo " Telemetria Health Check: /health/ (200 OK)"
           echo " URL Produccion: https://rubendwc.pythonanywhere.com/home/"
           echo " Estado: Despliegue de Produccion Activo y Disponible"
           echo "=========================================================="
+
