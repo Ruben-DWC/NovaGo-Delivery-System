@@ -15,12 +15,17 @@
 .forbidden-card {
     max-width: 580px;
     width: 100%;
-    background: var(--bg-card, #ffffff);
+    background: var(--bg-secondary, #ffffff);
     border-radius: 1rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--line, #e2e8f0);
     padding: 2.5rem;
     text-align: center;
+}
+html[data-theme='dark'] .forbidden-card {
+    background: #121c31;
+    border-color: rgba(148, 163, 184, 0.24);
+    box-shadow: 0 16px 36px -20px rgba(0, 0, 0, 0.85);
 }
 .forbidden-icon-badge {
     display: inline-flex;
@@ -46,6 +51,10 @@
     text-align: left;
     font-size: 0.88rem;
     margin-bottom: 1.5rem;
+}
+html[data-theme='dark'] .forbidden-info-box {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(148, 163, 184, 0.2);
 }
 </style>
 {% endblock %}

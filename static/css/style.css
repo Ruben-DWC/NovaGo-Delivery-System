@@ -1,6 +1,7 @@
 :root {
     --bg: #f4f6fb;
     --bg-secondary: #f6f9fd;
+    --bg-card: #ffffff;
     --surface: #ffffff;
     --surface-2: #f9fbff;
     --text: #162033;
@@ -33,6 +34,7 @@
 html[data-theme='dark'] {
     --bg: #0b1221;
     --bg-secondary: #121c31;
+    --bg-card: #121c31;
     --surface: #121c31;
     --surface-2: #16233a;
     --text: #e6eefc;
