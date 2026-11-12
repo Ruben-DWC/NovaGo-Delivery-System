@@ -11,7 +11,8 @@
             <span>Tu Carrito</span>
             <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count"
                   x-text="count"
-                  :class="{ 'd-none': count === 0 }"
+                  x-show="count > 0"
+                  x-cloak
                   {% if not cart_count %}style="display: none;"{% endif %}>{{ cart_count|default:0 }}</span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito" title="Cerrar"></button>
@@ -20,7 +21,8 @@
         <!-- Contenedor dinámico de ítems con Alpine.js -->
         <div id="cartDrawerItemsList"
              class="flex-grow-1 overflow-y-auto p-3 vstack gap-3"
-             :class="{ 'd-none': items.length === 0 }"
+             x-show="items && items.length > 0"
+             x-cloak
              {% if not cart_items %}style="display: none;"{% endif %}>
             
             <template x-for="item in items" :key="item.id">
@@ -41,9 +43,10 @@
                     <div class="flex-grow-1 min-w-0">
                         <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold"
                             :title="item.nombre"
-                            x-text="item.nombre"></h6>
+                            x-text="item.nombre"
+                            style="color: var(--text, #f1f5f9);"></h6>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="small text-muted" x-text="'S/ ' + Number(item.precio).toFixed(2)"></span>
+                            <span class="small" style="color: var(--text-soft, #94a3b8);" x-text="'S/ ' + Number(item.precio).toFixed(2)"></span>
                             <strong class="text-brand small" x-text="'S/ ' + Number(item.subtotal).toFixed(2)"></strong>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
@@ -95,7 +98,8 @@
         <!-- Estado vacío con microinteracciones y feedback claro -->
         <div id="cartDrawerEmpty"
              class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-4 text-center"
-             :class="{ 'd-none': items.length > 0 }"
+             x-show="!items || items.length === 0"
+             x-cloak
              {% if cart_items %}style="display: none;"{% endif %}>
             <div class="cart-drawer-empty-icon mb-3 empty-state-icon">
                 <i class="fas fa-shopping-bag fa-2x"></i>
@@ -110,7 +114,8 @@
         <!-- Resumen y checkout footer reactivo -->
         <div id="cartDrawerFooter"
              class="cart-drawer-footer border-top p-3 bg-surface"
-             :class="{ 'd-none': items.length === 0 }"
+             x-show="items && items.length > 0"
+             x-cloak
              {% if not cart_items %}style="display: none;"{% endif %}>
             <div class="d-flex justify-content-between small text-muted mb-1">
                 <span>Subtotal</span>
@@ -179,6 +184,14 @@ function alpineCartDrawer() {
         },
 
         applyCartData(data) {
+            const listEl = document.getElementById('cartDrawerItemsList');
+            const emptyEl = document.getElementById('cartDrawerEmpty');
+            const footerEl = document.getElementById('cartDrawerFooter');
+
+            if (listEl) listEl.style.removeProperty('display');
+            if (emptyEl) emptyEl.style.removeProperty('display');
+            if (footerEl) footerEl.style.removeProperty('display');
+
             if (data.items) {
                 this.items = data.items.map(function(it) {
                     return {
@@ -206,7 +219,9 @@ function alpineCartDrawer() {
         },
 
         async updateQty(id, newQty) {
-            if (newQty < 0) return;
+            if (newQty < 1) {
+                return this.removeItem(id);
+            }
             this.loading = true;
             try {
                 const formData = new FormData();

@@ -317,14 +317,24 @@ function initializeGlobalCartDrawer() {
     const updateCartUI = (data, options = {}) => {
         if (!data) return;
 
-        // Notify Alpine.js reactive components
+        // 1. Notify Alpine.js reactive components
         window.dispatchEvent(new CustomEvent('cart-updated', { detail: data }));
 
-        // 1. Navbar & floating badge counters
+        // 2. Clear any conflicting inline styles from initial SSR render
+        const drawerItemsEl = document.getElementById('cartDrawerItemsList');
+        const drawerEmptyEl = document.getElementById('cartDrawerEmpty');
+        const drawerFooterEl = document.getElementById('cartDrawerFooter');
+
+        if (drawerItemsEl) drawerItemsEl.style.removeProperty('display');
+        if (drawerEmptyEl) drawerEmptyEl.style.removeProperty('display');
+        if (drawerFooterEl) drawerFooterEl.style.removeProperty('display');
+
+        // 3. Navbar & floating badge counters
         document.querySelectorAll('.js-nav-cart-count').forEach(el => {
             el.textContent = data.cart_count || 0;
             if (data.cart_count > 0) {
                 el.classList.remove('d-none');
+                el.style.removeProperty('display');
                 el.classList.remove('cart-pulse-anim');
                 void el.offsetWidth;
                 el.classList.add('cart-pulse-anim');
@@ -333,7 +343,7 @@ function initializeGlobalCartDrawer() {
             }
         });
 
-        // 2. Floating action pill
+        // 4. Floating action pill
         if (floatingPill) {
             if (data.cart_count > 0) {
                 floatingPill.classList.remove('is-hidden');
@@ -345,7 +355,7 @@ function initializeGlobalCartDrawer() {
             floatingTotal.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
         }
 
-        // 3. Offcanvas totals
+        // 5. Offcanvas totals
         if (subtotalEl && data.cart_subtotal !== undefined) {
             subtotalEl.textContent = 'S/ ' + Number(data.cart_subtotal).toFixed(2);
         }
@@ -356,12 +366,12 @@ function initializeGlobalCartDrawer() {
             totalEl.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
         }
 
-        // 4. Offcanvas items list
-        if (itemsListEl && emptyEl && footerEl) {
+        // 6. Vanilla DOM fallback ONLY when Alpine.js is not active
+        if (!window.Alpine && drawerItemsEl && drawerEmptyEl && drawerFooterEl) {
             if (data.items && data.items.length > 0) {
-                itemsListEl.classList.remove('d-none');
-                emptyEl.classList.add('d-none');
-                footerEl.classList.remove('d-none');
+                drawerItemsEl.classList.remove('d-none');
+                drawerEmptyEl.classList.add('d-none');
+                drawerFooterEl.classList.remove('d-none');
 
                 let html = '';
                 data.items.forEach(item => {
@@ -387,15 +397,15 @@ function initializeGlobalCartDrawer() {
                         </div>
                     </article>`;
                 });
-                itemsListEl.innerHTML = html;
+                drawerItemsEl.innerHTML = html;
             } else {
-                itemsListEl.classList.add('d-none');
-                emptyEl.classList.remove('d-none');
-                footerEl.classList.add('d-none');
+                drawerItemsEl.classList.add('d-none');
+                drawerEmptyEl.classList.remove('d-none');
+                drawerFooterEl.classList.add('d-none');
             }
         }
 
-        // 5. Toast feedback
+        // 7. Toast feedback
         const toastEl = document.getElementById('cartToast');
         const toastMsg = document.getElementById('cartToastMsg');
         if (options.showToast && toastEl && toastMsg && typeof bootstrap !== 'undefined') {
@@ -404,7 +414,7 @@ function initializeGlobalCartDrawer() {
             toast.show();
         }
 
-        // 6. Auto-open drawer if requested
+        // 8. Auto-open drawer if requested
         if (options.openDrawer && drawerEl && typeof bootstrap !== 'undefined') {
             const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
             offcanvas.show();
