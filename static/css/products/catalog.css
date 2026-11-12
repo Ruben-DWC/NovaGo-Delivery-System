@@ -119,7 +119,7 @@
 .catalog-description,
 .product-card-description {
     margin: 0;
-    color: #475569;
+    color: var(--text-soft, #5d6880);
     min-height: 2.8rem;
 }
 
@@ -544,8 +544,13 @@ html[data-theme='dark'] .catalog-subtitle,
 html[data-theme='dark'] .catalog-description,
 html[data-theme='dark'] .product-card-description,
 html[data-theme='dark'] .detail-description,
-html[data-theme='dark'] .related-price {
-    color: #cbd5e1 !important;
+html[data-theme='dark'] .related-price,
+html[data-bs-theme='dark'] .catalog-description,
+html[data-bs-theme='dark'] .product-card-description,
+[data-theme='dark'] .catalog-description,
+[data-bs-theme='dark'] .catalog-description,
+body.dark-mode .catalog-description {
+    color: #e2e8f0 !important;
 }
 
 html[data-theme='dark'] .catalog-toolbar {
