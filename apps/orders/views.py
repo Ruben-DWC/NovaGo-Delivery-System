@@ -24,6 +24,15 @@ class AddToCartView(View):
 	def post(self, request, producto_id):
 		quantity = request.POST.get('quantity', 1)
 		CartService.add_product(request, producto_id, quantity)
+		totals = CartService.get_totals(request)
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+			return JsonResponse({
+				'status': 'success',
+				'message': 'Producto agregado al carrito.',
+				'cart_count': totals['count'],
+				'cart_total': float(totals['total']),
+				'cart_subtotal': float(totals['subtotal']),
+			})
 		messages.success(request, 'Producto agregado al carrito.')
 		return redirect(request.META.get('HTTP_REFERER', 'orders:cart'))
 

@@ -6,7 +6,9 @@
 {% endblock %}
 {% block content %}
 <section class="section-space reveal-up is-visible product-detail-page">
-    <a href="{% url catalog_url_name %}" class="btn btn-outline-dark mb-3">Volver al catalogo</a>
+    <a href="{% url catalog_url_name %}" class="btn-card-detail mb-3 d-inline-flex align-items-center gap-2">
+        <i class="fas fa-arrow-left"></i> Volver al catálogo
+    </a>
     <div class="row g-4">
         <div class="col-lg-7">
             <article class="hero-shell detail-shell">
@@ -24,12 +26,12 @@
 
                 <div class="detail-meta-grid">
                     <div class="detail-meta-item">
-                        <span>Categoria</span>
-                        <strong>{{ product.categoria.nombre|default:'Sin categoria' }}</strong>
+                        <span>Categoría</span>
+                        <strong>{{ product.categoria.nombre|default:'Sin categoría' }}</strong>
                     </div>
                     <div class="detail-meta-item">
                         <span>Precio</span>
-                        <strong>S/ {{ product.precio }}</strong>
+                        <strong class="catalog-price">S/ {{ product.precio }}</strong>
                     </div>
                     <div class="detail-meta-item">
                         <span>Disponibilidad</span>
@@ -38,18 +40,20 @@
                 </div>
 
                 {% if product.stock > 0 %}
-                <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="row g-2 align-items-end detail-buy-form" data-detail-qty-form>
+                <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="row g-2 align-items-end detail-buy-form js-detail-cart-form" data-product-name="{{ product.nombre }}" data-detail-qty-form>
                     {% csrf_token %}
                     <div class="col-sm-4">
-                        <label class="form-label" for="qty">Cantidad</label>
+                        <label class="form-label fw-bold" for="qty">Cantidad</label>
                         <div class="detail-qty-control" role="group" aria-label="Cantidad para {{ product.nombre }}">
-                            <button type="button" class="detail-qty-btn" data-detail-qty-minus>-</button>
-                            <input class="form-control" type="number" id="qty" name="quantity" min="1" max="{{ product.stock }}" value="1">
-                            <button type="button" class="detail-qty-btn" data-detail-qty-plus>+</button>
+                            <button type="button" class="detail-qty-btn" data-detail-qty-minus aria-label="Disminuir">-</button>
+                            <input class="form-control" type="number" id="qty" name="quantity" min="1" max="{{ product.stock }}" value="1" aria-label="Cantidad">
+                            <button type="button" class="detail-qty-btn" data-detail-qty-plus aria-label="Aumentar">+</button>
                         </div>
                     </div>
                     <div class="col-sm-8 d-grid">
-                        <button class="btn btn-cta btn-lift" type="submit">Agregar al carrito</button>
+                        <button class="btn btn-cta btn-lift" type="submit">
+                            <i class="fas fa-shopping-cart me-1"></i> Agregar al carrito
+                        </button>
                     </div>
                 </form>
                 <p class="detail-stock-note mt-2 mb-0">Disponibles ahora: {{ product.stock }} unidades</p>
@@ -67,46 +71,123 @@
                             <strong>{{ item.nombre }}</strong>
                             <p class="related-price">S/ {{ item.precio }}</p>
                         </div>
-                        <a href="{% url product_detail_url_name item.id %}" class="btn btn-sm btn-outline-dark">Ver</a>
+                        <a href="{% url product_detail_url_name item.id %}" class="btn-card-detail">Ver</a>
                     </div>
                 {% empty %}
-                    <p class="text-muted">Aun no hay productos relacionados.</p>
+                <p class="text-muted">Aún no hay productos relacionados.</p>
                 {% endfor %}
             </article>
         </div>
     </div>
 </section>
+
+<!-- Floating Cart Action Pill -->
+<aside id="floating-cart-pill" class="floating-cart-container {% if not cart_count %}is-hidden{% endif %}" aria-label="Acceso rápido al carrito de compras">
+    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
+        <div class="cart-pill-icon">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-pill-counter js-nav-cart-count">{{ cart_count|default:0 }}</span>
+        </div>
+        <div class="cart-pill-info">
+            <span class="cart-pill-label">Mi Carrito</span>
+            <span class="cart-pill-total" id="floating-cart-total">S/ {{ cart_total|floatformat:2 }}</span>
+        </div>
+        <div class="cart-pill-arrow">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </a>
+</aside>
+
+<!-- Toast Notification Feedback -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+    <div id="cartToast" class="toast cart-toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="fas fa-circle-check text-success fs-5"></i>
+                <span id="cartToastMsg">¡Producto agregado al carrito!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var form = document.querySelector('[data-detail-qty-form]');
-    if (!form) {
-        return;
-    }
+    const form = document.querySelector('[data-detail-qty-form]');
+    const toastEl = document.getElementById('cartToast');
+    const toast = toastEl && typeof bootstrap !== 'undefined' ? new bootstrap.Toast(toastEl, { delay: 3500 }) : null;
+    const toastMsg = document.getElementById('cartToastMsg');
+    const floatingPill = document.getElementById('floating-cart-pill');
+    const floatingTotal = document.getElementById('floating-cart-total');
 
-    var input = form.querySelector('#qty');
-    var minus = form.querySelector('[data-detail-qty-minus]');
-    var plus = form.querySelector('[data-detail-qty-plus]');
-    if (!input || !minus || !plus) {
-        return;
-    }
+    if (form) {
+        const input = form.querySelector('#qty');
+        const minus = form.querySelector('[data-detail-qty-minus]');
+        const plus = form.querySelector('[data-detail-qty-plus]');
 
-    minus.addEventListener('click', function () {
-        var min = parseInt(input.min || '1', 10);
-        var val = parseInt(input.value || '1', 10);
-        if (isNaN(val)) {
-            val = min;
+        if (input && minus && plus) {
+            minus.addEventListener('click', function () {
+                const min = parseInt(input.min || '1', 10);
+                const val = parseInt(input.value || '1', 10);
+                input.value = String(Math.max(min, (isNaN(val) ? min : val) - 1));
+            });
+
+            plus.addEventListener('click', function () {
+                const max = parseInt(input.max || '9999', 10);
+                const val = parseInt(input.value || '1', 10);
+                input.value = String(Math.min(max, (isNaN(val) ? 1 : val) + 1));
+            });
         }
-        input.value = String(Math.max(min, val - 1));
-    });
 
-    plus.addEventListener('click', function () {
-        var max = parseInt(input.max || '9999', 10);
-        var val = parseInt(input.value || '1', 10);
-        if (isNaN(val)) {
-            val = 1;
-        }
-        input.value = String(Math.min(max, val + 1));
-    });
+        form.addEventListener('submit', function (e) {
+            const formData = new FormData(form);
+            const action = form.action;
+            const productName = form.getAttribute('data-product-name') || '';
+
+            e.preventDefault();
+            fetch(action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (res.ok) return res.json();
+                throw new Error('Fallback POST');
+            })
+            .then(data => {
+                // Actualizar badges
+                document.querySelectorAll('.js-nav-cart-count').forEach(el => {
+                    el.textContent = data.cart_count;
+                    el.classList.remove('d-none');
+                    el.classList.remove('cart-pulse-anim');
+                    void el.offsetWidth;
+                    el.classList.add('cart-pulse-anim');
+                });
+
+                if (floatingTotal && data.cart_total !== undefined) {
+                    floatingTotal.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
+                }
+
+                if (floatingPill && data.cart_count > 0) {
+                    floatingPill.classList.remove('is-hidden');
+                    floatingPill.classList.remove('cart-pulse-anim');
+                    void floatingPill.offsetWidth;
+                    floatingPill.classList.add('cart-pulse-anim');
+                }
+
+                if (toast && toastMsg) {
+                    toastMsg.textContent = `¡"${productName}" agregado al carrito!`;
+                    toast.show();
+                }
+            })
+            .catch(() => {
+                form.submit();
+            });
+        });
+    }
 });
 </script>
 {% endblock %}

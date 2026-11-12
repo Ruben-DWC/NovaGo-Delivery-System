@@ -205,17 +205,24 @@ html[data-theme='dark'] .cart-count-pill {
     color: #bae6fd;
 }
 
-html[data-theme='dark'] .cart-page .btn-outline-dark {
+html[data-theme='dark'] .cart-page .btn-outline-dark,
+html[data-theme='dark'] .cart-page .btn-outline-secondary {
     color: #e2e8f0;
     border-color: rgba(148, 163, 184, 0.55);
     background: rgba(15, 23, 42, 0.45);
 }
 
 html[data-theme='dark'] .cart-page .btn-outline-dark:hover,
-html[data-theme='dark'] .cart-page .btn-outline-dark:focus {
-    color: #0f172a;
-    background: #e2e8f0;
-    border-color: #e2e8f0;
+html[data-theme='dark'] .cart-page .btn-outline-dark:focus,
+html[data-theme='dark'] .cart-page .btn-outline-secondary:hover,
+html[data-theme='dark'] .cart-page .btn-outline-secondary:focus {
+    color: #ffffff;
+    background: #1e2e4a;
+    border-color: #60a5fa;
+}
+
+html[data-theme='dark'] .cart-summary-line strong.text-primary {
+    color: #ff8c66 !important;
 }
 
 @media (max-width: 992px) {

@@ -1,21 +1,26 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Carrito - NovaGo{% endblock %}
+{% block title %}Carrito de Compras - NovaGo{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/orders/cart.css' %}">
 {% endblock %}
 {% block content %}
 <section class="section-space reveal-up is-visible cart-page">
-    <div class="section-header">
-        <p class="section-label">COMPRA</p>
-        <h2>Tu carrito</h2>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <p class="section-label mb-1">MI COMPRA</p>
+            <h2 class="mb-0">Tu Carrito</h2>
+        </div>
+        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i class="fas fa-arrow-left"></i> Continuar comprando
+        </a>
     </div>
 
     {% if items %}
     <div class="cart-layout">
         <div class="cart-items-shell">
             <div class="cart-head-row">
-                <p class="mb-0">Productos en carrito</p>
+                <p class="mb-0 fw-bold">Productos seleccionados</p>
                 <span class="cart-count-pill">{{ count }} item{{ count|pluralize }}</span>
             </div>
 
@@ -23,18 +28,20 @@
                 {% for item in items %}
                 <article class="cart-item-card">
                     <a class="cart-item-media" href="{% url 'products:product_detail' item.producto.id %}" aria-label="Ver detalle de {{ item.producto.nombre }}">
-                        <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}">
+                        <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}" loading="lazy">
                     </a>
 
                     <div class="cart-item-content">
                         <div class="cart-item-top">
                             <div>
-                                <h5 class="cart-item-title mb-1">{{ item.producto.nombre }}</h5>
+                                <h5 class="cart-item-title mb-1 fw-bold">{{ item.producto.nombre }}</h5>
                                 <p class="cart-item-price mb-0">Precio unitario: <strong>S/ {{ item.producto.precio }}</strong></p>
                             </div>
                             <form method="post" action="{% url 'orders:remove_from_cart' item.producto.id %}">
                                 {% csrf_token %}
-                                <button class="btn btn-sm btn-danger" type="submit" title="Quitar {{ item.producto.nombre }}">Quitar</button>
+                                <button class="btn btn-sm btn-outline-danger" type="submit" title="Quitar {{ item.producto.nombre }}">
+                                    <i class="fas fa-trash-can"></i> Quitar
+                                </button>
                             </form>
                         </div>
 
@@ -42,11 +49,11 @@
                             <form method="post" action="{% url 'orders:update_cart' item.producto.id %}" class="qty-form" data-qty-form>
                                 {% csrf_token %}
                                 <div class="qty-control" role="group" aria-label="Cantidad para {{ item.producto.nombre }}">
-                                    <button type="button" class="qty-btn" data-qty-minus>-</button>
+                                    <button type="button" class="qty-btn" data-qty-minus aria-label="Disminuir">-</button>
                                     <input type="number" class="form-control qty-input" name="quantity" min="0" max="{{ item.producto.stock }}" value="{{ item.cantidad }}" aria-label="Cantidad para {{ item.producto.nombre }}" title="Cantidad para {{ item.producto.nombre }}">
-                                    <button type="button" class="qty-btn" data-qty-plus>+</button>
+                                    <button type="button" class="qty-btn" data-qty-plus aria-label="Aumentar">+</button>
                                 </div>
-                                <button class="btn btn-outline-dark btn-sm" type="submit">Actualizar</button>
+                                <button class="btn btn-outline-secondary btn-sm" type="submit">Actualizar</button>
                             </form>
                             <p class="cart-item-subtotal mb-0">Subtotal: <strong>S/ {{ item.subtotal }}</strong></p>
                         </div>
@@ -58,36 +65,54 @@
 
         <aside class="cart-summary-shell">
             <article class="hero-shell cart-summary-card">
-                <h5>Resumen de compra</h5>
+                <h5 class="fw-bold mb-3">Resumen de compra</h5>
                 <div class="cart-summary-line">
                     <span>Subtotal</span>
                     <strong>S/ {{ subtotal }}</strong>
                 </div>
                 <div class="cart-summary-line">
-                    <span>Envio</span>
+                    <span>Envío</span>
                     <strong>S/ {{ shipping }}</strong>
                 </div>
                 <div class="cart-summary-line total">
-                    <span>Total</span>
-                    <strong>S/ {{ total }}</strong>
+                    <span>Total a pagar</span>
+                    <strong class="text-primary fs-5">S/ {{ total }}</strong>
                 </div>
 
-                <div class="mt-3 d-grid gap-2">
+                <div class="mt-4 d-grid gap-2">
                     {% if user.is_authenticated and user.role == 'cliente' %}
-                    <a class="btn btn-cta btn-lift" href="{% url 'users:portal_cliente_pago' %}">Ir a pago y checkout</a>
+                    <a class="btn btn-cta btn-lift py-2" href="{% url 'users:portal_cliente_pago' %}">
+                        <i class="fas fa-credit-card me-1"></i> Ir a pago y checkout
+                    </a>
+                    {% elif user.is_authenticated %}
+                    <div class="alert alert-warning small mb-2">
+                        Has iniciado sesión como <strong>{{ user.get_role_display }}</strong>. Para realizar compras con delivery, accede con una cuenta de <strong>Cliente</strong>.
+                    </div>
                     {% else %}
-                    <a class="btn btn-cta btn-lift" href="{% url 'users:login' %}">Inicia sesion para finalizar</a>
+                    <a class="btn btn-cta btn-lift py-2" href="{% url 'users:login' %}?next={% url 'users:portal_cliente_pago' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i> Inicia sesión para ordenar
+                    </a>
+                    <a class="btn btn-outline-primary btn-sm py-2" href="{% url 'users:register' %}">
+                        <i class="fas fa-user-plus me-1"></i> ¿No tienes cuenta? Regístrate aquí
+                    </a>
                     {% endif %}
-                    <a class="btn btn-outline-dark" href="{% url 'products:product_list' %}">Seguir comprando</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'products:product_list' %}">
+                        <i class="fas fa-store me-1"></i> Seguir explorando catálogo
+                    </a>
                 </div>
             </article>
         </aside>
     </div>
     {% else %}
-    <article class="hero-shell cart-empty-state">
-        <h4 class="mb-2">Tu carrito esta vacio</h4>
-        <p class="mb-3">Explora el catalogo y agrega productos para continuar con tu compra.</p>
-        <a class="btn btn-cta" href="{% url 'products:product_list' %}">Ver catalogo</a>
+    <article class="hero-shell cart-empty-state py-5 text-center">
+        <div class="mb-3">
+            <i class="fas fa-cart-shopping fa-3x text-muted opacity-50"></i>
+        </div>
+        <h4 class="mb-2 fw-bold">Tu carrito está vacío</h4>
+        <p class="text-muted mb-4">Aún no has agregado productos. Explora nuestro catálogo y selecciona tus artículos favoritos.</p>
+        <a class="btn btn-cta btn-lift px-4" href="{% url 'products:product_list' %}">
+            <i class="fas fa-store me-1"></i> Ver catálogo de productos
+        </a>
     </article>
     {% endif %}
 </section>

@@ -12,7 +12,7 @@
 > **Universidad Tecnológica del Perú (UTP)**  
 > **Facultad de Ingeniería de Sistemas e Informática**  
 > **Curso:** Herramientas de Desarrollo (`100000S66T`) - Ciclo 2026-II  
-> **Docente Oficial:** MBA Mg. Ing. Rene Alonso Nieto Valencia  
+> **Docente Oficial:** Jeymi Melanie Valdivia Eguiluz  
 > **Equipo de Desarrollo (Modalidad Dúo Oficial UTP):**  
 > 1. **Ruben Walter Vivas Jimenez** (Código: `U18209770` | Correo: `u22224908@utp.edu.pe` | GitHub: [`@Ruben-DWC`](https://github.com/Ruben-DWC)) - *Líder Backend & Cloud Architecture*  
 > 2. **Conislla Lavado Cesar Jesus** (Código: `U23264049` | Correo: `u23264049@utp.edu.pe` | GitHub: [`@umaten`](https://github.com/umaten)) - *Responsable QA, CI/CD & Telemetría*  

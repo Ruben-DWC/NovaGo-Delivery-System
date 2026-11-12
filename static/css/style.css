@@ -9,6 +9,11 @@
     --brand-deep: #ea4f1f;
     --accent: #1e8f75;
     --ink: #0f1728;
+    --surface-card: #ffffff;
+    --border-color: #dde3ef;
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+    --input-text: #162033;
     --ring: rgba(255, 106, 61, 0.22);
     --radius-lg: 24px;
     --radius-md: 16px;
@@ -28,6 +33,11 @@ html[data-theme='dark'] {
     --brand-deep: #ff6d3e;
     --accent: #4cc9a8;
     --ink: #e6eefc;
+    --surface-card: #121c31;
+    --border-color: #273858;
+    --input-bg: #16233a;
+    --input-border: #2e4168;
+    --input-text: #e6eefc;
     --shadow-xl: 0 30px 48px -24px rgba(0, 0, 0, 0.65);
     --shadow-md: 0 20px 36px -24px rgba(0, 0, 0, 0.7);
 }
@@ -195,6 +205,123 @@ html[data-theme='dark'] .alert-info {
     color: #d7ecff;
     background-color: #173253;
     border-color: #2a4f7d;
+}
+
+html[data-theme='dark'] .alert-success {
+    color: #6ee7b7;
+    background-color: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+html[data-theme='dark'] .alert-warning {
+    color: #fde68a;
+    background-color: rgba(245, 158, 11, 0.16);
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+html[data-theme='dark'] .alert-danger {
+    color: #fca5a5;
+    background-color: rgba(239, 68, 68, 0.16);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+html[data-theme='dark'] .alert-light {
+    color: #e2e8f0;
+    background-color: #16233a;
+    border-color: #273858;
+}
+
+/* Global Form Controls for Dark Mode (WCAG 2.1 AA) */
+html[data-theme='dark'] .form-control,
+html[data-theme='dark'] .form-select {
+    background-color: #16233a;
+    border-color: #2e4168;
+    color: #e6eefc;
+}
+
+html[data-theme='dark'] .form-control:focus,
+html[data-theme='dark'] .form-select:focus {
+    background-color: #1c2b47;
+    border-color: #ff8c66;
+    color: #ffffff;
+    box-shadow: 0 0 0 0.25rem rgba(255, 140, 102, 0.25);
+}
+
+html[data-theme='dark'] .form-control::placeholder {
+    color: #8292ab;
+    opacity: 0.9;
+}
+
+html[data-theme='dark'] .input-group-text {
+    background-color: #1a2942;
+    border-color: #2e4168;
+    color: #cbd5e1;
+}
+
+/* Global Badges for Dark Mode */
+html[data-theme='dark'] .badge.bg-light,
+html[data-theme='dark'] .badge.bg-secondary {
+    background-color: #1e2e4a !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #2e4168 !important;
+}
+
+html[data-theme='dark'] .text-muted {
+    color: #9cb0cf !important; /* > 4.5:1 contrast against dark surfaces */
+}
+
+html[data-theme='dark'] .text-secondary {
+    color: #9cb0cf !important;
+}
+
+/* Pagination in Dark Mode */
+html[data-theme='dark'] .pagination .page-link {
+    background-color: #16233a;
+    border-color: #273858;
+    color: #cbd5e1;
+}
+
+html[data-theme='dark'] .pagination .page-item.active .page-link {
+    background-color: #ff6d3e;
+    border-color: #ff6d3e;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .pagination .page-link:hover {
+    background-color: #223454;
+    color: #ffffff;
+    border-color: #3b5077;
+}
+
+/* Cart Badge & Pulsing Animations */
+.cart-badge-nav {
+    background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+    color: #ffffff !important;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.25em 0.55em;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(234, 79, 31, 0.4);
+    vertical-align: middle;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html[data-theme='dark'] .cart-badge-nav {
+    background: linear-gradient(135deg, #ff8c66, #ff5722);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(255, 109, 62, 0.5);
+}
+
+@keyframes cartBounce {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.35); }
+    50% { transform: scale(0.9); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.cart-pulse-anim {
+    animation: cartBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hero-shell {
