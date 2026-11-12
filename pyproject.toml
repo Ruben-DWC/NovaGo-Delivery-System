@@ -1,0 +1,85 @@
+[project]
+name = "novago-delivery-system"
+version = "0.3.0"
+description = "Sistema de Gestión y Despacho Logístico para Restaurantes NovaGo"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Ruben Walter Vivas Jimenez", email = "u22224908@utp.edu.pe" },
+    { name = "Conislla Lavado Cesar Jesus", email = "u23264049@utp.edu.pe" }
+]
+dependencies = [
+    "Django>=6.0.3",
+    "Pillow>=12.1.1",
+    "django-crispy-forms>=2.6",
+    "crispy-bootstrap5>=2026.3",
+    "channels>=4.3.2",
+    "daphne>=4.2.1",
+    "openpyxl>=3.1.5",
+    "reportlab>=4.2.5",
+    "dj-database-url>=2.3.0",
+    "psycopg2-binary>=2.9.10",
+    "whitenoise>=6.9.0",
+    "gunicorn>=23.0.0",
+    "django-htmx>=1.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-django>=4.9.0",
+    "pytest-asyncio>=1.5.0",
+    "flake8>=7.1.1",
+    "ruff>=0.9.10",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-p django --tb=short -q"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::UserWarning:django.core.handlers.base",
+    "ignore::pytest.PytestDeprecationWarning",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 127
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "migrations",
+    "**/migrations/*",
+    "staticfiles",
+    "media",
+    "django_htmx",
+]
+
+[tool.ruff.lint]
+select = [
+    "E9",
+    "F63",
+    "F7",
+    "F82",
+    "F401",
+    "F841",
+    "B",
+    "C4",
+]
+ignore = [
+    "E501", # line too long
+    "B008", # function call in argument defaults
+    "B005", # strip multi-character strings
+    "F403", # unable to detect undefined names from star imports
+    "F405", # name may be undefined from star imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings.py" = ["F401", "E402"]
+"**/migrations/*" = ["E501", "F401"]
+"apps/__init__.py" = ["F401", "F403"]
+

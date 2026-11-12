@@ -9,13 +9,11 @@ from django.shortcuts import redirect, render, get_object_or_404 # type: ignore
 from django.http import JsonResponse, HttpResponse # type: ignore
 from django.urls import reverse_lazy, reverse # pyright: ignore[reportMissingModuleSource]
 from django.views.generic import TemplateView, FormView, View, ListView, CreateView, UpdateView, DeleteView # type: ignore
-from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView # type: ignore
+from django.contrib.auth.views import LoginView as AuthLoginView # type: ignore
 from django.contrib.auth import login, logout, get_user_model # type: ignore
 from django.contrib import messages # type: ignore
 from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
-from django.utils.decorators import method_decorator # type: ignore
 from django.utils import timezone # pyright: ignore[reportMissingModuleSource]
-from django.views.decorators.http import require_http_methods # type: ignore
 from django.db import transaction # pyright: ignore[reportMissingModuleSource]
 from django.db.models import Count, Sum, Q # pyright: ignore[reportMissingModuleSource]
 from .forms import ClientRegisterForm, UserProfileForm, AdminProductForm, AdminCategoryForm, AdminUserManageForm
@@ -489,6 +487,11 @@ class ClientPaymentGatewayView(ClientRequiredMixin, FormView):
                 'recibir_promociones': form.cleaned_data.get('recibir_promociones'),
             }
             
+            idempotency_key = (
+                form.cleaned_data.get('idempotency_key')
+                or self.request.POST.get('idempotency_key')
+                or self.request.headers.get('X-Idempotency-Key')
+            )
             order = OrderService.create_order_from_cart(
                 user=self.request.user,
                 request=self.request,
@@ -498,6 +501,7 @@ class ClientPaymentGatewayView(ClientRequiredMixin, FormView):
                 referencia=form.cleaned_data.get('referencia', ''),
                 notas=form.cleaned_data.get('notas', ''),
                 datos_pago_adicionales=datos_pago_adicionales,
+                idempotency_key=idempotency_key,
             )
         except ValueError as exc:
             form.add_error(None, str(exc))

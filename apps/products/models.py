@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 
 class Categoria(models.Model):
     """

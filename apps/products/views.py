@@ -10,20 +10,33 @@ class ProductListView(ListView):
 	context_object_name = 'products'
 	paginate_by = 12
 
+	def get_template_names(self):
+		if getattr(self.request, 'htmx', False):
+			return ['products/partials/product_grid.html']
+		return [self.template_name]
+
 	def get_queryset(self):
 		queryset = (
 			Producto.objects.select_related('categoria')
 			.filter(activo=True)
 		)
 
-		categoria_id = self.kwargs.get('categoria_id')
+		categoria_id = (
+			self.kwargs.get('categoria_id')
+			or self.request.GET.get('categoria')
+			or self.request.GET.get('categoria_id')
+		)
 		query = self.request.GET.get('q', '').strip()
 		sort = self.request.GET.get('sort', '').strip()
 		min_price = self.request.GET.get('min_price', '').strip()
 		max_price = self.request.GET.get('max_price', '').strip()
 
 		if categoria_id:
-			queryset = queryset.filter(categoria_id=categoria_id, categoria__activa=True)
+			try:
+				cat_int = int(categoria_id)
+				queryset = queryset.filter(categoria_id=cat_int, categoria__activa=True)
+			except (ValueError, TypeError):
+				pass
 
 		if query:
 			queryset = queryset.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
@@ -76,7 +89,17 @@ class ProductListView(ListView):
 
 		context['categories'] = categories_with_count
 		context['total_all_products'] = Producto.objects.filter(activo=True).count()
-		context['active_category'] = self.kwargs.get('categoria_id')
+		active_cat = (
+			self.kwargs.get('categoria_id')
+			or self.request.GET.get('categoria')
+			or self.request.GET.get('categoria_id')
+		)
+		if active_cat:
+			try:
+				active_cat = int(active_cat)
+			except (ValueError, TypeError):
+				active_cat = None
+		context['active_category'] = active_cat
 		context['search_query'] = self.request.GET.get('q', '').strip()
 		context['active_sort'] = self.request.GET.get('sort', '').strip()
 		context['min_price'] = self.request.GET.get('min_price', '').strip()

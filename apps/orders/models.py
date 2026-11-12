@@ -83,6 +83,16 @@ class Pedido(models.Model):
         decimal_places=2,
         default=0.00
     )
+
+    idempotency_key = models.CharField(
+        'Clave de Idempotencia',
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True,
+        db_index=True,
+        help_text='Identificador único para garantizar idempotencia en la creación del pedido'
+    )
     
     fecha_pedido = models.DateTimeField(
         'Fecha de Pedido',

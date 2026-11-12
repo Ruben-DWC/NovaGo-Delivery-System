@@ -18,6 +18,10 @@
     <!-- Phosphor Icons v2.1 -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     
+    <!-- HTMX v2.0.4 & Alpine.js v3.14.8 -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" crossorigin="anonymous"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    
     <!-- Custom CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -43,7 +47,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <!-- Navigation -->
     {% include 'components/navbar.html' %}
     
@@ -75,6 +79,16 @@
     
     <!-- Custom JS -->
     <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- HTMX Configuration -->
+    <script>
+        document.addEventListener('htmx:configRequest', function(evt) {
+            const csrf = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            if (csrf) {
+                evt.detail.headers['X-CSRFToken'] = csrf.split('=')[1];
+            }
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

@@ -1,3 +1,4 @@
+import uuid
 from django import forms
 from apps.payments.models import Pago
 
@@ -97,6 +98,10 @@ class CheckoutForm(forms.Form):
     )
     
     # Campos opcionales
+    idempotency_key = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
     referencia = forms.CharField(
         label="Referencia de pago",
         max_length=100,
@@ -108,3 +113,8 @@ class CheckoutForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.initial.get('idempotency_key'):
+            self.initial['idempotency_key'] = str(uuid.uuid4())

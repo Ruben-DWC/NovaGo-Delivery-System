@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django.db import transaction # type: ignore
+from django.db import transaction, IntegrityError # type: ignore
 from django.db.models import Count, Q # type: ignore
 from django.utils import timezone  # type: ignore
 from django.urls import reverse # type: ignore
@@ -9,6 +9,40 @@ from apps.products.models import Producto
 from apps.orders.models import Pedido, ItemPedido
 from apps.payments.models import Pago
 from apps.tracking.route_service import ensure_delivery_route_for_order
+
+
+class OrderDomainError(ValueError):
+    """Excepción base para errores de dominio en la gestión de pedidos."""
+    pass
+
+
+class InsufficientStockError(OrderDomainError):
+    """Excepción de dominio cuando no hay stock suficiente para un producto."""
+    def __init__(self, producto_nombre: str, stock_disponible: int, cantidad_solicitada: int):
+        self.producto_nombre = producto_nombre
+        self.stock_disponible = stock_disponible
+        self.cantidad_solicitada = cantidad_solicitada
+        super().__init__(
+            f"Stock insuficiente para '{producto_nombre}'. "
+            f"Disponible: {stock_disponible}, solicitado: {cantidad_solicitada}."
+        )
+
+
+class EmptyCartError(OrderDomainError):
+    """Excepción lanzada cuando se intenta crear un pedido desde un carrito vacío."""
+    def __init__(self, message: str = "El carrito está vacío."):
+        super().__init__(message)
+
+
+class DuplicateOrderError(OrderDomainError):
+    """Excepción lanzada cuando una clave de idempotencia ya fue procesada."""
+    def __init__(self, idempotency_key: str, order_id: int | None = None):
+        self.idempotency_key = idempotency_key
+        self.order_id = order_id
+        super().__init__(
+            f"El pedido con clave de idempotencia '{idempotency_key}' ya ha sido procesado "
+            f"(Pedido #{order_id})."
+        )
 
 
 class CartService:
@@ -95,37 +129,96 @@ class CartService:
 class OrderService:
     @staticmethod
     @transaction.atomic
-    def create_order_from_cart(*, user, request, direccion_entrega, telefono_contacto, metodo_pago, referencia="", notas="", datos_pago_adicionales=None):
+    def create_order_from_cart(
+        *,
+        user,
+        request,
+        direccion_entrega,
+        telefono_contacto,
+        metodo_pago,
+        referencia="",
+        notas="",
+        datos_pago_adicionales=None,
+        idempotency_key=None,
+    ):
+        """
+        Crea un pedido con bloqueo pesimista select_for_update() e idempotencia.
+        Protege inventario contra condiciones de carrera y sobreventa concurrentes.
+        """
+        # 1. Soporte de idempotencia: si la clave ya fue registrada, retornar el pedido existente
+        if idempotency_key:
+            existing_order = (
+                Pedido.objects.filter(idempotency_key=idempotency_key)
+                .select_related('cliente', 'pago')
+                .first()
+            )
+            if existing_order:
+                CartService.clear(request)
+                return existing_order
+
         cart_summary = CartService.get_totals(request)
         if not cart_summary["items"]:
-            raise ValueError("El carrito esta vacio.")
+            raise EmptyCartError("El carrito está vacío.")
 
-        order = Pedido.objects.create(
-            cliente=user,
-            direccion_entrega=direccion_entrega,
-            telefono_contacto=telefono_contacto,
-            notas=notas,
-            subtotal=cart_summary["subtotal"],
-            costo_envio=cart_summary["shipping"],
-            total=cart_summary["total"],
-            estado="pendiente_asignacion",
-        )
+        # 2. Concurrencia robusta: Bloqueo pesimista select_for_update() ordenado por ID para prevenir deadlocks
+        product_ids = sorted([item["producto"].id for item in cart_summary["items"]])
+        locked_products = {
+            p.id: p
+            for p in Producto.objects.select_for_update().filter(id__in=product_ids).order_by("id")
+        }
 
+        # 3. Validación atómica de inventario contra filas bloqueadas en base de datos
         for item in cart_summary["items"]:
-            product = item["producto"]
-            quantity = item["cantidad"]
-            if product.stock < quantity:
-                raise ValueError(f"Stock insuficiente para {product.nombre}.")
+            prod_id = item["producto"].id
+            locked_prod = locked_products.get(prod_id)
+            requested_qty = item["cantidad"]
 
+            if not locked_prod or not locked_prod.activo:
+                raise InsufficientStockError(item["producto"].nombre, 0, requested_qty)
+
+            if locked_prod.stock < requested_qty:
+                raise InsufficientStockError(locked_prod.nombre, locked_prod.stock, requested_qty)
+
+        # 4. Creación atómica de pedido con clave de idempotencia protegida contra colisiones concurrentes
+        try:
+            with transaction.atomic():
+                order = Pedido.objects.create(
+                    cliente=user,
+                    direccion_entrega=direccion_entrega,
+                    telefono_contacto=telefono_contacto,
+                    notas=notas,
+                    subtotal=cart_summary["subtotal"],
+                    costo_envio=cart_summary["shipping"],
+                    total=cart_summary["total"],
+                    estado="pendiente_asignacion",
+                    idempotency_key=idempotency_key or None,
+                )
+        except IntegrityError:
+            if idempotency_key:
+                existing_order = (
+                    Pedido.objects.filter(idempotency_key=idempotency_key)
+                    .select_related('cliente', 'pago')
+                    .first()
+                )
+                if existing_order:
+                    CartService.clear(request)
+                    return existing_order
+                raise DuplicateOrderError(idempotency_key) from None
+            raise
+
+        # 5. Creación de ítems y deducción segura de stock sobre instancias bloqueadas
+        for item in cart_summary["items"]:
+            locked_prod = locked_products[item["producto"].id]
+            requested_qty = item["cantidad"]
             ItemPedido.objects.create(
                 pedido=order,
-                producto=product,
-                cantidad=quantity,
-                precio_unitario=product.precio,
+                producto=locked_prod,
+                cantidad=requested_qty,
+                precio_unitario=locked_prod.precio,
             )
-            product.reducir_stock(quantity)
+            locked_prod.reducir_stock(requested_qty)
 
-        # Crear registro de pago con datos adicionales
+        # 6. Registro de pago con metadatos de facturación e idempotencia
         pago_notas = ""
         if datos_pago_adicionales:
             pago_items = []
@@ -136,24 +229,30 @@ class OrderService:
                     'factura': 'Factura',
                 }
                 pago_items.append(f"Facturación: {tipo_fact_map.get(datos_pago_adicionales['tipo_facturacion'], 'No especificado')}")
-            
+
             if datos_pago_adicionales.get('numero_tarjeta_ultimos'):
                 pago_items.append(f"Tarjeta (últimos 4): {datos_pago_adicionales['numero_tarjeta_ultimos']}")
-            
+
             if datos_pago_adicionales.get('tipo_pos'):
                 pago_items.append(f"Tipo POS: {datos_pago_adicionales['tipo_pos']}")
-            
+
             if datos_pago_adicionales.get('recibir_promociones'):
                 pago_items.append("Cliente desea recibir promociones y descuentos")
-            
-            pago_notas = " | ".join(pago_items) if pago_items else ""
 
+            if idempotency_key:
+                pago_items.append(f"Idempotency-Key: {idempotency_key}")
+
+            pago_notas = " | ".join(pago_items) if pago_items else ""
+        elif idempotency_key:
+            pago_notas = f"Idempotency-Key: {idempotency_key}"
+
+        pago_ref = referencia or (f"IDEMP-{idempotency_key[:24]}" if idempotency_key else "")
         Pago.objects.create(
             pedido=order,
             metodo=metodo_pago,
             monto=order.total,
             estado="pendiente",
-            referencia=referencia,
+            referencia=pago_ref,
             notas=pago_notas,
         )
 
@@ -166,18 +265,25 @@ class OrderService:
     @transaction.atomic
     def cancel_order(order, reason=""):
         """
-        Cancela un pedido y reintegra el stock de cada producto al inventario.
+        Cancela un pedido y reintegra el stock de cada producto al inventario con bloqueo pesimista.
+        Ordena ítems por producto_id para prevenir interbloqueos (deadlocks) entre transacciones concurrentes.
         Resuelve Issue #1: Corrección de stock en pedidos cancelados.
         """
         if order.estado in ['entregado', 'cancelado']:
             raise ValueError(f"No se puede cancelar un pedido en estado {order.estado}.")
 
-        for item in order.items.select_related('producto'):
-            item.producto.aumentar_stock(item.cantidad)
+        for item in order.items.select_related('producto').order_by('producto_id'):
+            if item.producto_id:
+                try:
+                    locked_prod = Producto.objects.select_for_update().get(id=item.producto_id)
+                    locked_prod.aumentar_stock(item.cantidad)
+                except Producto.DoesNotExist:
+                    pass
 
         order.estado = 'cancelado'
         if reason:
-            order.notas = f"{order.notas} | Motivo cancelacion: {reason}".strip(" | ")
+            cancel_msg = f"Motivo cancelacion: {reason}"
+            order.notas = f"{order.notas} | {cancel_msg}" if order.notas else cancel_msg
         order.save(update_fields=['estado', 'notas'])
 
         if hasattr(order, 'pago') and order.pago.estado == 'pendiente':
@@ -292,7 +398,7 @@ class AutoAsignmentService:
                         'total': str(pedido.total),
                     }
                 )
-        except Exception as e:
+        except Exception:
             # Fallar silenciosamente si Channels no está disponible
             pass
 

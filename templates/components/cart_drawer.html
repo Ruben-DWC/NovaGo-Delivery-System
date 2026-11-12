@@ -1,66 +1,128 @@
-<!-- Offcanvas Quick Cart Drawer: Visualización inmediata de productos agregados -->
-<div class="offcanvas offcanvas-end cart-drawer" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel" data-bs-backdrop="true">
+<!-- Offcanvas Quick Cart Drawer: Visualización reactiva inmediata con Alpine.js y Bootstrap -->
+<div class="offcanvas offcanvas-end cart-drawer"
+     tabindex="-1"
+     id="cartOffcanvas"
+     aria-labelledby="cartOffcanvasLabel"
+     data-bs-backdrop="true"
+     x-data="alpineCartDrawer()">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title fw-bold d-flex align-items-center gap-2" id="cartOffcanvasLabel">
             <i class="fas fa-bag-shopping text-brand"></i>
             <span>Tu Carrito</span>
-            <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count {% if not cart_count %}d-none{% endif %}">{{ cart_count|default:0 }}</span>
+            <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count"
+                  x-text="count"
+                  :class="{ 'd-none': count === 0 }"
+                  {% if not cart_count %}style="display: none;"{% endif %}>{{ cart_count|default:0 }}</span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito" title="Cerrar"></button>
     </div>
-
-    <div class="offcanvas-body d-flex flex-column p-0">
-        <!-- Contenedor dinámico de ítems -->
-        <div id="cartDrawerItemsList" class="flex-grow-1 overflow-y-auto p-3 vstack gap-3 {% if not cart_items %}d-none{% endif %}">
-            {% for item in cart_items %}
-            <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center" data-item-id="{{ item.producto.id }}">
-                <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}" class="cart-drawer-thumb rounded" width="60" height="60" style="object-fit: cover;">
-                <div class="flex-grow-1 min-w-0">
-                    <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold" title="{{ item.producto.nombre }}">{{ item.producto.nombre }}</h6>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="small text-muted">S/ {{ item.producto.precio }}</span>
-                        <strong class="text-brand small">S/ {{ item.subtotal }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <div class="qty-control qty-control-sm">
-                            <button type="button" class="qty-btn js-drawer-qty-minus" data-id="{{ item.producto.id }}" aria-label="Disminuir cantidad">-</button>
-                            <span class="qty-input-text px-2 small fw-bold">{{ item.cantidad }}</span>
-                            <button type="button" class="qty-btn js-drawer-qty-plus" data-id="{{ item.producto.id }}" data-max="{{ item.producto.stock }}" aria-label="Aumentar cantidad">+</button>
+    <div class="offcanvas-body d-flex flex-column p-0 position-relative">
+        <!-- Contenedor dinámico de ítems con Alpine.js -->
+        <div id="cartDrawerItemsList"
+             class="flex-grow-1 overflow-y-auto p-3 vstack gap-3"
+             :class="{ 'd-none': items.length === 0 }"
+             {% if not cart_items %}style="display: none;"{% endif %}>
+            
+            <template x-for="item in items" :key="item.id">
+                <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center"
+                         :data-item-id="item.id"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform scale-95">
+                    <img :src="item.imagen_url"
+                         :alt="item.nombre"
+                         class="cart-drawer-thumb rounded"
+                         width="60"
+                         height="60"
+                         style="object-fit: cover;">
+                    <div class="flex-grow-1 min-w-0">
+                        <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold"
+                            :title="item.nombre"
+                            x-text="item.nombre"></h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted" x-text="'S/ ' + Number(item.precio).toFixed(2)"></span>
+                            <strong class="text-brand small" x-text="'S/ ' + Number(item.subtotal).toFixed(2)"></strong>
                         </div>
-                        <button type="button" class="btn btn-link text-danger p-0 js-drawer-remove" data-id="{{ item.producto.id }}" title="Quitar producto" aria-label="Quitar {{ item.producto.nombre }} del carrito">
-                            <i class="fas fa-trash-can small"></i>
-                        </button>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="qty-control qty-control-sm">
+                                <button type="button"
+                                        class="qty-btn js-drawer-qty-minus"
+                                        :data-id="item.id"
+                                        @click="updateQty(item.id, item.cantidad - 1)"
+                                        aria-label="Disminuir cantidad">-</button>
+                                <span class="qty-input-text px-2 small fw-bold" x-text="item.cantidad"></span>
+                                <button type="button"
+                                        class="qty-btn js-drawer-qty-plus"
+                                        :data-id="item.id"
+                                        :data-max="item.stock"
+                                        @click="updateQty(item.id, item.cantidad + 1)"
+                                        :disabled="item.cantidad >= item.stock"
+                                        aria-label="Aumentar cantidad">+</button>
+                            </div>
+                            <button type="button"
+                                    class="btn btn-link text-danger p-0 js-drawer-remove"
+                                    :data-id="item.id"
+                                    @click="removeItem(item.id)"
+                                    title="Quitar producto"
+                                    :aria-label="'Quitar ' + item.nombre + ' del carrito'">
+                                <i class="fas fa-trash-can small"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </article>
-            {% endfor %}
+                </article>
+            </template>
+
+            <!-- Renderizado inicial SSR como fallback estático -->
+            <noscript>
+                {% for item in cart_items %}
+                <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center" data-item-id="{{ item.producto.id }}">
+                    <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}" class="cart-drawer-thumb rounded" width="60" height="60" style="object-fit: cover;">
+                    <div class="flex-grow-1 min-w-0">
+                        <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold">{{ item.producto.nombre }}</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">S/ {{ item.producto.precio }}</span>
+                            <strong class="text-brand small">S/ {{ item.subtotal }}</strong>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </noscript>
         </div>
 
-        <!-- Estado vacío -->
-        <div id="cartDrawerEmpty" class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-4 text-center {% if cart_items %}d-none{% endif %}">
-            <div class="cart-drawer-empty-icon mb-3">
-                <i class="fas fa-shopping-bag fa-3x text-muted opacity-50"></i>
+        <!-- Estado vacío con microinteracciones y feedback claro -->
+        <div id="cartDrawerEmpty"
+             class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-4 text-center"
+             :class="{ 'd-none': items.length > 0 }"
+             {% if cart_items %}style="display: none;"{% endif %}>
+            <div class="cart-drawer-empty-icon mb-3 empty-state-icon">
+                <i class="fas fa-shopping-bag fa-2x"></i>
             </div>
             <h5 class="fw-bold mb-1">Tu carrito está vacío</h5>
             <p class="text-muted small mb-4">Selecciona platillos, snacks o bebidas del catálogo para ordenar con despacho express.</p>
-            <a href="{% url 'products:product_list' %}" class="btn btn-cta btn-sm px-4" data-bs-dismiss="offcanvas">
+            <a href="{% url 'products:product_list' %}" class="btn btn-cta btn-sm px-4 btn-lift" data-bs-dismiss="offcanvas">
                 <i class="fas fa-store me-1"></i> Explorar Catálogo
             </a>
         </div>
 
-        <!-- Resumen y checkout footer -->
-        <div id="cartDrawerFooter" class="cart-drawer-footer border-top p-3 bg-surface {% if not cart_items %}d-none{% endif %}">
+        <!-- Resumen y checkout footer reactivo -->
+        <div id="cartDrawerFooter"
+             class="cart-drawer-footer border-top p-3 bg-surface"
+             :class="{ 'd-none': items.length === 0 }"
+             {% if not cart_items %}style="display: none;"{% endif %}>
             <div class="d-flex justify-content-between small text-muted mb-1">
                 <span>Subtotal</span>
-                <span id="cartDrawerSubtotal" class="fw-bold">S/ {{ cart_subtotal|floatformat:2 }}</span>
+                <span id="cartDrawerSubtotal" class="fw-bold" x-text="'S/ ' + Number(subtotal).toFixed(2)">S/ {{ cart_subtotal|floatformat:2 }}</span>
             </div>
             <div class="d-flex justify-content-between small text-muted mb-2">
                 <span>Envío express</span>
-                <span id="cartDrawerShipping" class="fw-bold">S/ {{ cart_shipping|floatformat:2 }}</span>
+                <span id="cartDrawerShipping" class="fw-bold" x-text="'S/ ' + Number(shipping).toFixed(2)">S/ {{ cart_shipping|floatformat:2 }}</span>
             </div>
             <div class="d-flex justify-content-between fs-5 fw-bold mb-3 border-top pt-2">
                 <span>Total a pagar</span>
-                <span id="cartDrawerTotal" class="text-brand">S/ {{ cart_total|floatformat:2 }}</span>
+                <span id="cartDrawerTotal" class="text-brand" x-text="'S/ ' + Number(total).toFixed(2)">S/ {{ cart_total|floatformat:2 }}</span>
             </div>
 
             <div class="d-grid gap-2">
@@ -86,3 +148,116 @@
     </div>
 </div>
 
+<script>
+function alpineCartDrawer() {
+    return {
+        items: [
+            {% for item in cart_items %}
+            {
+                id: {{ item.producto.id }},
+                nombre: "{{ item.producto.nombre|escapejs }}",
+                precio: {{ item.producto.precio|stringformat:".2f" }},
+                cantidad: {{ item.cantidad }},
+                subtotal: {{ item.subtotal|stringformat:".2f" }},
+                stock: {{ item.producto.stock }},
+                imagen_url: "{{ item.producto.imagen_url }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        count: {{ cart_count|default:0 }},
+        subtotal: {{ cart_subtotal|stringformat:".2f"|default:"0.00" }},
+        shipping: {{ cart_shipping|stringformat:".2f"|default:"0.00" }},
+        total: {{ cart_total|stringformat:".2f"|default:"0.00" }},
+        loading: false,
+
+        init() {
+            window.addEventListener('cart-updated', (e) => {
+                if (e.detail) {
+                    this.applyCartData(e.detail);
+                }
+            });
+        },
+
+        applyCartData(data) {
+            if (data.items) {
+                this.items = data.items.map(function(it) {
+                    return {
+                        id: it.id,
+                        nombre: it.nombre,
+                        precio: Number(it.precio),
+                        cantidad: Number(it.cantidad),
+                        subtotal: Number(it.subtotal),
+                        stock: Number(it.stock || 999),
+                        imagen_url: it.imagen_url
+                    };
+                });
+            }
+            this.count = Number(data.cart_count || 0);
+            this.subtotal = Number(data.cart_subtotal || 0);
+            this.shipping = Number(data.cart_shipping || 0);
+            this.total = Number(data.cart_total || 0);
+        },
+
+        getCsrf() {
+            const match = document.cookie.match(/(^|;)\s*csrftoken\s*=\s*([^;]+)/);
+            if (match) return match[2];
+            const meta = document.querySelector('input[name=csrfmiddlewaretoken]');
+            return meta ? meta.value : '{{ csrf_token }}';
+        },
+
+        async updateQty(id, newQty) {
+            if (newQty < 0) return;
+            this.loading = true;
+            try {
+                const formData = new FormData();
+                formData.append('quantity', newQty);
+                formData.append('csrfmiddlewaretoken', this.getCsrf());
+
+                const res = await fetch('/orders/carrito/actualizar/' + id + '/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.applyCartData(data);
+                    window.dispatchEvent(new CustomEvent('cart-updated', { detail: data }));
+                }
+            } catch (err) {
+                console.error('Error updating quantity:', err);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async removeItem(id) {
+            this.loading = true;
+            try {
+                const formData = new FormData();
+                formData.append('csrfmiddlewaretoken', this.getCsrf());
+
+                const res = await fetch('/orders/carrito/eliminar/' + id + '/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.applyCartData(data);
+                    window.dispatchEvent(new CustomEvent('cart-updated', { detail: data }));
+                }
+            } catch (err) {
+                console.error('Error removing item:', err);
+            } finally {
+                this.loading = false;
+            }
+        }
+    };
+}
+</script>

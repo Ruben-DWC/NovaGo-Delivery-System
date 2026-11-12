@@ -7,7 +7,7 @@ from django.views.generic import TemplateView, FormView
 from django.db.models import Count, Q
 from .models import Pedido
 from .forms import CheckoutForm
-from .services import CartService, OrderService, AutoAsignmentService, JornadaService
+from .services import CartService, OrderService, AutoAsignmentService
 from apps.products.models import Producto
 from apps.users.mixins import AdminRequiredMixin
 
@@ -131,6 +131,11 @@ class CheckoutView(LoginRequiredMixin, FormView):
 
 	def form_valid(self, form):
 		try:
+			idempotency_key = (
+				form.cleaned_data.get('idempotency_key')
+				or self.request.POST.get('idempotency_key')
+				or self.request.headers.get('X-Idempotency-Key')
+			)
 			order = OrderService.create_order_from_cart(
 				user=self.request.user,
 				request=self.request,
@@ -139,6 +144,7 @@ class CheckoutView(LoginRequiredMixin, FormView):
 				metodo_pago=form.cleaned_data['metodo_pago'],
 				referencia=form.cleaned_data.get('referencia', ''),
 				notas=form.cleaned_data.get('notas', ''),
+				idempotency_key=idempotency_key,
 			)
 		except ValueError as exc:
 			form.add_error(None, str(exc))
@@ -250,7 +256,7 @@ class AdminDashboardView(AdminRequiredMixin, TemplateView):
 		).order_by('-fecha_pedido')[:20]
 		
 		# Motorizados con estadísticas
-		from apps.users.models import PerfilMotorizado, User
+		from apps.users.models import PerfilMotorizado
 		motorizados = PerfilMotorizado.objects.select_related('usuario').annotate(
 			pedidos_hoy=Count(
 				'usuario__entregas',

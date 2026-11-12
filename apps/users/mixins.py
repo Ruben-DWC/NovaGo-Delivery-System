@@ -4,7 +4,7 @@ from django.shortcuts import redirect # type: ignore
 
 
 class RoleRequiredMixin(LoginRequiredMixin):
-    allowed_roles = tuple()
+    allowed_roles = ()
     allow_staff = False
     redirect_url = 'home'
     denied_message = 'No tienes permisos para acceder a esta sección.'

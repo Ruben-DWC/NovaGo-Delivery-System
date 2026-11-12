@@ -13,6 +13,7 @@
             <article class="auth-card auth-card-wide">
                 <form method="post" class="auth-form">
                     {% csrf_token %}
+                    {{ form.idempotency_key }}
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                     {% endif %}

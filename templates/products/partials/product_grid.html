@@ -1,0 +1,123 @@
+{% load static %}
+<!-- Partial: Product Grid & Pagination for HTMX / Standard SSR -->
+<div class="catalog-grid-wrapper">
+    <!-- Resumen de resultados dinámicos -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small">
+            Mostrando <strong>{{ products|length }}</strong> de <strong>{{ paginator.count|default:products|length }}</strong> productos disponibles
+        </span>
+        {% if search_query or min_price or max_price or active_category %}
+        <a href="{% url catalog_url_name %}"
+           class="badge bg-secondary-subtle text-secondary border text-decoration-none py-1 px-2"
+           hx-get="{% url catalog_url_name %}"
+           hx-target="#product-grid-content"
+           hx-indicator="#catalog-loading-indicator"
+           hx-push-url="true"
+           title="Limpiar filtros activos">
+            <i class="fas fa-times me-1"></i> Limpiar filtros
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Grilla de Tarjetas -->
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <article class="catalog-card h-100 shadow-sm border-0">
+                <a href="{% url product_detail_url_name product.id %}" class="catalog-image-wrap" aria-label="Ver detalle de {{ product.nombre }}">
+                    <img class="catalog-image" src="{{ product.imagen_url }}" alt="{{ product.nombre }}" loading="lazy">
+                    {% if product.destacado %}
+                    <span class="catalog-badge">Destacado</span>
+                    {% endif %}
+                </a>
+
+                <div class="catalog-body">
+                    <div class="catalog-top">
+                        <h5 class="fw-bold text-truncate" title="{{ product.nombre }}">{{ product.nombre }}</h5>
+                        <span class="catalog-category badge border">{{ product.categoria.nombre|default:'General' }}</span>
+                    </div>
+                    <p class="catalog-description small">{{ product.descripcion|truncatechars:75 }}</p>
+
+                    <div class="catalog-meta d-flex justify-content-between align-items-center mb-3">
+                        <p class="catalog-price mb-0 fw-bold fs-5">S/ {{ product.precio }}</p>
+                        {% if product.stock > 0 %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Stock {{ product.stock }}</span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Agotado</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="d-flex gap-2 js-add-cart-form" data-product-name="{{ product.nombre }}">
+                            {% csrf_token %}
+                            <div class="qty-control">
+                                <button type="button" class="qty-btn" aria-label="Disminuir cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)>1) el.value=parseInt(el.value)-1;">-</button>
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input" aria-label="Cantidad para {{ product.nombre }}" readonly>
+                                <button type="button" class="qty-btn" aria-label="Aumentar cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)<{{ product.stock }}) el.value=parseInt(el.value)+1;">+</button>
+                            </div>
+                            <button class="btn btn-cta flex-grow-1 btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart me-1"></i> Agregar
+                            </button>
+                        </form>
+                        <a class="btn-card-detail" href="{% url product_detail_url_name product.id %}">Ver detalles</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="hero-shell empty-state-card p-5 d-inline-block text-center shadow-sm">
+                <div class="empty-state-icon mb-3">
+                    <i class="fas fa-utensils fa-3x text-muted opacity-50"></i>
+                </div>
+                <h4 class="fw-bold mb-2">No encontramos platillos para tu búsqueda</h4>
+                <p class="text-muted mb-4" style="max-width: 440px; margin: 0 auto;">
+                    No hay productos que coincidan con los filtros aplicados. Prueba modificando los términos de búsqueda o limpiando los filtros de precio.
+                </p>
+                <a href="{% url catalog_url_name %}"
+                   class="btn btn-cta btn-lift px-4 py-2"
+                   hx-get="{% url catalog_url_name %}"
+                   hx-target="#product-grid-content"
+                   hx-indicator="#catalog-loading-indicator"
+                   hx-push-url="true">
+                    <i class="fas fa-rotate-left me-1"></i> Restablecer Filtros
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav class="mt-5" aria-label="Paginación del catálogo">
+        <div class="pagination justify-content-center catalog-pagination">
+            {% if page_obj.has_previous %}
+            <span class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}"
+                   hx-get="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}"
+                   hx-target="#product-grid-content"
+                   hx-indicator="#catalog-loading-indicator"
+                   hx-push-url="true">
+                    &laquo; Anterior
+                </a>
+            </span>
+            {% endif %}
+            <span class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></span>
+            {% if page_obj.has_next %}
+            <span class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}"
+                   hx-get="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}"
+                   hx-target="#product-grid-content"
+                   hx-indicator="#catalog-loading-indicator"
+                   hx-push-url="true">
+                    Siguiente &raquo;
+                </a>
+            </span>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
+</div>
+

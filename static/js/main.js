@@ -317,6 +317,9 @@ function initializeGlobalCartDrawer() {
     const updateCartUI = (data, options = {}) => {
         if (!data) return;
 
+        // Notify Alpine.js reactive components
+        window.dispatchEvent(new CustomEvent('cart-updated', { detail: data }));
+
         // 1. Navbar & floating badge counters
         document.querySelectorAll('.js-nav-cart-count').forEach(el => {
             el.textContent = data.cart_count || 0;

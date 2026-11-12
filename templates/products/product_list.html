@@ -16,18 +16,38 @@
 
     <!-- Barra de herramientas: Búsqueda, Filtros y Ordenamiento -->
     <div class="catalog-toolbar">
-        <form class="row g-3 align-items-center" method="get" action="{% url search_url_name %}">
+        <form id="catalogFilterForm" class="row g-3 align-items-center" method="get" action="{% url search_url_name %}">
             {% if active_category %}
             <input type="hidden" name="categoria" value="{{ active_category }}">
             {% endif %}
             <div class="col-lg-5 col-md-12">
                 <div class="input-group">
                     <span class="input-group-text border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="search" class="form-control border-start-0" name="q" value="{{ search_query }}" placeholder="Buscar por nombre o ingredientes..." aria-label="Buscar productos">
+                    <input type="search"
+                           class="form-control border-start-0"
+                           name="q"
+                           value="{{ search_query }}"
+                           placeholder="Buscar por nombre o ingredientes..."
+                           aria-label="Buscar productos"
+                           hx-get="{% url catalog_url_name %}"
+                           hx-trigger="input changed delay:300ms, search"
+                           hx-target="#product-grid-content"
+                           hx-indicator="#catalog-loading-indicator"
+                           hx-include="#catalogFilterForm"
+                           hx-push-url="true">
                 </div>
             </div>
             <div class="col-lg-3 col-sm-6">
-                <select class="form-select" name="sort" onchange="this.form.submit()" title="Criterio de ordenamiento" aria-label="Criterio de ordenamiento">
+                <select class="form-select"
+                        name="sort"
+                        title="Criterio de ordenamiento"
+                        aria-label="Criterio de ordenamiento"
+                        hx-get="{% url catalog_url_name %}"
+                        hx-trigger="change"
+                        hx-target="#product-grid-content"
+                        hx-indicator="#catalog-loading-indicator"
+                        hx-include="#catalogFilterForm"
+                        hx-push-url="true">
                     <option value="" {% if not active_sort %}selected{% endif %}>Ordenar por: Recomendados</option>
                     <option value="precio_asc" {% if active_sort == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
                     <option value="precio_desc" {% if active_sort == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
@@ -38,100 +58,115 @@
             <div class="col-lg-2 col-sm-4">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">S/ Min</span>
-                    <input type="number" step="0.5" class="form-control" name="min_price" value="{{ min_price }}" placeholder="0" aria-label="Precio mínimo">
+                    <input type="number"
+                           step="0.5"
+                           class="form-control"
+                           name="min_price"
+                           value="{{ min_price }}"
+                           placeholder="0"
+                           aria-label="Precio mínimo"
+                           hx-get="{% url catalog_url_name %}"
+                           hx-trigger="change delay:400ms"
+                           hx-target="#product-grid-content"
+                           hx-indicator="#catalog-loading-indicator"
+                           hx-include="#catalogFilterForm"
+                           hx-push-url="true">
                 </div>
             </div>
             <div class="col-lg-2 col-sm-2 d-grid">
-                <button type="submit" class="btn btn-primary btn-lift">Filtrar</button>
+                <button type="submit"
+                        class="btn btn-primary btn-lift"
+                        hx-get="{% url catalog_url_name %}"
+                        hx-target="#product-grid-content"
+                        hx-indicator="#catalog-loading-indicator"
+                        hx-include="#catalogFilterForm"
+                        hx-push-url="true">
+                    Filtrar
+                </button>
             </div>
         </form>
 
         <hr class="my-3 opacity-25">
 
-        <!-- Píldoras de Categorías con Conteo -->
+        <!-- Píldoras de Categorías con Conteo y HTMX -->
         <div class="d-flex flex-wrap gap-2 align-items-center">
             <span class="catalog-toolbar-label me-1"><i class="fas fa-tags me-1"></i> Categorías:</span>
-            <a class="category-pill {% if not active_category %}active{% endif %}" href="{% url catalog_url_name %}{% if active_sort %}?sort={{ active_sort }}{% endif %}">
+            <a class="category-pill {% if not active_category %}active{% endif %}"
+               href="{% url catalog_url_name %}{% if active_sort %}?sort={{ active_sort }}{% endif %}"
+               hx-get="{% url catalog_url_name %}"
+               hx-target="#product-grid-content"
+               hx-indicator="#catalog-loading-indicator"
+               hx-include="#catalogFilterForm"
+               hx-push-url="true">
                 Todos <span class="category-badge-count">{{ total_all_products }}</span>
             </a>
             {% for category in categories %}
-                <a class="category-pill {% if active_category == category.id %}active{% endif %}" href="{% url catalog_category_url_name category.id %}{% if active_sort %}?sort={{ active_sort }}{% endif %}">
+                <a class="category-pill {% if active_category == category.id %}active{% endif %}"
+                   href="{% url catalog_category_url_name category.id %}{% if active_sort %}?sort={{ active_sort }}{% endif %}"
+                   hx-get="{% url catalog_category_url_name category.id %}"
+                   hx-target="#product-grid-content"
+                   hx-indicator="#catalog-loading-indicator"
+                   hx-include="#catalogFilterForm"
+                   hx-push-url="true">
                     {{ category.nombre }} <span class="category-badge-count">{{ category.total_productos }}</span>
                 </a>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Grilla de Productos -->
-    <div class="row g-4">
-        {% for product in products %}
-        <div class="col-sm-6 col-lg-4 col-xl-3">
-            <article class="catalog-card h-100 shadow-sm border-0">
-                <a href="{% url product_detail_url_name product.id %}" class="catalog-image-wrap" aria-label="Ver detalle de {{ product.nombre }}">
-                    <img class="catalog-image" src="{{ product.imagen_url }}" alt="{{ product.nombre }}" loading="lazy">
-                    {% if product.destacado %}
-                    <span class="catalog-badge">Destacado</span>
-                    {% endif %}
-                </a>
-
-                <div class="catalog-body">
-                    <div class="catalog-top">
-                        <h5 class="fw-bold text-truncate" title="{{ product.nombre }}">{{ product.nombre }}</h5>
-                        <span class="catalog-category badge border">{{ product.categoria.nombre|default:'General' }}</span>
-                    </div>
-                    <p class="catalog-description small" style="color: var(--text-soft, #cbd5e1);">{{ product.descripcion|truncatechars:75 }}</p>
-
-                    <div class="catalog-meta d-flex justify-content-between align-items-center mb-3">
-                        <p class="catalog-price mb-0 fw-bold fs-5">S/ {{ product.precio }}</p>
-                        {% if product.stock > 0 %}
-                        <span class="badge bg-success-subtle text-success border border-success-subtle">Stock {{ product.stock }}</span>
-                        {% else %}
-                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Agotado</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="d-flex gap-2 js-add-cart-form" data-product-name="{{ product.nombre }}">
-                            {% csrf_token %}
-                            <div class="qty-control">
-                                <button type="button" class="qty-btn" aria-label="Disminuir cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)>1) el.value=parseInt(el.value)-1;">-</button>
-                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input" aria-label="Cantidad para {{ product.nombre }}" readonly>
-                                <button type="button" class="qty-btn" aria-label="Aumentar cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)<{{ product.stock }}) el.value=parseInt(el.value)+1;">+</button>
-                            </div>
-                            <button class="btn btn-cta flex-grow-1 btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>
-                                <i class="fas fa-shopping-cart me-1"></i> Agregar
-                            </button>
-                        </form>
-                        <a class="btn-card-detail" href="{% url product_detail_url_name product.id %}">Ver detalles</a>
+    <!-- Contenedor Reactivo con Skeleton Loaders (HTMX Indicator) -->
+    <div id="product-grid-container" class="position-relative mt-4">
+        <!-- Skeleton Loader Overlay mientras HTMX carga -->
+        <div class="htmx-indicator skeleton-overlay" id="catalog-loading-indicator">
+            <div class="row g-4">
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
+                        <div class="skeleton-img shimmer"></div>
+                        <div class="p-3">
+                            <div class="skeleton-line shimmer mb-2" style="width: 70%; height: 16px;"></div>
+                            <div class="skeleton-line shimmer mb-3" style="width: 40%; height: 14px;"></div>
+                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                        </div>
                     </div>
                 </div>
-            </article>
-        </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="hero-shell p-5 d-inline-block text-center shadow-sm">
-                <i class="fas fa-search fa-3x text-muted mb-3 d-block"></i>
-                <h4 class="fw-bold">No se encontraron productos</h4>
-                <p class="text-muted mb-3">Prueba con otros términos de búsqueda o cambia la categoría seleccionada.</p>
-                <a href="{% url catalog_url_name %}" class="btn btn-cta">Ver todos los productos</a>
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
+                        <div class="skeleton-img shimmer"></div>
+                        <div class="p-3">
+                            <div class="skeleton-line shimmer mb-2" style="width: 80%; height: 16px;"></div>
+                            <div class="skeleton-line shimmer mb-3" style="width: 35%; height: 14px;"></div>
+                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
+                        <div class="skeleton-img shimmer"></div>
+                        <div class="p-3">
+                            <div class="skeleton-line shimmer mb-2" style="width: 60%; height: 16px;"></div>
+                            <div class="skeleton-line shimmer mb-3" style="width: 45%; height: 14px;"></div>
+                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
+                        <div class="skeleton-img shimmer"></div>
+                        <div class="p-3">
+                            <div class="skeleton-line shimmer mb-2" style="width: 75%; height: 16px;"></div>
+                            <div class="skeleton-line shimmer mb-3" style="width: 50%; height: 14px;"></div>
+                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
 
-    {% if is_paginated %}
-    <nav class="mt-5" aria-label="Paginación del catálogo">
-        <div class="pagination justify-content-center catalog-pagination">
-            {% if page_obj.has_previous %}
-            <span class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}">&laquo; Anterior</a></span>
-            {% endif %}
-            <span class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></span>
-            {% if page_obj.has_next %}
-            <span class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}">Siguiente &raquo;</a></span>
-            {% endif %}
+        <!-- Contenido Real renderizado dinámicamente -->
+        <div id="product-grid-content">
+            {% include 'products/partials/product_grid.html' %}
         </div>
-    </nav>
-    {% endif %}
+    </div>
 </section>
 
 <!-- Floating Cart Action Pill: Permite ver de inmediato dónde quedan los productos seleccionados -->
