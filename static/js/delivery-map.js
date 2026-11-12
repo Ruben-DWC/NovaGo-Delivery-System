@@ -232,6 +232,18 @@ class DeliveryMap {
 
     scheduleReconnect() {
         this.reconnectAttempts += 1;
+        if (this.reconnectAttempts > 2) {
+            // Entornos WSGI (PythonAnywhere) no soportan WebSockets nativos.
+            // Fallback elegante a sondeo HTTP periódico cada 15s para telemetría continua.
+            if (!this.httpPollingActive) {
+                this.httpPollingActive = true;
+                this.setSignalStatus('Modo HTTP activo (15s)', true);
+                this.pollingTimer = window.setInterval(() => {
+                    this.fetchInitialSnapshot();
+                }, 15000);
+            }
+            return;
+        }
         const waitMs = Math.min(10000, 1500 * this.reconnectAttempts);
         window.setTimeout(() => this.initWebSocket(), waitMs);
     }
@@ -673,6 +685,9 @@ class DeliveryMap {
 
         this.fetchInitialSnapshot();
         this.initWebSocket();
+        window.setTimeout(() => {
+            if (this.map) this.map.invalidateSize();
+        }, 350);
     }
 
     updateMarkers() {
