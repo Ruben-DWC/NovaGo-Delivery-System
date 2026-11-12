@@ -5,6 +5,7 @@ app_name = 'orders'
 
 urlpatterns = [
     path('carrito/', views.CartView.as_view(), name='cart'),
+    path('carrito/api/', views.CartDataView.as_view(), name='cart_data'),
     path('carrito/agregar/<int:producto_id>/', views.AddToCartView.as_view(), name='add_to_cart'),
     path('carrito/actualizar/<int:item_id>/', views.UpdateCartView.as_view(), name='update_cart'),
     path('carrito/eliminar/<int:item_id>/', views.RemoveFromCartView.as_view(), name='remove_from_cart'),

@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initializeThemeSwitcher();
     
+    // Quick Cart Offcanvas & Reactive Cart Sync
+    initializeGlobalCartDrawer();
+    
     // Auto-dismiss alerts after 5 seconds
     autoDissmissAlerts();
     
@@ -115,6 +118,7 @@ function initializeThemeSwitcher() {
     const applyTheme = (pref) => {
         const resolved = resolveTheme(pref);
         html.setAttribute('data-theme', resolved);
+        html.setAttribute('data-bs-theme', resolved);
         html.setAttribute('data-theme-pref', pref);
 
         optionButtons.forEach((btn) => {
@@ -287,6 +291,242 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         alertDiv.remove();
     }, 5000);
+}
+
+// ===========================
+// Global Reactive Cart Drawer
+// ===========================
+function initializeGlobalCartDrawer() {
+    const drawerEl = document.getElementById('cartOffcanvas');
+    const floatingPill = document.getElementById('floating-cart-pill');
+    const floatingTotal = document.getElementById('floating-cart-total');
+    const itemsListEl = document.getElementById('cartDrawerItemsList');
+    const emptyEl = document.getElementById('cartDrawerEmpty');
+    const footerEl = document.getElementById('cartDrawerFooter');
+    const subtotalEl = document.getElementById('cartDrawerSubtotal');
+    const shippingEl = document.getElementById('cartDrawerShipping');
+    const totalEl = document.getElementById('cartDrawerTotal');
+
+    const getCsrfToken = () => {
+        const match = document.cookie.match(/(^|;)\s*csrftoken\s*=\s*([^;]+)/);
+        if (match) return match[2];
+        const input = document.querySelector('[name=csrfmiddlewaretoken]');
+        return input ? input.value : '';
+    };
+
+    const updateCartUI = (data, options = {}) => {
+        if (!data) return;
+
+        // 1. Navbar & floating badge counters
+        document.querySelectorAll('.js-nav-cart-count').forEach(el => {
+            el.textContent = data.cart_count || 0;
+            if (data.cart_count > 0) {
+                el.classList.remove('d-none');
+                el.classList.remove('cart-pulse-anim');
+                void el.offsetWidth;
+                el.classList.add('cart-pulse-anim');
+            } else {
+                el.classList.add('d-none');
+            }
+        });
+
+        // 2. Floating action pill
+        if (floatingPill) {
+            if (data.cart_count > 0) {
+                floatingPill.classList.remove('is-hidden');
+            } else {
+                floatingPill.classList.add('is-hidden');
+            }
+        }
+        if (floatingTotal && data.cart_total !== undefined) {
+            floatingTotal.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
+        }
+
+        // 3. Offcanvas totals
+        if (subtotalEl && data.cart_subtotal !== undefined) {
+            subtotalEl.textContent = 'S/ ' + Number(data.cart_subtotal).toFixed(2);
+        }
+        if (shippingEl && data.cart_shipping !== undefined) {
+            shippingEl.textContent = 'S/ ' + Number(data.cart_shipping).toFixed(2);
+        }
+        if (totalEl && data.cart_total !== undefined) {
+            totalEl.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
+        }
+
+        // 4. Offcanvas items list
+        if (itemsListEl && emptyEl && footerEl) {
+            if (data.items && data.items.length > 0) {
+                itemsListEl.classList.remove('d-none');
+                emptyEl.classList.add('d-none');
+                footerEl.classList.remove('d-none');
+
+                let html = '';
+                data.items.forEach(item => {
+                    html += `
+                    <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center" data-item-id="${item.id}">
+                        <img src="${item.imagen_url}" alt="${item.nombre}" class="cart-drawer-thumb rounded" width="60" height="60" style="object-fit: cover;">
+                        <div class="flex-grow-1 min-w-0">
+                            <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold" title="${item.nombre}">${item.nombre}</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">S/ ${Number(item.precio).toFixed(2)}</span>
+                                <strong class="text-brand small">S/ ${Number(item.subtotal).toFixed(2)}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="qty-control qty-control-sm">
+                                    <button type="button" class="qty-btn js-drawer-qty-minus" data-id="${item.id}" aria-label="Disminuir cantidad">-</button>
+                                    <span class="qty-input-text px-2 small fw-bold">${item.cantidad}</span>
+                                    <button type="button" class="qty-btn js-drawer-qty-plus" data-id="${item.id}" data-max="${item.stock || 999}" aria-label="Aumentar cantidad">+</button>
+                                </div>
+                                <button type="button" class="btn btn-link text-danger p-0 js-drawer-remove" data-id="${item.id}" title="Quitar producto">
+                                    <i class="fas fa-trash-can small"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>`;
+                });
+                itemsListEl.innerHTML = html;
+            } else {
+                itemsListEl.classList.add('d-none');
+                emptyEl.classList.remove('d-none');
+                footerEl.classList.add('d-none');
+            }
+        }
+
+        // 5. Toast feedback
+        const toastEl = document.getElementById('cartToast');
+        const toastMsg = document.getElementById('cartToastMsg');
+        if (options.showToast && toastEl && toastMsg && typeof bootstrap !== 'undefined') {
+            toastMsg.textContent = options.message || data.message || 'Producto agregado al carrito.';
+            const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 });
+            toast.show();
+        }
+
+        // 6. Auto-open drawer if requested
+        if (options.openDrawer && drawerEl && typeof bootstrap !== 'undefined') {
+            const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
+            offcanvas.show();
+        }
+    };
+
+    // Global listener for Add to Cart forms (.js-add-cart-form)
+    document.addEventListener('submit', function(e) {
+        const form = e.target.closest('.js-add-cart-form');
+        if (!form) return;
+
+        e.preventDefault();
+        const action = form.action;
+        const formData = new FormData(form);
+        const productName = form.getAttribute('data-product-name') || '';
+
+        fetch(action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Respuesta no JSON');
+        })
+        .then(data => {
+            updateCartUI(data, {
+                showToast: true,
+                message: productName ? `¡"${productName}" agregado al carrito!` : data.message,
+                openDrawer: true
+            });
+        })
+        .catch(() => {
+            form.submit();
+        });
+    });
+
+    // Drawer quantity buttons and remove button
+    if (drawerEl) {
+        drawerEl.addEventListener('click', function(e) {
+            const plusBtn = e.target.closest('.js-drawer-qty-plus');
+            const minusBtn = e.target.closest('.js-drawer-qty-minus');
+            const removeBtn = e.target.closest('.js-drawer-remove');
+
+            if (plusBtn) {
+                const id = plusBtn.getAttribute('data-id');
+                const max = parseInt(plusBtn.getAttribute('data-max') || '999', 10);
+                const currentText = plusBtn.parentElement.querySelector('.qty-input-text');
+                const current = parseInt(currentText ? currentText.textContent : '1', 10);
+                if (current >= max) return;
+
+                const formData = new FormData();
+                formData.append('quantity', current + 1);
+
+                fetch(`/orders/carrito/actualizar/${id}/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                })
+                .then(res => res.json())
+                .then(data => updateCartUI(data))
+                .catch(err => console.error(err));
+            }
+
+            if (minusBtn) {
+                const id = minusBtn.getAttribute('data-id');
+                const currentText = minusBtn.parentElement.querySelector('.qty-input-text');
+                const current = parseInt(currentText ? currentText.textContent : '1', 10);
+
+                if (current <= 1) {
+                    fetch(`/orders/carrito/eliminar/${id}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => updateCartUI(data))
+                    .catch(err => console.error(err));
+                } else {
+                    const formData = new FormData();
+                    formData.append('quantity', current - 1);
+
+                    fetch(`/orders/carrito/actualizar/${id}/`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => updateCartUI(data))
+                    .catch(err => console.error(err));
+                }
+            }
+
+            if (removeBtn) {
+                const id = removeBtn.getAttribute('data-id');
+                fetch(`/orders/carrito/eliminar/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                })
+                .then(res => res.json())
+                .then(data => updateCartUI(data))
+                .catch(err => console.error(err));
+            }
+        });
+    }
+
+    window.NovaGoUpdateCartUI = updateCartUI;
 }
 
 // ===========================

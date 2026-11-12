@@ -11,6 +11,7 @@ urlpatterns = [
     path('portal/motorizado/rastreo/<int:pedido_id>/', views.TrackOrderView.as_view(), name='motorizado_rastreo_pedido'),
     path('motorizado/dashboard/', views.MotorizadoDashboardView.as_view(), name='motorizado_dashboard_portal'),
     path('rastrear/<int:pedido_id>/', views.TrackOrderView.as_view(), name='track_order'),
+    path('consulta/', views.PublicOrderLookupView.as_view(), name='public_lookup'),
     
     path('api/actualizar-ubicacion/', views.UpdateLocationView.as_view(), name='update_location'),
     path('api/mapa-motorizado/', views.MotorizadoMapDataView.as_view(), name='motorizado_map_data'),

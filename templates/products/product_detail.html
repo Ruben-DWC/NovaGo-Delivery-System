@@ -40,7 +40,7 @@
                 </div>
 
                 {% if product.stock > 0 %}
-                <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="row g-2 align-items-end detail-buy-form js-detail-cart-form" data-product-name="{{ product.nombre }}" data-detail-qty-form>
+                <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="row g-2 align-items-end detail-buy-form js-add-cart-form js-detail-cart-form" data-product-name="{{ product.nombre }}" data-detail-qty-form>
                     {% csrf_token %}
                     <div class="col-sm-4">
                         <label class="form-label fw-bold" for="qty">Cantidad</label>
@@ -83,7 +83,7 @@
 
 <!-- Floating Cart Action Pill -->
 <aside id="floating-cart-pill" class="floating-cart-container {% if not cart_count %}is-hidden{% endif %}" aria-label="Acceso rápido al carrito de compras">
-    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
+    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
         <div class="cart-pill-icon">
             <i class="fas fa-shopping-bag"></i>
             <span class="cart-pill-counter js-nav-cart-count">{{ cart_count|default:0 }}</span>
@@ -114,12 +114,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('[data-detail-qty-form]');
-    const toastEl = document.getElementById('cartToast');
-    const toast = toastEl && typeof bootstrap !== 'undefined' ? new bootstrap.Toast(toastEl, { delay: 3500 }) : null;
-    const toastMsg = document.getElementById('cartToastMsg');
-    const floatingPill = document.getElementById('floating-cart-pill');
-    const floatingTotal = document.getElementById('floating-cart-total');
-
     if (form) {
         const input = form.querySelector('#qty');
         const minus = form.querySelector('[data-detail-qty-minus]');
@@ -138,55 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.value = String(Math.min(max, (isNaN(val) ? 1 : val) + 1));
             });
         }
-
-        form.addEventListener('submit', function (e) {
-            const formData = new FormData(form);
-            const action = form.action;
-            const productName = form.getAttribute('data-product-name') || '';
-
-            e.preventDefault();
-            fetch(action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (res.ok) return res.json();
-                throw new Error('Fallback POST');
-            })
-            .then(data => {
-                // Actualizar badges
-                document.querySelectorAll('.js-nav-cart-count').forEach(el => {
-                    el.textContent = data.cart_count;
-                    el.classList.remove('d-none');
-                    el.classList.remove('cart-pulse-anim');
-                    void el.offsetWidth;
-                    el.classList.add('cart-pulse-anim');
-                });
-
-                if (floatingTotal && data.cart_total !== undefined) {
-                    floatingTotal.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
-                }
-
-                if (floatingPill && data.cart_count > 0) {
-                    floatingPill.classList.remove('is-hidden');
-                    floatingPill.classList.remove('cart-pulse-anim');
-                    void floatingPill.offsetWidth;
-                    floatingPill.classList.add('cart-pulse-anim');
-                }
-
-                if (toast && toastMsg) {
-                    toastMsg.textContent = `¡"${productName}" agregado al carrito!`;
-                    toast.show();
-                }
-            })
-            .catch(() => {
-                form.submit();
-            });
-        });
     }
 });
 </script>

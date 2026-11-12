@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Centro de Contacto - NovaGo Delivery{% endblock %}
+
+{% block content %}
+<section class="section-space reveal-up is-visible">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="hero-shell p-4 p-md-5 mb-4 text-center">
+                <span class="kicker mb-2">ATENCIÓN Y SOPORTE</span>
+                <h1 class="h2 fw-bold mb-2">¿Cómo podemos ayudarte?</h1>
+                <p class="text-muted mb-0">Comunícate con nuestro equipo técnico de soporte o revisa las preguntas más frecuentes sobre el servicio de delivery.</p>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="feature-tile p-4 h-100">
+                        <i class="fas fa-headset text-brand fa-2x mb-3"></i>
+                        <h5 class="fw-bold mb-2">Mesa de Ayuda al Cliente</h5>
+                        <p class="text-muted small mb-3">Atención para incidencias en pedidos, consultas de entrega o problemas de pago.</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li class="mb-2"><i class="fas fa-envelope text-brand me-2"></i> soporte@novago.pe</li>
+                            <li><i class="fas fa-phone text-brand me-2"></i> +51 (01) 315-9600</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-tile p-4 h-100">
+                        <i class="fas fa-motorcycle text-brand fa-2x mb-3"></i>
+                        <h5 class="fw-bold mb-2">Canal para Repartidores</h5>
+                        <p class="text-muted small mb-3">Soporte telemático en ruta y gestión de jornadas de despacho.</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li class="mb-2"><i class="fas fa-envelope text-brand me-2"></i> flota@novago.pe</li>
+                            <li><i class="fas fa-map-marker-alt text-brand me-2"></i> Lima Metropolitana, Perú</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="hero-shell p-4 p-md-5">
+                <h4 class="fw-bold mb-3">Preguntas Frecuentes (FAQ)</h4>
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    <div class="accordion-item bg-transparent">
+                        <h2 class="accordion-header" id="faqOne">
+                            <button class="accordion-button collapsed bg-transparent fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                ¿Cómo puedo rastrear mi entrega en tiempo real?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="faqOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                Puedes consultar directamente en nuestra <a href="{% url 'tracking:public_lookup' %}">página pública de consulta</a> ingresando tu número de pedido, o si estás registrado, acceder al portal de cliente con mapa interactivo en vivo.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-transparent">
+                        <h2 class="accordion-header" id="faqTwo">
+                            <button class="accordion-button collapsed bg-transparent fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                ¿Cuánto es el costo de envío?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted">
+                                El costo estándar de despacho metropolitano es de S/ 5.00 por orden, visible en todo momento de manera transparente en tu carrito de compras.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

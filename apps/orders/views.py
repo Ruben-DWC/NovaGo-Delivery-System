@@ -8,11 +8,43 @@ from django.db.models import Count, Q
 from .models import Pedido
 from .forms import CheckoutForm
 from .services import CartService, OrderService, AutoAsignmentService, JornadaService
+from apps.products.models import Producto
 from apps.users.mixins import AdminRequiredMixin
+
+
+def serialize_cart(request, message="Carrito actualizado."):
+	"""Serializa el estado completo del carrito para respuestas AJAX enriquecidas."""
+	totals = CartService.get_totals(request)
+	items_data = [
+		{
+			'id': item['producto'].id,
+			'nombre': item['producto'].nombre,
+			'precio': float(item['producto'].precio),
+			'imagen_url': item['producto'].imagen_url,
+			'cantidad': item['cantidad'],
+			'stock': item['producto'].stock,
+			'subtotal': float(item['subtotal']),
+		}
+		for item in totals.get('items', [])
+	]
+	return {
+		'status': 'success',
+		'message': message,
+		'cart_count': totals.get('count', 0),
+		'cart_subtotal': float(totals.get('subtotal', 0)),
+		'cart_shipping': float(totals.get('shipping', 0)),
+		'cart_total': float(totals.get('total', 0)),
+		'items': items_data,
+	}
 
 
 class CartView(TemplateView):
 	template_name = 'orders/cart.html'
+
+	def get(self, request, *args, **kwargs):
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+			return JsonResponse(serialize_cart(request, "Datos del carrito recuperados."))
+		return super().get(request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -20,20 +52,28 @@ class CartView(TemplateView):
 		return context
 
 
+class CartDataView(View):
+	"""Endpoint JSON público para sincronizar el estado del carrito en drawers y widgets."""
+	def get(self, request):
+		return JsonResponse(serialize_cart(request, "Estado actual del carrito."))
+
+
 class AddToCartView(View):
 	def post(self, request, producto_id):
 		quantity = request.POST.get('quantity', 1)
-		CartService.add_product(request, producto_id, quantity)
-		totals = CartService.get_totals(request)
+		try:
+			qty_int = max(1, int(quantity))
+		except (ValueError, TypeError):
+			qty_int = 1
+
+		producto = get_object_or_404(Producto, id=producto_id, activo=True)
+		CartService.add_product(request, producto_id, qty_int)
+		msg = f'¡"{producto.nombre}" agregado al carrito!'
+
 		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
-			return JsonResponse({
-				'status': 'success',
-				'message': 'Producto agregado al carrito.',
-				'cart_count': totals['count'],
-				'cart_total': float(totals['total']),
-				'cart_subtotal': float(totals['subtotal']),
-			})
-		messages.success(request, 'Producto agregado al carrito.')
+			return JsonResponse(serialize_cart(request, msg))
+
+		messages.success(request, msg)
 		return redirect(request.META.get('HTTP_REFERER', 'orders:cart'))
 
 
@@ -41,16 +81,34 @@ class UpdateCartView(View):
 	def post(self, request, item_id):
 		quantity = request.POST.get('quantity')
 		if quantity is None:
+			if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+				return JsonResponse({'status': 'error', 'message': 'Cantidad inválida.'}, status=400)
 			return HttpResponseBadRequest('Cantidad invalida.')
-		CartService.update_product(request, item_id, quantity)
-		messages.success(request, 'Carrito actualizado.')
+
+		try:
+			qty_int = int(quantity)
+		except (ValueError, TypeError):
+			qty_int = 1
+
+		CartService.update_product(request, item_id, qty_int)
+		msg = 'Carrito actualizado.'
+
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+			return JsonResponse(serialize_cart(request, msg))
+
+		messages.success(request, msg)
 		return redirect('orders:cart')
 
 
 class RemoveFromCartView(View):
 	def post(self, request, item_id):
 		CartService.remove_product(request, item_id)
-		messages.info(request, 'Producto retirado del carrito.')
+		msg = 'Producto retirado del carrito.'
+
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+			return JsonResponse(serialize_cart(request, msg))
+
+		messages.info(request, msg)
 		return redirect('orders:cart')
 
 

@@ -7,6 +7,9 @@ app_name = 'users'
 urlpatterns = [
     # Landing page principal
     path('home/', views.HomeView.as_view(), name='home'),
+    path('nosotros/', views.AboutView.as_view(), name='about'),
+    path('terminos/', views.TermsView.as_view(), name='terms'),
+    path('contacto/', views.ContactView.as_view(), name='contact'),
     
     # Autenticación
     path('login/', views.LoginView.as_view(), name='login'),

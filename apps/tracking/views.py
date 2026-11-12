@@ -32,6 +32,31 @@ def broadcast_order_tracking_snapshot(pedido):
 		},
 	)
 
+class PublicOrderLookupView(TemplateView):
+	"""Vista pública para consulta rápida del estado de entrega de un pedido mediante ID."""
+	template_name = 'tracking/public_lookup.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		order_query = self.request.GET.get('order_id', '').strip().lstrip('#')
+		context['order_query'] = order_query
+		if order_query.isdigit():
+			pedido = (
+				Pedido.objects.filter(id=int(order_query))
+				.select_related('cliente', 'motorizado')
+				.prefetch_related('items__producto')
+				.first()
+			)
+			if pedido:
+				context['pedido'] = pedido
+				context['found'] = True
+			else:
+				context['not_found'] = True
+		elif order_query:
+			context['not_found'] = True
+		return context
+
+
 class TrackOrderView(LoginRequiredMixin, TemplateView):
 	template_name = 'tracking/track_order_map.html'
 

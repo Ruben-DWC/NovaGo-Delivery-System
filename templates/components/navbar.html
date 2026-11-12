@@ -401,7 +401,7 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a class="nav-link position-relative d-inline-flex align-items-center gap-1 {% if request.resolver_match.url_name == 'portal_cliente_carrito' %}active{% endif %}" href="{% url 'users:portal_cliente_carrito' %}" title="Ver carrito de compras">
+                    <a class="nav-link position-relative d-inline-flex align-items-center gap-1 {% if request.resolver_match.url_name == 'portal_cliente_carrito' %}active{% endif %}" href="{% url 'users:portal_cliente_carrito' %}" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" title="Ver carrito de compras">
                         <i class="fas fa-shopping-cart"></i> Carrito
                         <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count {% if not cart_count %}d-none{% endif %}">{{ cart_count|default:0 }}</span>
                     </a>
@@ -433,9 +433,14 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a class="nav-link position-relative d-inline-flex align-items-center gap-1 {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" href="{% url 'orders:cart' %}" id="public-nav-cart" title="Ver carrito de compras">
+                    <a class="nav-link position-relative d-inline-flex align-items-center gap-1 {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" href="{% url 'orders:cart' %}" id="public-nav-cart" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" title="Ver carrito de compras">
                         <i class="fas fa-shopping-cart"></i> Carrito
                         <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count {% if not cart_count %}d-none{% endif %}">{{ cart_count|default:0 }}</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'public_lookup' %}active{% endif %}" href="{% url 'tracking:public_lookup' %}" title="Consulta pública del estado de entrega">
+                        <i class="fas fa-magnifying-glass-location"></i> Rastrear
                     </a>
                 </div>
                 {% if user.is_authenticated %}

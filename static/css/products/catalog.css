@@ -637,7 +637,12 @@ html[data-theme='dark'] .product-card-price {
     color: #ff8c66 !important; /* Coral de alto contraste WCAG AA 7.8:1 */
 }
 
-html[data-theme='dark'] .detail-meta-item span,
+html[data-theme='dark'] .detail-meta-item span {
+    background: transparent !important;
+    color: #aebad1 !important;
+    border: none !important;
+}
+
 html[data-theme='dark'] .catalog-category,
 html[data-theme='dark'] .product-card-category {
     background: #1e2e4a !important;

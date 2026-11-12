@@ -6,12 +6,12 @@
                 <p>Delivery de nueva generacion con enfoque en velocidad, trazabilidad y experiencia.</p>
             </div>
             <div class="col-md-4">
-                <h5>Enlaces</h5>
+                <h5>Enlaces Rápidos</h5>
                 <ul class="list-unstyled">
-                    <li><a href="#" class="text-white-50">Sobre Nosotros</a></li>
-                    <li><a href="#" class="text-white-50">Términos y Condiciones</a></li>
-                    <li><a href="#" class="text-white-50">Política de Privacidad</a></li>
-                    <li><a href="#" class="text-white-50">Contacto</a></li>
+                    <li><a href="{% url 'users:about' %}" class="text-white-50">Sobre Nosotros</a></li>
+                    <li><a href="{% url 'tracking:public_lookup' %}" class="text-white-50">Consulta de Pedidos</a></li>
+                    <li><a href="{% url 'users:terms' %}" class="text-white-50">Términos y Condiciones</a></li>
+                    <li><a href="{% url 'users:contact' %}" class="text-white-50">Soporte y Contacto</a></li>
                 </ul>
             </div>
             <div class="col-md-4">

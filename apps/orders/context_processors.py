@@ -23,3 +23,4 @@ def cart_context(request):
             'cart_shipping': 0,
             'cart_total': 0,
         }
+

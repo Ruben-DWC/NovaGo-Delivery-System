@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Términos y Condiciones - NovaGo Delivery{% endblock %}
+
+{% block content %}
+<section class="section-space reveal-up is-visible">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="hero-shell p-4 p-md-5">
+                <span class="kicker mb-2">CONDICIONES DEL SERVICIO</span>
+                <h1 class="h2 fw-bold mb-4">Términos y Condiciones de Uso</h1>
+
+                <div class="vstack gap-4 text-muted">
+                    <article>
+                        <h4 class="fw-bold text-body mb-2">1. Naturaleza del Proyecto y Plataforma</h4>
+                        <p>NovaGo Delivery es un sistema desarrollado con fines académicos y de demostración técnica de ingeniería de software para el curso de Herramientas de Desarrollo de la Universidad Tecnológica del Perú. Todas las transacciones financieras y pasarelas de pago operan bajo simulación controlada y no debitan fondos reales.</p>
+                    </article>
+
+                    <article>
+                        <h4 class="fw-bold text-body mb-2">2. Registro de Cuentas y Roles</h4>
+                        <p>Los usuarios registrados asumen la responsabilidad de resguardar sus credenciales de acceso. El sistema implementa un estricto control de acceso basado en roles (RBAC) con tres perfiles: Cliente, Motorizado y Administrador.</p>
+                    </article>
+
+                    <article>
+                        <h4 class="fw-bold text-body mb-2">3. Pedidos, Stock y Despachos</h4>
+                        <p>La disponibilidad de los productos se actualiza en tiempo real en la base de datos. En caso de cancelación de un pedido no despachado, el stock reservado se reintegra automáticamente al catálogo central.</p>
+                    </article>
+
+                    <article>
+                        <h4 class="fw-bold text-body mb-2">4. Geolocalización y Privacidad</h4>
+                        <p>Las coordenadas telemáticas del motorizado son empleadas exclusivamente durante la vigencia de la jornada de entrega para trazar la ruta hacia la dirección consignada por el cliente.</p>
+                    </article>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Última actualización: Ciclo 2026-II UTP</span>
+                    <a href="{% url 'products:product_list' %}" class="btn btn-cta btn-sm">Ir al catálogo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

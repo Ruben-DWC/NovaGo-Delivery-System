@@ -207,6 +207,21 @@ def build_order_progress_payload(order):
 class HomeView(TemplateView):
     template_name = 'home.html'
 
+
+class AboutView(TemplateView):
+    """Página pública institucional: Sobre Nosotros y NovaGo Delivery."""
+    template_name = 'pages/about.html'
+
+
+class TermsView(TemplateView):
+    """Página pública: Términos y Condiciones de Servicio y Despacho."""
+    template_name = 'pages/terms.html'
+
+
+class ContactView(TemplateView):
+    """Página pública: Centro de Contacto, Soporte y FAQ."""
+    template_name = 'pages/contact.html'
+
 class LoginView(AuthLoginView):
     template_name = 'users/login.html'
     redirect_authenticated_user = True

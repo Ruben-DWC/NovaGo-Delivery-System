@@ -136,7 +136,7 @@
 
 <!-- Floating Cart Action Pill: Permite ver de inmediato dónde quedan los productos seleccionados -->
 <aside id="floating-cart-pill" class="floating-cart-container {% if not cart_count %}is-hidden{% endif %}" aria-label="Acceso rápido al carrito de compras">
-    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
+    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
         <div class="cart-pill-icon">
             <i class="fas fa-shopping-bag"></i>
             <span class="cart-pill-counter js-nav-cart-count">{{ cart_count|default:0 }}</span>
@@ -163,74 +163,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const toastEl = document.getElementById('cartToast');
-    const toast = toastEl && typeof bootstrap !== 'undefined' ? new bootstrap.Toast(toastEl, { delay: 3500 }) : null;
-    const toastMsg = document.getElementById('cartToastMsg');
-    const floatingPill = document.getElementById('floating-cart-pill');
-    const floatingTotal = document.getElementById('floating-cart-total');
-
-    function updateCartUI(data, productName) {
-        // Actualizar contadores de carrito en navbar y floating pill
-        document.querySelectorAll('.js-nav-cart-count').forEach(el => {
-            el.textContent = data.cart_count;
-            el.classList.remove('d-none');
-            el.classList.remove('cart-pulse-anim');
-            void el.offsetWidth; // Trigger reflow
-            el.classList.add('cart-pulse-anim');
-        });
-
-        // Actualizar total en floating pill
-        if (floatingTotal && data.cart_total !== undefined) {
-            floatingTotal.textContent = 'S/ ' + Number(data.cart_total).toFixed(2);
-        }
-
-        // Mostrar floating pill si estaba oculto
-        if (floatingPill && data.cart_count > 0) {
-            floatingPill.classList.remove('is-hidden');
-            floatingPill.classList.remove('cart-pulse-anim');
-            void floatingPill.offsetWidth;
-            floatingPill.classList.add('cart-pulse-anim');
-        }
-
-        // Toast feedback
-        if (toast && toastMsg) {
-            toastMsg.textContent = productName ? `¡"${productName}" agregado al carrito!` : (data.message || 'Producto agregado al carrito.');
-            toast.show();
-        }
-    }
-
-    document.querySelectorAll('.js-add-cart-form').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            const formData = new FormData(form);
-            const action = form.action;
-            const productName = form.getAttribute('data-product-name') || '';
-
-            // Intentar envío AJAX para UX impecable
-            e.preventDefault();
-            fetch(action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (res.ok) return res.json();
-                throw new Error('Respuesta no JSON, procediendo con envío estándar');
-            })
-            .then(data => {
-                updateCartUI(data, productName);
-            })
-            .catch(() => {
-                // Fallback tradicional
-                form.submit();
-            });
-        });
-    });
-});
-</script>
 {% endblock %}
