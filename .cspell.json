@@ -1,6 +1,9 @@
 {
   "version": "0.2",
   "enabled": false,
+  "language": "es,en",
+  "checkOnlyEnabledFileTypes": true,
+  "enabledLanguageIds": [],
   "ignorePaths": [
     "**/*"
   ]
