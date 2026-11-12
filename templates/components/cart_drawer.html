@@ -27,7 +27,7 @@
                             <span class="qty-input-text px-2 small fw-bold">{{ item.cantidad }}</span>
                             <button type="button" class="qty-btn js-drawer-qty-plus" data-id="{{ item.producto.id }}" data-max="{{ item.producto.stock }}" aria-label="Aumentar cantidad">+</button>
                         </div>
-                        <button type="button" class="btn btn-link text-danger p-0 js-drawer-remove" data-id="{{ item.producto.id }}" title="Quitar producto">
+                        <button type="button" class="btn btn-link text-danger p-0 js-drawer-remove" data-id="{{ item.producto.id }}" title="Quitar producto" aria-label="Quitar {{ item.producto.nombre }} del carrito">
                             <i class="fas fa-trash-can small"></i>
                         </button>
                     </div>
@@ -85,3 +85,4 @@
         </div>
     </div>
 </div>
+

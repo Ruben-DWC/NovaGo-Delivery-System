@@ -14,9 +14,10 @@
 
                 <form method="get" action="{% url 'tracking:public_lookup' %}" class="row g-2 justify-content-center">
                     <div class="col-sm-8 col-md-7">
+                        <label for="orderIdInput" class="visually-hidden">Número de pedido</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hashtag text-muted"></i></span>
-                            <input type="text" name="order_id" class="form-control" placeholder="Ej: 15 o #15" value="{{ order_query }}" aria-label="Número de pedido" required autofocus>
+                            <input type="text" id="orderIdInput" name="order_id" class="form-control" placeholder="Ej: 15 o #15" value="{{ order_query }}" aria-label="Número de pedido" required autofocus>
                         </div>
                     </div>
                     <div class="col-sm-4 col-md-3 d-grid">
@@ -87,11 +88,12 @@
                 <h6 class="fw-bold mb-2"><i class="fas fa-bag-shopping me-1 text-muted"></i> Ítems en el pedido</h6>
                 <div class="table-responsive mb-3">
                     <table class="table table-sm align-middle">
+                        <caption class="visually-hidden">Detalle de productos incluidos en el pedido</caption>
                         <thead>
                             <tr class="text-muted small">
-                                <th>Producto</th>
-                                <th class="text-center">Cant.</th>
-                                <th class="text-end">Subtotal</th>
+                                <th scope="col">Producto</th>
+                                <th scope="col" class="text-center">Cant.</th>
+                                <th scope="col" class="text-end">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,3 +148,4 @@
     </div>
 </section>
 {% endblock %}
+
