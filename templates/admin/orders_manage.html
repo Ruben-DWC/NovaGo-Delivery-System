@@ -5,156 +5,389 @@
 {% block extra_css %}
 {{ block.super }}
 <style>
-    .orders-admin-page { padding: 1.15rem; }
+    .orders-admin-page {
+        padding: 1.5rem;
+        min-height: 100%;
+    }
 
     .orders-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 0.7rem;
+        gap: 1.2rem;
         flex-wrap: wrap;
-        margin-bottom: 0.8rem;
-        padding: 1rem 1.05rem;
-        border: 1px solid var(--line);
+        margin-bottom: 1.2rem;
+        padding: 1.1rem 1.3rem;
+        border: 1px solid var(--border-color);
         border-radius: 16px;
-        background: linear-gradient(120deg, rgba(255,255,255,0.9), rgba(245,249,255,0.92));
-        box-shadow: 0 18px 36px -30px rgba(15, 23, 42, 0.5);
+        background: var(--surface-card);
+        box-shadow: 0 14px 30px -20px rgba(15, 23, 42, 0.25);
     }
 
-    html[data-theme='dark'] .orders-header,
-    html[data-theme='dark'] .orders-filters,
-    html[data-theme='dark'] .orders-bulk,
-    html[data-theme='dark'] .orders-table-wrap {
-        background: rgba(15, 23, 42, 0.64);
-        border-color: rgba(148, 163, 184, 0.24);
+    html[data-theme='dark'] .orders-header {
+        background: #132038;
+        border-color: #273858;
+        box-shadow: 0 16px 36px -24px rgba(0, 0, 0, 0.75);
+    }
+
+    .header-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+    }
+
+    .header-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.6);
+        flex-shrink: 0;
     }
 
     .orders-title {
         margin: 0;
         color: var(--text);
-        font-size: 1.4rem;
+        font-size: 1.38rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+
+    .orders-subtitle {
+        margin: 0.2rem 0 0;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
     }
 
     .orders-header-actions {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.6rem;
         flex-wrap: wrap;
     }
 
     .orders-btn {
         text-decoration: none;
-        padding: 0.5rem 0.72rem;
+        padding: 0.55rem 0.95rem;
         border-radius: 10px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--border-color);
         color: var(--text);
         font-weight: 700;
+        font-size: 0.84rem;
         background: var(--bg);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .orders-btn:hover {
+        transform: translateY(-1px);
+        color: var(--brand);
+        border-color: var(--brand);
     }
 
     .orders-btn.primary {
         border: none;
-        color: #fff;
         background: linear-gradient(120deg, #0ea5e9, #0284c7);
+        color: #fff;
+        box-shadow: 0 10px 20px -12px rgba(14, 165, 233, 0.6);
     }
 
+    /* Filters Bar */
     .orders-filters {
         display: grid;
         grid-template-columns: 2fr 1fr 1fr 1fr auto;
-        gap: 0.55rem;
-        margin-bottom: 0.75rem;
+        gap: 0.65rem;
+        margin-bottom: 1.1rem;
+        background: var(--surface-card);
+        padding: 0.95rem;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+    }
+
+    html[data-theme='dark'] .orders-filters {
+        background: #132038;
+        border-color: #273858;
+    }
+
+    .search-input-wrap {
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+
+    .search-input-wrap .orders-control {
+        padding-left: 2.25rem;
+        width: 100%;
     }
 
     .orders-control {
-        width: 100%;
-        padding: 0.56rem;
+        padding: 0.6rem 0.85rem;
         border-radius: 10px;
-        border: 1px solid var(--line);
-        background: var(--bg);
-        color: var(--text);
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--input-text);
+        font-size: 0.88rem;
+        font-family: inherit;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .orders-bulk {
-        display: grid;
-        grid-template-columns: 1fr 220px 220px auto;
-        gap: 0.55rem;
-        align-items: end;
-        margin-bottom: 0.75rem;
+    .orders-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
 
-    .orders-label {
-        display: block;
-        font-size: 0.75rem;
-        color: var(--text-secondary, #667799);
-        font-weight: 700;
-        margin-bottom: 0.2rem;
-    }
-
-    .orders-submit {
-        padding: 0.56rem 0.75rem;
-        border-radius: 10px;
-        border: none;
-        background: linear-gradient(120deg, #f97316, #ea580c);
+    .btn-orders-filter {
+        background: linear-gradient(120deg, #3b82f6, #2563eb);
         color: #fff;
+        border: none;
         font-weight: 700;
+        padding: 0.6rem 1.1rem;
+        border-radius: 10px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
+    .btn-orders-filter:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px -8px rgba(59, 130, 246, 0.7);
+    }
+
+    /* Bulk Actions Bar */
+    .orders-bulk {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.1rem;
+        padding: 0.85rem 1.1rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-card);
+        flex-wrap: wrap;
+    }
+
+    html[data-theme='dark'] .orders-bulk {
+        background: #132038;
+        border-color: #273858;
+    }
+
+    .bulk-badge-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-secondary);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .bulk-fields {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: 1;
+        flex-wrap: wrap;
+    }
+
+    .bulk-fields .orders-control {
+        min-width: 170px;
+    }
+
+    .btn-orders-bulk-submit {
+        background: linear-gradient(120deg, #f97316, #ea580c);
+        border: none;
+        color: #fff;
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.84rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 16px -8px rgba(249, 115, 22, 0.6);
+    }
+
+    .btn-orders-bulk-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px -8px rgba(249, 115, 22, 0.8);
+    }
+
+    /* Table */
     .orders-table-wrap {
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: var(--bg-secondary, #f5f9ff);
-        overflow: auto;
-        box-shadow: 0 18px 36px -32px rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        background: var(--surface-card);
+        overflow-x: auto;
+        box-shadow: 0 16px 36px -28px rgba(15, 23, 42, 0.4);
+    }
+
+    html[data-theme='dark'] .orders-table-wrap {
+        background: #132038;
+        border-color: #273858;
+        box-shadow: 0 20px 40px -28px rgba(0, 0, 0, 0.8);
     }
 
     .orders-table {
         width: 100%;
         border-collapse: collapse;
-    }
-
-    .orders-table th,
-    .orders-table td {
         text-align: left;
-        padding: 0.58rem;
+    }
+
+    .orders-table th {
+        background: var(--table-header-bg);
+        color: var(--text-secondary);
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 0.9rem 1rem;
         border-bottom: 1px solid var(--line);
+        white-space: nowrap;
     }
 
-    .orders-table tbody tr:hover {
-        background: rgba(14, 165, 233, 0.05);
+    html[data-theme='dark'] .orders-table th {
+        background: #182846;
+        color: #94a3b8;
+        border-color: #273858;
     }
 
-    html[data-theme='dark'] .orders-table tbody tr:hover {
-        background: rgba(148, 163, 184, 0.08);
+    .orders-table td {
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--line);
+        color: var(--text);
+        font-size: 0.88rem;
+        vertical-align: middle;
     }
 
-    .orders-table-empty {
-        padding: 0.8rem;
+    html[data-theme='dark'] .orders-table td {
+        border-color: #1e304f;
     }
 
-    .orders-pagination {
-        margin-top: 0.8rem;
+    .orders-table tbody tr:hover td {
+        background: var(--table-hover-bg);
+    }
+
+    html[data-theme='dark'] .orders-table tbody tr:hover td {
+        background: #1c3256;
+    }
+
+    .order-id-badge {
+        font-weight: 800;
+        color: #3b82f6;
+        font-size: 0.92rem;
+    }
+
+    .badge-payment {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.24rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(100, 116, 139, 0.12);
+        color: var(--text);
+        border: 1px solid var(--border-color);
+    }
+
+    .badge-assigned {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.24rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(249, 115, 22, 0.12);
+        color: #ea580c;
+        border: 1px solid rgba(249, 115, 22, 0.25);
+    }
+
+    html[data-theme='dark'] .badge-assigned {
+        background: rgba(249, 115, 22, 0.2);
+        color: #fdba74;
+    }
+
+    .badge-unassigned {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.24rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Empty State */
+    .admin-empty-wrap {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+
+    .admin-empty-icon {
+        font-size: 2.5rem;
+        color: var(--text-secondary);
+        opacity: 0.6;
+        margin-bottom: 0.8rem;
+    }
+
+    /* Pagination */
+    .admin-pagination {
+        margin-top: 1.2rem;
         display: flex;
-        gap: 0.45rem;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
         flex-wrap: wrap;
     }
 
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
+    .page-btn {
+        text-decoration: none;
+        padding: 0.45rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-card);
+        color: var(--text);
+        font-weight: 700;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.18s ease;
+    }
+
+    .page-btn:hover {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: #fff;
     }
 
     @media (max-width: 960px) {
-        .orders-filters,
-        .orders-bulk {
-            grid-template-columns: 1fr;
-        }
+        .orders-filters { grid-template-columns: 1fr; }
+        .orders-bulk { flex-direction: column; align-items: stretch; }
     }
 </style>
 {% endblock %}
@@ -162,15 +395,31 @@
 {% block admin_content %}
 <section class="orders-admin-page">
     <div class="orders-header">
-        <h1 class="orders-title"><i class="fas fa-clipboard-list"></i> Gestión de Pedidos</h1>
+        <div class="header-title-group">
+            <div class="header-icon-box">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div>
+                <h1 class="orders-title">Gestión de Pedidos</h1>
+                <p class="orders-subtitle">Supervisión operativa, estados de despacho, asignación de repartidores y pagos.</p>
+            </div>
+        </div>
         <div class="orders-header-actions">
-            <a href="{% url 'users:admin_export_orders' %}?{{ request.GET.urlencode }}&format=csv" class="orders-btn">Exportar CSV</a>
-            <a href="{% url 'users:admin_export_orders' %}?{{ request.GET.urlencode }}&format=xlsx" class="orders-btn primary">Exportar XLSX</a>
+            <a href="{% url 'users:admin_export_orders' %}?{{ request.GET.urlencode }}&format=csv" class="orders-btn">
+                <i class="fas fa-file-csv"></i> Exportar CSV
+            </a>
+            <a href="{% url 'users:admin_export_orders' %}?{{ request.GET.urlencode }}&format=xlsx" class="orders-btn primary">
+                <i class="fas fa-file-excel"></i> Exportar XLSX
+            </a>
         </div>
     </div>
 
+    <!-- Filter Form -->
     <form method="get" class="orders-filters">
-        <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar por cliente, teléfono o ID" class="orders-control" aria-label="Buscar pedidos">
+        <div class="search-input-wrap">
+            <i class="fas fa-magnifying-glass search-icon"></i>
+            <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar por cliente, teléfono o ID de pedido..." class="orders-control" aria-label="Buscar pedidos">
+        </div>
         <select name="estado" class="orders-control" title="Filtrar por estado" aria-label="Filtrar por estado">
             <option value="">Todos los estados</option>
             {% for value, label in estado_options %}
@@ -188,76 +437,114 @@
             <option value="1" {% if filter_assigned == '1' %}selected{% endif %}>Asignado</option>
             <option value="0" {% if filter_assigned == '0' %}selected{% endif %}>Sin asignar</option>
         </select>
-        <button type="submit" class="orders-control">Filtrar</button>
+        <button type="submit" class="btn-orders-filter">
+            <i class="fas fa-filter"></i> Filtrar
+        </button>
     </form>
 
+    <!-- Bulk Form -->
     <form method="post" action="{% url 'users:admin_orders_bulk_action' %}">
         {% csrf_token %}
         <div class="orders-bulk">
-            <div>
-                <label for="bulk-action" class="orders-label">Acción masiva</label>
+            <span class="bulk-badge-title">
+                <i class="fas fa-bolt text-warning"></i> Acción Masiva:
+            </span>
+            <div class="bulk-fields">
                 <select id="bulk-action" name="action" class="orders-control" aria-label="Acción masiva">
-                    <option value="">Selecciona acción</option>
+                    <option value="">-- Selecciona acción --</option>
                     <option value="assign">Asignar motorizado</option>
-                    <option value="status">Cambiar estado</option>
-                    <option value="cancel">Cancelar pedidos</option>
+                    <option value="status">Cambiar estado del pedido</option>
+                    <option value="cancel">Cancelar pedidos seleccionados</option>
                 </select>
-            </div>
-            <div>
-                <label for="bulk-motorizado" class="orders-label">Motorizado</label>
                 <select id="bulk-motorizado" name="motorizado_id" class="orders-control" aria-label="Motorizado">
-                    <option value="">-- Opcional --</option>
+                    <option value="">-- Motorizado (opcional) --</option>
                     {% for moto in motorizados %}
                     <option value="{{ moto.id }}">{{ moto.get_full_name|default:moto.username }}</option>
                     {% endfor %}
                 </select>
-            </div>
-            <div>
-                <label for="bulk-status" class="orders-label">Nuevo estado</label>
                 <select id="bulk-status" name="new_status" class="orders-control" aria-label="Nuevo estado">
-                    <option value="">-- Opcional --</option>
+                    <option value="">-- Nuevo estado (opcional) --</option>
                     {% for value, label in estado_options %}
                     <option value="{{ value }}">{{ label }}</option>
                     {% endfor %}
                 </select>
+                <button type="submit" class="btn-orders-bulk-submit">
+                    <i class="fas fa-check"></i> Aplicar a pedidos
+                </button>
             </div>
-            <button type="submit" class="orders-submit">Aplicar</button>
         </div>
 
         <div class="orders-table-wrap">
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>
-                            <label for="select-all-orders" class="visually-hidden">Seleccionar todos los pedidos</label>
+                        <th style="width: 44px; text-align: center;">
                             <input type="checkbox" id="select-all-orders" title="Seleccionar todos los pedidos" aria-label="Seleccionar todos los pedidos">
                         </th>
-                        <th>Pedido</th>
-                        <th>Cliente</th>
-                        <th>Motorizado</th>
-                        <th>Estado</th>
-                        <th>Pago</th>
-                        <th>Total</th>
-                        <th>Fecha</th>
+                        <th><i class="fas fa-hashtag me-1 text-primary"></i> Pedido</th>
+                        <th><i class="fas fa-user me-1 text-info"></i> Cliente</th>
+                        <th><i class="fas fa-motorcycle me-1 text-warning"></i> Repartidor</th>
+                        <th><i class="fas fa-traffic-light me-1 text-secondary"></i> Estado</th>
+                        <th><i class="fas fa-credit-card me-1 text-secondary"></i> Pago</th>
+                        <th><i class="fas fa-sack-dollar me-1 text-success"></i> Total</th>
+                        <th><i class="fas fa-calendar-days me-1 text-secondary"></i> Fecha y Hora</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
                     <tr>
-                        <td>
-                            <label for="order-{{ order.id }}" class="visually-hidden">Seleccionar pedido {{ order.id }}</label>
+                        <td style="text-align: center;">
                             <input id="order-{{ order.id }}" type="checkbox" name="selected_orders" value="{{ order.id }}" class="bulk-order-item" title="Seleccionar pedido {{ order.id }}" aria-label="Seleccionar pedido {{ order.id }}">
                         </td>
-                        <td>#{{ order.id }}</td>
-                        <td>{{ order.cliente.get_full_name|default:order.cliente.username }}</td>
-                        <td>{% if order.motorizado %}{{ order.motorizado.get_full_name|default:order.motorizado.username }}{% else %}Sin asignar{% endif %}</td>
-                        <td>{{ order.get_estado_display }}</td>
-                        <td>{% if order.pago %}{{ order.pago.get_metodo_display }}{% else %}Sin pago{% endif %}</td>
-                        <td>S/. {{ order.total|floatformat:2 }}</td>
-                        <td>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            <span class="order-id-badge">#{{ order.id }}</span>
+                        </td>
+                        <td>
+                            <div style="font-weight: 800; color: var(--text);">{{ order.cliente.get_full_name|default:order.cliente.username }}</div>
+                            <div style="font-size: 0.74rem; color: var(--text-secondary);">@{{ order.cliente.username }}</div>
+                        </td>
+                        <td>
+                            {% if order.motorizado %}
+                            <span class="badge-assigned">
+                                <i class="fas fa-motorcycle"></i> {{ order.motorizado.get_full_name|default:order.motorizado.username }}
+                            </span>
+                            {% else %}
+                            <span class="badge-unassigned">
+                                <i class="fas fa-clock"></i> Sin asignar
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-pill status-{{ order.estado }}">{{ order.get_estado_display }}</span>
+                        </td>
+                        <td>
+                            {% if order.pago %}
+                            <span class="badge-payment">
+                                <i class="fas fa-check-circle text-success"></i> {{ order.pago.get_metodo_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge-payment" style="opacity: 0.7;">
+                                <i class="fas fa-hourglass-start"></i> Pendiente
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong style="color: var(--brand); font-size: 0.95rem;">S/. {{ order.total|floatformat:2 }}</strong>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.84rem; color: var(--text-secondary);">{{ order.fecha_pedido|date:'d/m/Y H:i' }}</span>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="orders-table-empty">No hay pedidos con esos filtros.</td></tr>
+                    <tr>
+                        <td colspan="8">
+                            <div class="admin-empty-wrap">
+                                <div class="admin-empty-icon"><i class="fas fa-clipboard-question"></i></div>
+                                <h3 style="font-weight: 700; color: var(--text);">No hay pedidos registrados</h3>
+                                <p style="color: var(--text-secondary); font-size: 0.88rem;">No existen pedidos que coincidan con los filtros aplicados.</p>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -265,14 +552,20 @@
     </form>
 
     {% if is_paginated %}
-    <div class="orders-pagination">
-        {% if page_obj.has_previous %}
-        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
-        {% endif %}
-        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
-        {% endif %}
+    <div class="admin-pagination">
+        <span style="color: var(--text-secondary); font-weight: 700; font-size: 0.84rem;">Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        <div style="display: flex; gap: 0.4rem;">
+            {% if page_obj.has_previous %}
+            <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-btn">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-btn">
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
     </div>
     {% endif %}
 </section>

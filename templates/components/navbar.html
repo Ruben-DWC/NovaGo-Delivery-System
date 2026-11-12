@@ -225,6 +225,27 @@
         text-align: center;
     }
 
+    .nav-btn-store {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.38rem !important;
+        padding: 0.35rem 0.75rem !important;
+        border-radius: 999px !important;
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        color: var(--brand, #ff6a3d) !important;
+        background: rgba(255, 106, 61, 0.1) !important;
+        border: 1px solid rgba(255, 106, 61, 0.28) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .nav-btn-store:hover {
+        background: var(--brand, #ff6a3d) !important;
+        color: #fff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 10px 20px -10px rgba(255, 106, 61, 0.6) !important;
+    }
+
     html[data-theme='dark'] .client-breadcrumb .crumb-root {
         background: rgba(96, 165, 250, 0.14);
         border-color: rgba(96, 165, 250, 0.28);
@@ -347,27 +368,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav me-auto align-items-lg-center gap-lg-2">
                 {% spaceless %}
-                {% if '/portal/admin/' in request.path %}
-                <div class="nav-item dropdown admin-nav-dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Administración
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <h6 class="dropdown-header">Panel administrativo</h6>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'portal_admin' %}active{% endif %}" href="{% url 'users:portal_admin' %}"><i class="fas fa-chart-pie"></i> Dashboard</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' %}active{% endif %}" href="{% url 'users:admin_users' %}"><i class="fas fa-users"></i> Usuarios</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'users:admin_orders' %}"><i class="fas fa-clipboard-list"></i> Órdenes</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' %}active{% endif %}" href="{% url 'users:admin_products' %}"><i class="fas fa-box"></i> Productos</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' %}active{% endif %}" href="{% url 'users:admin_categories' %}"><i class="fas fa-layer-group"></i> Categorías</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}" href="{% url 'users:admin_payments' %}"><i class="fas fa-credit-card"></i> Pagos</a>
-                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_audit_logs' %}active{% endif %}" href="{% url 'users:admin_audit_logs' %}"><i class="fas fa-file-alt"></i> Bitácora</a>
-                        <hr class="dropdown-divider">
-                        <a class="dropdown-item" href="{% url 'users:admin_reports' %}"><i class="fas fa-chart-bar"></i> Reportes</a>
-                        <a class="dropdown-item" href="{% url 'users:admin_income' %}"><i class="fas fa-dollar-sign"></i> Ingresos</a>
-                        <a class="dropdown-item" href="{% url 'users:admin_performance' %}"><i class="fas fa-tachometer-alt"></i> Performance</a>
-                    </div>
-                </div>
-                {% endif %}
                 {% if user.is_authenticated and user.role == 'motorizado' %}
                 <div class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'portal_motorizado' or request.resolver_match.url_name == 'motorizado_dashboard' or request.resolver_match.url_name == 'motorizado_dashboard_portal' %}active{% endif %}" href="{% url 'tracking:portal_motorizado' %}">
@@ -397,7 +397,7 @@
                 </div>
                 <div class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'portal_cliente_catalogo' %}active{% endif %}" href="{% url 'users:portal_cliente_catalogo' %}">
-                        Catalogo
+                        Catálogo
                     </a>
                 </div>
                 <div class="nav-item">
@@ -421,9 +421,54 @@
                         Rastreo
                     </a>
                 </div>
+                {% elif user.is_authenticated and user.is_staff or user.is_authenticated and user.role == 'admin' %}
+                <!-- Navegación Ejecutiva para Administrador -->
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'portal_admin' %}active{% endif %}" href="{% url 'users:portal_admin' %}">
+                        <i class="fas fa-chart-pie me-1"></i> Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' or request.resolver_match.url_name == 'admin_clients' or request.resolver_match.url_name == 'admin_employees' or request.resolver_match.url_name == 'admin_roles' %}active{% endif %}" href="{% url 'users:admin_users' %}">
+                        <i class="fas fa-users me-1"></i> Usuarios
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' %}active{% endif %}" href="{% url 'users:admin_products' %}">
+                        <i class="fas fa-box me-1"></i> Productos
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}" href="{% url 'users:admin_orders' %}">
+                        <i class="fas fa-clipboard-list me-1"></i> Pedidos
+                    </a>
+                </div>
+                <div class="nav-item dropdown admin-nav-dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' or request.resolver_match.url_name == 'admin_payments' or request.resolver_match.url_name == 'admin_audit_logs' or request.resolver_match.url_name == 'admin_reports' or request.resolver_match.url_name == 'admin_income' or request.resolver_match.url_name == 'admin_performance' %}active{% endif %}" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sliders me-1"></i> Más Gestión
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <h6 class="dropdown-header">Reportes y Finanzas</h6>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}" href="{% url 'users:admin_reports' %}"><i class="fas fa-chart-bar"></i> Reportes Ejecutivos</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_income' %}active{% endif %}" href="{% url 'users:admin_income' %}"><i class="fas fa-dollar-sign"></i> Ingresos y Ventas</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_performance' %}active{% endif %}" href="{% url 'users:admin_performance' %}"><i class="fas fa-tachometer-alt"></i> Performance Operativa</a>
+                        <hr class="dropdown-divider">
+                        <h6 class="dropdown-header">Catálogo y Control</h6>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' %}active{% endif %}" href="{% url 'users:admin_categories' %}"><i class="fas fa-layer-group"></i> Categorías</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}" href="{% url 'users:admin_payments' %}"><i class="fas fa-credit-card"></i> Gestión de Pagos</a>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'admin_audit_logs' %}active{% endif %}" href="{% url 'users:admin_audit_logs' %}"><i class="fas fa-file-shield"></i> Bitácora y Auditoría</a>
+                        <hr class="dropdown-divider">
+                        <a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-gear"></i> Django Admin</a>
+                    </div>
+                </div>
+                <div class="nav-item ms-lg-2">
+                    <a class="nav-link nav-btn-store" href="{% url 'products:product_list' %}" title="Ver catálogo público como cliente">
+                        <i class="fas fa-store me-1"></i> Ver Tienda
+                    </a>
+                </div>
                 {% else %}
                 <div class="nav-item">
-                    <a class="nav-link" href="{% if user.is_authenticated %}{% url 'users:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+                    <a class="nav-link" href="{% url 'home' %}">
                         Inicio
                     </a>
                 </div>
@@ -443,13 +488,6 @@
                         <i class="fas fa-magnifying-glass-location"></i> Rastrear
                     </a>
                 </div>
-                {% if user.is_authenticated %}
-                <div class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}" href="{% url 'orders:order_list' %}">
-                        Mis pedidos
-                    </a>
-                </div>
-                {% endif %}
                 {% endif %}
                 {% endspaceless %}
             </div>

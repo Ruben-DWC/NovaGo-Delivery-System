@@ -6,190 +6,657 @@
 {{ block.super }}
 <style>
     .admin-users-page {
-        padding: 1.2rem;
+        padding: 1.5rem;
         background:
             radial-gradient(circle at 10% 5%, rgba(14, 165, 233, 0.08), transparent 32%),
             radial-gradient(circle at 92% 94%, rgba(249, 115, 22, 0.08), transparent 30%);
+        min-height: 100%;
     }
 
+    /* Header */
     .admin-users-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        gap: 0.9rem;
+        align-items: center;
+        gap: 1.2rem;
         flex-wrap: wrap;
-        margin-bottom: 0.9rem;
+        margin-bottom: 1.2rem;
+        padding: 1.1rem 1.3rem;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        background: var(--surface-card);
+        box-shadow: 0 14px 30px -20px rgba(15, 23, 42, 0.25);
+    }
+
+    html[data-theme='dark'] .admin-users-header {
+        background: #132038;
+        border-color: #273858;
+        box-shadow: 0 16px 36px -24px rgba(0, 0, 0, 0.75);
+    }
+
+    .header-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+    }
+
+    .header-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 10px 20px -10px rgba(14, 165, 233, 0.6);
+        flex-shrink: 0;
     }
 
     .admin-users-title {
         margin: 0;
         color: var(--text);
-        font-size: 1.42rem;
-        letter-spacing: 0.01em;
+        font-size: 1.38rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
     }
 
     .admin-users-subtitle {
-        margin: 0.26rem 0 0;
-        color: var(--text-secondary, #667799);
-        font-size: 0.88rem;
+        margin: 0.2rem 0 0;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
     }
 
     .admin-users-actions {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.6rem;
         flex-wrap: wrap;
     }
 
     .admin-users-btn {
         text-decoration: none;
-        padding: 0.52rem 0.72rem;
+        padding: 0.55rem 0.95rem;
         border-radius: 10px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--border-color);
         color: var(--text);
         font-weight: 700;
+        font-size: 0.84rem;
         background: var(--bg);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
 
     .admin-users-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 12px 24px -20px rgba(15, 23, 42, 0.75);
+        box-shadow: 0 10px 20px -12px rgba(15, 23, 42, 0.35);
+        color: var(--brand);
+        border-color: var(--brand);
     }
 
     .admin-users-btn.primary {
         border: none;
         background: linear-gradient(120deg, #0ea5e9, #0284c7);
         color: #fff;
+        box-shadow: 0 10px 20px -12px rgba(14, 165, 233, 0.6);
     }
 
+    .admin-users-btn.primary:hover {
+        background: linear-gradient(120deg, #0284c7, #0369a1);
+        color: #fff;
+    }
+
+    /* Scope Tabs */
     .admin-users-scope {
-        margin-bottom: 0.85rem;
+        margin-bottom: 1.2rem;
         display: flex;
-        gap: 0.5rem;
+        gap: 0.55rem;
         flex-wrap: wrap;
     }
 
     .scope-chip {
-        border: 1px solid var(--line);
+        border: 1px solid var(--border-color);
         border-radius: 999px;
-        padding: 0.38rem 0.68rem;
+        padding: 0.42rem 0.9rem;
         text-decoration: none;
-        color: var(--text-secondary, #667799);
-        background: var(--bg);
+        color: var(--text-secondary);
+        background: var(--surface-card);
         font-weight: 700;
-        font-size: 0.78rem;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
         transition: all 0.2s ease;
     }
 
-    .scope-chip.active {
-        color: #fff;
-        border-color: rgba(14, 165, 233, 0.6);
-        background: linear-gradient(120deg, #0ea5e9, #0284c7);
+    html[data-theme='dark'] .scope-chip {
+        background: #132038;
+        border-color: #273858;
     }
 
+    .scope-chip:hover {
+        color: var(--text);
+        border-color: #0ea5e9;
+        transform: translateY(-1px);
+    }
+
+    .scope-chip.active {
+        color: #fff !important;
+        border-color: #0ea5e9;
+        background: linear-gradient(120deg, #0ea5e9, #0284c7);
+        box-shadow: 0 8px 18px -10px rgba(14, 165, 233, 0.7);
+    }
+
+    /* KPI Cards */
     .admin-users-kpis {
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 0.56rem;
-        margin-bottom: 0.85rem;
+        gap: 0.75rem;
+        margin-bottom: 1.2rem;
     }
 
     .users-kpi {
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: var(--bg-secondary, #f5f9ff);
-        padding: 0.58rem 0.64rem;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background: var(--surface-card);
+        padding: 0.85rem 0.95rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
         animation: rise-in 260ms ease both;
+    }
+
+    html[data-theme='dark'] .users-kpi {
+        background: #132038;
+        border-color: #273858;
+        box-shadow: 0 10px 25px -16px rgba(0, 0, 0, 0.6);
+    }
+
+    .users-kpi:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -14px rgba(15, 23, 42, 0.25);
+    }
+
+    .users-kpi::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+    }
+
+    .users-kpi.kpi-total::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .users-kpi.kpi-active::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .users-kpi.kpi-inactive::before { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+    .users-kpi.kpi-client::before { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
+    .users-kpi.kpi-moto::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+    .users-kpi.kpi-admin::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+    .kpi-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.35rem;
     }
 
     .users-kpi label {
         display: block;
-        margin-bottom: 0.18rem;
-        font-size: 0.68rem;
+        margin: 0;
+        font-size: 0.72rem;
         text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: var(--text-secondary, #667799);
-        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--text-secondary);
+        font-weight: 800;
     }
+
+    .kpi-icon {
+        font-size: 0.85rem;
+        opacity: 0.85;
+    }
+
+    .kpi-total .kpi-icon { color: #3b82f6; }
+    .kpi-active .kpi-icon { color: #10b981; }
+    .kpi-inactive .kpi-icon { color: #f43f5e; }
+    .kpi-client .kpi-icon { color: #06b6d4; }
+    .kpi-moto .kpi-icon { color: #f97316; }
+    .kpi-admin .kpi-icon { color: #8b5cf6; }
 
     .users-kpi strong {
         color: var(--text);
-        font-size: 1rem;
+        font-size: 1.35rem;
+        font-weight: 800;
+        display: block;
+        line-height: 1.1;
     }
 
+    /* Filters Bar */
     .admin-users-filters {
         display: grid;
         grid-template-columns: 2fr 1fr 1fr auto;
-        gap: 0.55rem;
-        margin-bottom: 0.85rem;
+        gap: 0.65rem;
+        margin-bottom: 1.1rem;
+        background: var(--surface-card);
+        padding: 0.95rem;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
     }
 
-    .admin-users-bulk {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr auto;
-        gap: 0.55rem;
-        margin-bottom: 0.85rem;
-        align-items: end;
+    html[data-theme='dark'] .admin-users-filters {
+        background: #132038;
+        border-color: #273858;
     }
 
-    .bulk-label {
-        display: block;
-        margin-bottom: 0.22rem;
-        color: var(--text-secondary, #667799);
-        font-size: 0.75rem;
-        font-weight: 700;
+    .search-input-wrap {
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+
+    .search-input-wrap .admin-users-control {
+        padding-left: 2.25rem;
+        width: 100%;
     }
 
     .admin-users-control {
-        padding: 0.56rem;
+        padding: 0.6rem 0.85rem;
         border-radius: 10px;
-        border: 1px solid var(--line);
-        background: var(--bg);
-        color: var(--text);
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--input-text);
+        font-size: 0.88rem;
+        font-family: inherit;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .admin-users-control:focus {
         outline: none;
-        border-color: rgba(14, 165, 233, 0.62);
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
     }
 
+    .btn-filter-submit {
+        background: linear-gradient(120deg, #0ea5e9, #0284c7);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        padding: 0.6rem 1.1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-filter-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px -8px rgba(14, 165, 233, 0.7);
+    }
+
+    /* Bulk Actions Bar */
+    .admin-users-bulk {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.1rem;
+        padding: 0.85rem 1.1rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-card);
+        flex-wrap: wrap;
+    }
+
+    html[data-theme='dark'] .admin-users-bulk {
+        background: #132038;
+        border-color: #273858;
+    }
+
+    .bulk-badge-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-secondary);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .bulk-fields {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: 1;
+        flex-wrap: wrap;
+    }
+
+    .bulk-fields .admin-users-control {
+        min-width: 170px;
+    }
+
+    .btn-bulk-submit {
+        background: var(--bg);
+        border: 1px solid var(--border-color);
+        color: var(--text);
+        padding: 0.6rem 0.95rem;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.84rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-bulk-submit:hover {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #fff;
+    }
+
+    /* Data Table */
     .admin-users-table-wrap {
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: var(--bg-secondary, #f5f9ff);
-        overflow: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        background: var(--surface-card);
+        overflow-x: auto;
+        box-shadow: 0 16px 36px -28px rgba(15, 23, 42, 0.4);
+    }
+
+    html[data-theme='dark'] .admin-users-table-wrap {
+        background: #132038;
+        border-color: #273858;
+        box-shadow: 0 20px 40px -28px rgba(0, 0, 0, 0.8);
     }
 
     .admin-users-table {
         width: 100%;
         border-collapse: collapse;
-    }
-
-    .admin-users-table th,
-    .admin-users-table td {
         text-align: left;
-        padding: 0.62rem;
-        border-bottom: 1px solid var(--line);
     }
 
     .admin-users-table th {
-        font-size: 0.72rem;
+        background: var(--table-header-bg);
+        color: var(--text-secondary);
+        font-size: 0.74rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: var(--text-secondary, #667799);
+        letter-spacing: 0.04em;
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--line);
+        white-space: nowrap;
     }
 
-    .admin-users-empty {
-        padding: 0.8rem;
+    html[data-theme='dark'] .admin-users-table th {
+        background: #182846;
+        color: #94a3b8;
+        border-color: #273858;
     }
 
+    .admin-users-table td {
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--line);
+        color: var(--text);
+        font-size: 0.88rem;
+        vertical-align: middle;
+    }
+
+    html[data-theme='dark'] .admin-users-table td {
+        border-color: #1e304f;
+    }
+
+    .admin-users-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .admin-users-table tbody tr:hover td {
+        background: var(--table-hover-bg);
+    }
+
+    html[data-theme='dark'] .admin-users-table tbody tr:hover td {
+        background: #1c3256;
+    }
+
+    /* Cell Components */
+    .user-profile-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar-mini {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+        border: 2px solid rgba(59, 130, 246, 0.35);
+        flex-shrink: 0;
+    }
+
+    .user-name-title {
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .user-handle-sub {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 0.1rem;
+    }
+
+    .user-email-text {
+        font-family: inherit;
+        color: var(--text);
+        font-size: 0.86rem;
+    }
+
+    /* Role Badges */
+    .badge-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.28rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .badge-role-admin {
+        background: rgba(139, 92, 246, 0.15);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #8b5cf6;
+    }
+
+    html[data-theme='dark'] .badge-role-admin {
+        color: #c4b5fd;
+        background: rgba(139, 92, 246, 0.22);
+    }
+
+    .badge-role-moto {
+        background: rgba(249, 115, 22, 0.15);
+        border: 1px solid rgba(249, 115, 22, 0.3);
+        color: #ea580c;
+    }
+
+    html[data-theme='dark'] .badge-role-moto {
+        color: #fdba74;
+        background: rgba(249, 115, 22, 0.22);
+    }
+
+    .badge-role-client {
+        background: rgba(14, 165, 233, 0.15);
+        border: 1px solid rgba(14, 165, 233, 0.3);
+        color: #0284c7;
+    }
+
+    html[data-theme='dark'] .badge-role-client {
+        color: #7dd3fc;
+        background: rgba(14, 165, 233, 0.22);
+    }
+
+    /* Status Badges */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.28rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .badge-status .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .badge-status-active {
+        background: rgba(16, 185, 129, 0.14);
+        border: 1px solid rgba(16, 185, 129, 0.32);
+        color: #059669;
+    }
+
+    html[data-theme='dark'] .badge-status-active {
+        color: #6ee7b7;
+        background: rgba(16, 185, 129, 0.22);
+    }
+
+    .badge-status-active .status-dot {
+        background: #10b981;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+    }
+
+    .badge-status-inactive {
+        background: rgba(239, 68, 68, 0.14);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #dc2626;
+    }
+
+    html[data-theme='dark'] .badge-status-inactive {
+        color: #fca5a5;
+        background: rgba(239, 68, 68, 0.22);
+    }
+
+    .badge-status-inactive .status-dot {
+        background: #ef4444;
+    }
+
+    /* Action Buttons */
+    .btn-action-edit {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.36rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg);
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.8rem;
+        transition: all 0.18s ease;
+    }
+
+    .btn-action-edit:hover {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px -6px rgba(14, 165, 233, 0.6);
+    }
+
+    /* Empty State */
+    .admin-users-empty-wrap {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+
+    .admin-users-empty-icon {
+        font-size: 2.5rem;
+        color: var(--text-secondary);
+        opacity: 0.6;
+        margin-bottom: 0.8rem;
+    }
+
+    .admin-users-empty-text {
+        font-weight: 700;
+        color: var(--text);
+        font-size: 1rem;
+        margin: 0 0 0.4rem;
+    }
+
+    .admin-users-empty-sub {
+        color: var(--text-secondary);
+        font-size: 0.86rem;
+        margin: 0;
+    }
+
+    /* Pagination */
     .admin-users-pagination {
-        margin-top: 0.7rem;
+        margin-top: 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination-counter {
+        color: var(--text-secondary);
+        font-size: 0.84rem;
+        font-weight: 700;
+    }
+
+    .pagination-controls {
         display: flex;
         gap: 0.4rem;
-        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        text-decoration: none;
+        padding: 0.45rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-card);
+        color: var(--text);
+        font-weight: 700;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.18s ease;
+    }
+
+    .page-btn:hover {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #fff;
     }
 
     @keyframes rise-in {
@@ -197,53 +664,114 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1180px) {
         .admin-users-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 920px) {
-        .admin-users-filters,
-        .admin-users-bulk { grid-template-columns: 1fr; }
+        .admin-users-filters { grid-template-columns: 1fr; }
+        .admin-users-bulk { flex-direction: column; align-items: stretch; }
     }
 
     @media (max-width: 620px) {
         .admin-users-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .admin-users-header { flex-direction: column; align-items: flex-start; }
     }
 </style>
 {% endblock %}
 
 {% block admin_content %}
 <section class="admin-users-page">
+    <!-- Header -->
     <div class="admin-users-header">
-        <div>
-            <h1 class="admin-users-title"><i class="fas fa-users-cog"></i> {{ page_title }}</h1>
-            <p class="admin-users-subtitle">{{ page_description }}</p>
+        <div class="header-title-group">
+            <div class="header-icon-box">
+                <i class="fas fa-users-gear"></i>
+            </div>
+            <div>
+                <h1 class="admin-users-title">{{ page_title }}</h1>
+                <p class="admin-users-subtitle">{{ page_description }}</p>
+            </div>
         </div>
         <div class="admin-users-actions">
-            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=csv" class="admin-users-btn">Exportar CSV</a>
-            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=xlsx" class="admin-users-btn primary">Exportar XLSX</a>
+            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=csv" class="admin-users-btn">
+                <i class="fas fa-file-csv"></i> Exportar CSV
+            </a>
+            <a href="{% url 'users:admin_export_users' %}?scope={{ scope }}{% if export_query %}&{{ export_query }}{% endif %}&format=xlsx" class="admin-users-btn primary">
+                <i class="fas fa-file-excel"></i> Exportar XLSX
+            </a>
         </div>
     </div>
 
+    <!-- Scope Pills -->
     <nav class="admin-users-scope" aria-label="Gestiones de usuarios">
-        <a href="{% url 'users:admin_users' %}" class="scope-chip {% if scope == 'all' %}active{% endif %}">Todos</a>
-        <a href="{% url 'users:admin_clients' %}" class="scope-chip {% if scope == 'clientes' %}active{% endif %}">Clientes</a>
-        <a href="{% url 'users:admin_employees' %}" class="scope-chip {% if scope == 'empleados' %}active{% endif %}">Empleados</a>
-        <a href="{% url 'users:admin_roles' %}" class="scope-chip">Roles</a>
+        <a href="{% url 'users:admin_users' %}" class="scope-chip {% if scope == 'all' %}active{% endif %}">
+            <i class="fas fa-layer-group"></i> Todos ({{ stats_total }})
+        </a>
+        <a href="{% url 'users:admin_clients' %}" class="scope-chip {% if scope == 'clientes' %}active{% endif %}">
+            <i class="fas fa-basket-shopping"></i> Clientes ({{ stats_clientes }})
+        </a>
+        <a href="{% url 'users:admin_employees' %}" class="scope-chip {% if scope == 'empleados' %}active{% endif %}">
+            <i class="fas fa-motorcycle"></i> Motorizados ({{ stats_motorizados }})
+        </a>
+        <a href="{% url 'users:admin_roles' %}" class="scope-chip">
+            <i class="fas fa-shield-halved"></i> Roles y Permisos
+        </a>
     </nav>
 
+    <!-- KPI Cards -->
     <section class="admin-users-kpis">
-        <article class="users-kpi"><label>Total</label><strong>{{ stats_total }}</strong></article>
-        <article class="users-kpi"><label>Activos</label><strong>{{ stats_active }}</strong></article>
-        <article class="users-kpi"><label>Inactivos</label><strong>{{ stats_inactive }}</strong></article>
-        <article class="users-kpi"><label>Clientes</label><strong>{{ stats_clientes }}</strong></article>
-        <article class="users-kpi"><label>Motorizados</label><strong>{{ stats_motorizados }}</strong></article>
-        <article class="users-kpi"><label>Admins</label><strong>{{ stats_admins }}</strong></article>
+        <article class="users-kpi kpi-total">
+            <div class="kpi-top-row">
+                <label>Total Usuarios</label>
+                <i class="fas fa-users kpi-icon"></i>
+            </div>
+            <strong>{{ stats_total }}</strong>
+        </article>
+        <article class="users-kpi kpi-active">
+            <div class="kpi-top-row">
+                <label>Activos</label>
+                <i class="fas fa-circle-check kpi-icon"></i>
+            </div>
+            <strong>{{ stats_active }}</strong>
+        </article>
+        <article class="users-kpi kpi-inactive">
+            <div class="kpi-top-row">
+                <label>Inactivos</label>
+                <i class="fas fa-circle-pause kpi-icon"></i>
+            </div>
+            <strong>{{ stats_inactive }}</strong>
+        </article>
+        <article class="users-kpi kpi-client">
+            <div class="kpi-top-row">
+                <label>Clientes</label>
+                <i class="fas fa-basket-shopping kpi-icon"></i>
+            </div>
+            <strong>{{ stats_clientes }}</strong>
+        </article>
+        <article class="users-kpi kpi-moto">
+            <div class="kpi-top-row">
+                <label>Motorizados</label>
+                <i class="fas fa-motorcycle kpi-icon"></i>
+            </div>
+            <strong>{{ stats_motorizados }}</strong>
+        </article>
+        <article class="users-kpi kpi-admin">
+            <div class="kpi-top-row">
+                <label>Admins</label>
+                <i class="fas fa-shield-halved kpi-icon"></i>
+            </div>
+            <strong>{{ stats_admins }}</strong>
+        </article>
     </section>
 
+    <!-- Filter Form -->
     <form method="get" class="admin-users-filters">
         <input type="hidden" name="scope" value="{{ scope }}">
-        <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar usuario" class="admin-users-control" aria-label="Buscar usuario">
+        <div class="search-input-wrap">
+            <i class="fas fa-magnifying-glass search-icon"></i>
+            <input type="text" name="q" value="{{ filter_q }}" placeholder="Buscar por nombre, usuario o correo electrónico..." class="admin-users-control" aria-label="Buscar usuario">
+        </div>
         <select name="role" class="admin-users-control" title="Filtrar por rol" aria-label="Filtrar por rol">
             <option value="">Todos los roles</option>
             <option value="cliente" {% if filter_role == 'cliente' %}selected{% endif %}>Cliente</option>
@@ -251,79 +779,133 @@
             <option value="admin" {% if filter_role == 'admin' %}selected{% endif %}>Administrador</option>
         </select>
         <select name="active" class="admin-users-control" title="Filtrar por estado" aria-label="Filtrar por estado">
-            <option value="">Todos</option>
+            <option value="">Todos los estados</option>
             <option value="1" {% if filter_active == '1' %}selected{% endif %}>Activos</option>
             <option value="0" {% if filter_active == '0' %}selected{% endif %}>Inactivos</option>
         </select>
-        <button type="submit" class="admin-users-control">Filtrar</button>
+        <button type="submit" class="btn-filter-submit">
+            <i class="fas fa-filter"></i> Filtrar
+        </button>
     </form>
 
+    <!-- Bulk Actions Form -->
     <form method="post" action="{% url 'users:admin_users_bulk_action' %}">
         {% csrf_token %}
         <input type="hidden" name="next_query" value="{{ request.GET.urlencode }}">
         <div class="admin-users-bulk">
-            <div>
-                <label for="bulk-action" class="bulk-label">Accion masiva</label>
-                <select id="bulk-action" name="action" class="admin-users-control" aria-label="Accion masiva en usuarios">
-                    <option value="">Selecciona accion</option>
-                    <option value="activate">Activar usuarios</option>
-                    <option value="deactivate">Desactivar usuarios</option>
-                    <option value="change_role">Cambiar rol</option>
+            <span class="bulk-badge-title">
+                <i class="fas fa-bolt text-warning"></i> Acción Masiva:
+            </span>
+            <div class="bulk-fields">
+                <select id="bulk-action" name="action" class="admin-users-control" aria-label="Acción masiva en usuarios">
+                    <option value="">-- Selecciona acción --</option>
+                    <option value="activate">Activar usuarios seleccionados</option>
+                    <option value="deactivate">Desactivar usuarios seleccionados</option>
+                    <option value="change_role">Cambiar rol de usuarios</option>
                 </select>
-            </div>
-            <div>
-                <label for="bulk-role" class="bulk-label">Nuevo rol</label>
-                <select id="bulk-role" name="bulk_role" class="admin-users-control" aria-label="Nuevo rol para accion masiva">
-                    <option value="">-- Opcional --</option>
+                <select id="bulk-role" name="bulk_role" class="admin-users-control" aria-label="Nuevo rol para acción masiva">
+                    <option value="">-- Rol destino (opcional) --</option>
                     <option value="cliente">Cliente</option>
                     <option value="motorizado">Motorizado</option>
                     <option value="admin">Administrador</option>
                 </select>
+                <button type="submit" class="btn-bulk-submit">
+                    <i class="fas fa-check"></i> Aplicar a seleccionados
+                </button>
             </div>
-            <button type="submit" class="admin-users-control">Aplicar accion</button>
         </div>
 
+        <!-- Data Table -->
         <div class="admin-users-table-wrap">
             <table class="admin-users-table">
                 <thead>
                     <tr>
-                        <th><input id="users-select-all" type="checkbox" aria-label="Seleccionar todos los usuarios"></th>
-                        <th>Usuario</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Registro</th>
-                        <th>Acciones</th>
+                        <th style="width: 44px; text-align: center;">
+                            <input id="users-select-all" type="checkbox" aria-label="Seleccionar todos los usuarios">
+                        </th>
+                        <th><i class="fas fa-user me-1 text-primary"></i> Usuario</th>
+                        <th><i class="fas fa-envelope me-1 text-secondary"></i> Correo Electrónico</th>
+                        <th><i class="fas fa-id-badge me-1 text-info"></i> Rol</th>
+                        <th><i class="fas fa-shield-heart me-1 text-success"></i> Estado</th>
+                        <th><i class="fas fa-calendar-day me-1 text-secondary"></i> Registro</th>
+                        <th style="text-align: right;"><i class="fas fa-sliders me-1"></i> Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in admin_users %}
                     <tr>
-                        <td><input type="checkbox" name="selected_users" value="{{ item.id }}" class="bulk-user-item" aria-label="Seleccionar usuario {{ item.username }}"></td>
-                        <td>{{ item.get_full_name|default:item.username }}</td>
-                        <td>{{ item.email|default:'-' }}</td>
-                        <td>{{ item.get_role_display }}</td>
-                        <td>{% if item.is_active %}Activo{% else %}Inactivo{% endif %}</td>
-                        <td>{{ item.fecha_registro|date:'d/m/Y' }}</td>
-                        <td><a href="{% url 'users:admin_user_update' item.id %}">Editar</a></td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" name="selected_users" value="{{ item.id }}" class="bulk-user-item" aria-label="Seleccionar usuario {{ item.username }}">
+                        </td>
+                        <td>
+                            <div class="user-profile-cell">
+                                <span class="user-avatar-mini">{{ item.username|first|upper }}</span>
+                                <div>
+                                    <div class="user-name-title">{{ item.get_full_name|default:item.username }}</div>
+                                    <div class="user-handle-sub">@{{ item.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="user-email-text">{{ item.email|default:'-' }}</span>
+                        </td>
+                        <td>
+                            {% if item.role == 'admin' %}
+                            <span class="badge-role badge-role-admin"><i class="fas fa-shield-halved"></i> Administrador</span>
+                            {% elif item.role == 'motorizado' %}
+                            <span class="badge-role badge-role-moto"><i class="fas fa-motorcycle"></i> Motorizado</span>
+                            {% else %}
+                            <span class="badge-role badge-role-client"><i class="fas fa-user"></i> Cliente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.is_active %}
+                            <span class="badge-status badge-status-active"><span class="status-dot"></span> Activo</span>
+                            {% else %}
+                            <span class="badge-status badge-status-inactive"><span class="status-dot"></span> Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="user-email-text">{{ item.fecha_registro|date:'d/m/Y' }}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'users:admin_user_update' item.id %}" class="btn-action-edit" title="Editar permisos y datos de usuario">
+                                <i class="fas fa-pen-to-square"></i> Editar
+                            </a>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="7" class="admin-users-empty">No se encontraron usuarios.</td></tr>
+                    <tr>
+                        <td colspan="7">
+                            <div class="admin-users-empty-wrap">
+                                <div class="admin-users-empty-icon"><i class="fas fa-user-slash"></i></div>
+                                <h3 class="admin-users-empty-text">No se encontraron usuarios</h3>
+                                <p class="admin-users-empty-sub">Intenta modificar los filtros de búsqueda o el rol seleccionado.</p>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </form>
 
+    <!-- Pagination -->
     {% if is_paginated %}
     <div class="admin-users-pagination">
-        {% if page_obj.has_previous %}
-        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
-        {% endif %}
-        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-        <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
-        {% endif %}
+        <span class="pagination-counter">Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        <div class="pagination-controls">
+            {% if page_obj.has_previous %}
+            <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-btn">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-btn">
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
     </div>
     {% endif %}
 </section>

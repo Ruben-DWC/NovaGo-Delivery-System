@@ -318,6 +318,86 @@
         color: var(--brand);
     }
 
+    /* Universal Admin Surface & Table Rules (Dark & Light Harmony) */
+    .kpi-card,
+    .users-kpi,
+    .payments-kpi {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    html[data-theme='dark'] .kpi-card,
+    html[data-theme='dark'] .users-kpi,
+    html[data-theme='dark'] .payments-kpi,
+    html[data-theme='dark'] .card {
+        background: #132038 !important;
+        border-color: #273858 !important;
+        color: #e6eefc !important;
+    }
+
+    .admin-users-table-wrap,
+    .admin-products-table-wrap,
+    .admin-categories-table-wrap,
+    .orders-table-wrap,
+    .payments-table-wrap,
+    .audit-table-wrap {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+    }
+
+    html[data-theme='dark'] .admin-users-table-wrap,
+    html[data-theme='dark'] .admin-products-table-wrap,
+    html[data-theme='dark'] .admin-categories-table-wrap,
+    html[data-theme='dark'] .orders-table-wrap,
+    html[data-theme='dark'] .payments-table-wrap,
+    html[data-theme='dark'] .audit-table-wrap {
+        background: #132038 !important;
+        border-color: #273858 !important;
+    }
+
+    html[data-theme='dark'] table th {
+        background: #182846 !important;
+        color: #94a3b8 !important;
+        border-color: #273858 !important;
+    }
+
+    html[data-theme='dark'] table td {
+        color: #e6eefc !important;
+        border-color: #1e304f !important;
+    }
+
+    html[data-theme='dark'] table tbody tr:hover td {
+        background: #1c3256 !important;
+    }
+
+    html[data-theme='dark'] .admin-users-control,
+    html[data-theme='dark'] .admin-products-control,
+    html[data-theme='dark'] .admin-categories-control,
+    html[data-theme='dark'] .orders-control,
+    html[data-theme='dark'] .payments-control,
+    html[data-theme='dark'] .audit-control {
+        background: #16233a !important;
+        border-color: #2e4168 !important;
+        color: #e6eefc !important;
+    }
+
+    /* Status Pills Accessibility */
+    .status-entregado { background: rgba(34, 197, 94, 0.16); color: #166534; }
+    .status-en_camino { background: rgba(16, 185, 129, 0.16); color: #047857; }
+    .status-en_preparacion { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+    .status-confirmado,
+    .status-pendiente_asignacion { background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+    .status-cancelado { background: rgba(239, 68, 68, 0.16); color: #b91c1c; }
+
+    html[data-theme='dark'] .status-entregado { background: rgba(34, 197, 94, 0.22) !important; color: #86efac !important; }
+    html[data-theme='dark'] .status-en_camino { background: rgba(16, 185, 129, 0.22) !important; color: #6ee7b7 !important; }
+    html[data-theme='dark'] .status-en_preparacion { background: rgba(245, 158, 11, 0.22) !important; color: #fde047 !important; }
+    html[data-theme='dark'] .status-confirmado,
+    html[data-theme='dark'] .status-pendiente_asignacion { background: rgba(59, 130, 246, 0.22) !important; color: #93c5fd !important; }
+    html[data-theme='dark'] .status-cancelado { background: rgba(239, 68, 68, 0.22) !important; color: #fca5a5 !important; }
+
     /* Responsive */
     @media (max-width: 912px) {
         .admin-sidebar {
