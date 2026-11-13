@@ -3,7 +3,7 @@ name = "novago-delivery-system"
 version = "0.3.0"
 description = "Sistema de Gestión y Despacho Logístico para Restaurantes NovaGo"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     { name = "Ruben Walter Vivas Jimenez", email = "u22224908@utp.edu.pe" },
     { name = "Conislla Lavado Cesar Jesus", email = "u23264049@utp.edu.pe" }

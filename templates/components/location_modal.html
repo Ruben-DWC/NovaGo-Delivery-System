@@ -1,0 +1,348 @@
+<!-- Modal de Verificación de Cobertura y Ubicación de Entrega (Estilo Norkys / NovaGo) -->
+<div class="modal fade" id="locationCoverageModal" tabindex="-1" aria-labelledby="locationCoverageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom">
+                <div>
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="locationCoverageModalLabel">
+                        <i class="ph-duotone ph-map-pin text-warning" aria-hidden="true"></i>
+                        Verifica tu cobertura
+                    </h5>
+                    <p class="text-muted small mb-0">Ingresa tu dirección o mueve el pin en el mapa para validar entrega y tiempo estimado.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="coverageAddressInput" class="form-label fw-semibold small">Dirección de entrega</label>
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ph-duotone ph-magnifying-glass" aria-hidden="true"></i></span>
+                                <input type="text"
+                                       class="form-control"
+                                       id="coverageAddressInput"
+                                       placeholder="Ej. Av. Larco 345, Miraflores, Lima"
+                                       value="{{ delivery_location.address|default:'' }}"
+                                       autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="coverageSearchBtn" title="Buscar dirección">
+                                    Buscar
+                                </button>
+                                <button class="btn btn-outline-primary" type="button" id="coverageGpsBtn" title="Usar mi ubicación actual (GPS)">
+                                    <i class="ph-duotone ph-crosshair" aria-hidden="true"></i>
+                                    <span class="d-none d-sm-inline ms-1">Mi GPS</span>
+                                </button>
+                            </div>
+                            <div class="coverage-suggestions d-none" id="coverageSuggestions" role="listbox" aria-label="Sugerencias de direcciones"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="coverageReferenceInput" class="form-label fw-semibold small">Referencia (opcional)</label>
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="coverageReferenceInput"
+                               placeholder="Ej. Edificio gris, dpto 402, frente al parque"
+                               value="{{ delivery_location.reference|default:'' }}">
+                    </div>
+
+                    <div class="col-12">
+                        <div id="novagoCoverageMap" class="coverage-map-box"></div>
+                        <small class="text-muted d-block mt-1">
+                            <i class="ph-duotone ph-hand-grabbing" aria-hidden="true"></i>
+                            Puedes arrastrar el marcador o hacer clic en el mapa para ajustar el punto exacto.
+                        </small>
+                    </div>
+
+                    <div class="col-12">
+                        <div id="coverageStatusBox" class="alert alert-light border d-flex align-items-center justify-content-between gap-2 mb-0" role="status">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="ph-duotone ph-compass fs-4 text-primary" aria-hidden="true"></i>
+                                <span id="coverageStatusText" class="small">
+                                    {% if delivery_location %}
+                                        {% if delivery_location.in_coverage %}
+                                            Cobertura confirmada ({{ delivery_location.distance_km }} km &middot; ETA ~{{ delivery_location.eta_minutes }} min).
+                                        {% else %}
+                                            Fuera de cobertura ({{ delivery_location.distance_km }} km). Radio máximo: {{ novago_store.radius_km|floatformat:0 }} km.
+                                        {% endif %}
+                                    {% else %}
+                                        Selecciona un punto dentro de Lima Metropolitana para validar cobertura.
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span id="coverageDistanceBadge" class="badge text-bg-secondary {% if not delivery_location %}d-none{% endif %}">
+                                {% if delivery_location %}{{ delivery_location.distance_km }} km{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="coverageClearBtn">
+                    Limpiar ubicación
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary fw-semibold" id="coverageConfirmBtn">
+                        <i class="ph-bold ph-check me-1" aria-hidden="true"></i>
+                        Confirmar Dirección
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modalEl = document.getElementById('locationCoverageModal');
+    if (!modalEl) return;
+
+    const storeLat = Number("{{ novago_store.lat|default:'-12.1191' }}");
+    const storeLng = Number("{{ novago_store.lng|default:'-77.0292' }}");
+    const coverageKm = Number("{{ novago_store.radius_km|default:'15.0' }}");
+    const apiUrl = "{% url 'users:api_delivery_location' %}";
+
+    let selectedLat = Number("{{ delivery_location.lat|default:'-12.1191' }}");
+    let selectedLng = Number("{{ delivery_location.lng|default:'-77.0292' }}");
+    let mapInstance = null;
+    let markerInstance = null;
+    let searchTimer = null;
+
+    const addressInput = document.getElementById('coverageAddressInput');
+    const refInput = document.getElementById('coverageReferenceInput');
+    const suggestionsBox = document.getElementById('coverageSuggestions');
+    const statusBox = document.getElementById('coverageStatusBox');
+    const statusText = document.getElementById('coverageStatusText');
+    const distBadge = document.getElementById('coverageDistanceBadge');
+    const confirmBtn = document.getElementById('coverageConfirmBtn');
+
+    function getCookie(name) {
+        const match = document.cookie.split('; ').find(r => r.startsWith(name + '='));
+        return match ? decodeURIComponent(match.split('=')[1]) : '';
+    }
+
+    function haversineKm(lat1, lng1, lat2, lng2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+        return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function updatePreviewStatus(lat, lng) {
+        const km = Math.round(haversineKm(storeLat, storeLng, lat, lng) * 100) / 100;
+        const inCov = km <= coverageKm;
+        const eta = Math.max(12, Math.round(10 + (km / 24) * 60));
+        distBadge.textContent = km.toFixed(2) + ' km';
+        distBadge.classList.remove('d-none');
+        statusBox.className = 'alert border d-flex align-items-center justify-content-between gap-2 mb-0 ' +
+            (inCov ? 'alert-success' : 'alert-warning');
+        statusText.textContent = inCov
+            ? `Cobertura confirmada (${km.toFixed(2)} km · ETA ~${eta} min).`
+            : `Fuera de cobertura (${km.toFixed(2)} km). El radio máximo de entrega es ${coverageKm} km.`;
+        distBadge.className = 'badge ' + (inCov ? 'text-bg-success' : 'text-bg-warning');
+    }
+
+    function loadLeafletAssets(callback) {
+        if (window.L) {
+            callback();
+            return;
+        }
+        if (!document.getElementById('leaflet-css-cdn')) {
+            const link = document.createElement('link');
+            link.id = 'leaflet-css-cdn';
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+        }
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = callback;
+        document.body.appendChild(script);
+    }
+
+    function initMap() {
+        loadLeafletAssets(function () {
+            if (!mapInstance) {
+                mapInstance = L.map('novagoCoverageMap').setView([selectedLat, selectedLng], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(mapInstance);
+
+                L.circle([storeLat, storeLng], {
+                    radius: coverageKm * 1000,
+                    color: '#ea580c',
+                    fillColor: '#f97316',
+                    fillOpacity: 0.08,
+                    weight: 1.5
+                }).addTo(mapInstance);
+
+                markerInstance = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(mapInstance);
+                markerInstance.on('dragend', function (e) {
+                    const pos = e.target.getLatLng();
+                    setCoordinates(pos.lat, pos.lng, true);
+                });
+                mapInstance.on('click', function (e) {
+                    setCoordinates(e.latlng.lat, e.latlng.lng, true);
+                });
+            }
+            setTimeout(function () {
+                mapInstance.invalidateSize();
+            }, 180);
+            updatePreviewStatus(selectedLat, selectedLng);
+        });
+    }
+
+    function setCoordinates(lat, lng, reverseGeocode) {
+        selectedLat = lat;
+        selectedLng = lng;
+        if (markerInstance) markerInstance.setLatLng([lat, lng]);
+        if (mapInstance) mapInstance.panTo([lat, lng]);
+        updatePreviewStatus(lat, lng);
+
+        if (reverseGeocode) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        addressInput.value = data.display_name;
+                    }
+                })
+                .catch(() => {});
+        }
+    }
+
+    function searchNominatim(query) {
+        if (!query || query.trim().length < 4) {
+            suggestionsBox.classList.add('d-none');
+            return;
+        }
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=pe&limit=5&q=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(results => {
+                suggestionsBox.innerHTML = '';
+                if (!results || !results.length) {
+                    suggestionsBox.classList.add('d-none');
+                    return;
+                }
+                results.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'coverage-suggestion-item';
+                    btn.innerHTML = `<i class="ph-duotone ph-map-pin text-warning mt-1"></i><span>${item.display_name}</span>`;
+                    btn.addEventListener('click', function () {
+                        addressInput.value = item.display_name;
+                        suggestionsBox.classList.add('d-none');
+                        setCoordinates(parseFloat(item.lat), parseFloat(item.lon), false);
+                    });
+                    suggestionsBox.appendChild(btn);
+                });
+                suggestionsBox.classList.remove('d-none');
+            })
+            .catch(() => suggestionsBox.classList.add('d-none'));
+    }
+
+    modalEl.addEventListener('shown.bs.modal', initMap);
+
+    addressInput.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => searchNominatim(addressInput.value), 380);
+    });
+
+    document.getElementById('coverageSearchBtn').addEventListener('click', function () {
+        searchNominatim(addressInput.value);
+    });
+
+    document.getElementById('coverageGpsBtn').addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            statusText.textContent = 'Tu navegador no soporta geolocalización GPS.';
+            return;
+        }
+        statusText.textContent = 'Obteniendo ubicación GPS...';
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                setCoordinates(pos.coords.latitude, pos.coords.longitude, true);
+            },
+            function () {
+                statusBox.className = 'alert alert-warning border mb-0';
+                statusText.textContent = 'No se pudo acceder al GPS. Permite el permiso o busca tu dirección manualmente.';
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        const address = addressInput.value.trim();
+        if (!address) {
+            addressInput.focus();
+            statusBox.className = 'alert alert-warning border mb-0';
+            statusText.textContent = 'Por favor ingresa o selecciona una dirección de entrega.';
+            return;
+        }
+        confirmBtn.disabled = true;
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                address: address,
+                reference: refInput.value.trim(),
+                lat: selectedLat,
+                lng: selectedLng
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            confirmBtn.disabled = false;
+            if (!data.ok) {
+                statusBox.className = 'alert alert-danger border mb-0';
+                statusText.textContent = data.error || 'No se pudo guardar la ubicación.';
+                return;
+            }
+            const loc = data.location;
+            const navLabel = document.getElementById('navLocationLabel');
+            const navEta = document.getElementById('navLocationEta');
+            if (navLabel) navLabel.textContent = loc.short_address;
+            if (navEta) {
+                if (loc.in_coverage) {
+                    navEta.textContent = `${loc.eta_minutes} min`;
+                    navEta.classList.remove('d-none');
+                } else {
+                    navEta.classList.add('d-none');
+                }
+            }
+            const checkoutAddr = document.getElementById('id_direccion_entrega');
+            if (checkoutAddr) {
+                checkoutAddr.value = loc.reference ? `${loc.address} (${loc.reference})` : loc.address;
+            }
+            const modalObj = bootstrap.Modal.getInstance(modalEl);
+            if (modalObj) modalObj.hide();
+        })
+        .catch(() => {
+            confirmBtn.disabled = false;
+            statusBox.className = 'alert alert-danger border mb-0';
+            statusText.textContent = 'Error de conexión al guardar tu dirección.';
+        });
+    });
+
+    document.getElementById('coverageClearBtn').addEventListener('click', function () {
+        fetch(apiUrl, {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        }).then(() => {
+            addressInput.value = '';
+            refInput.value = '';
+            const navLabel = document.getElementById('navLocationLabel');
+            const navEta = document.getElementById('navLocationEta');
+            if (navLabel) navLabel.textContent = 'Ubica tu dirección';
+            if (navEta) navEta.classList.add('d-none');
+            const modalObj = bootstrap.Modal.getInstance(modalEl);
+            if (modalObj) modalObj.hide();
+        });
+    });
+})();
+</script>

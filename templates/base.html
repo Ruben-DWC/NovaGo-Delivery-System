@@ -73,6 +73,11 @@
     
     <!-- Quick Cart Offcanvas Drawer -->
     {% include 'components/cart_drawer.html' %}
+
+    {% if not user.is_authenticated or user.role == 'cliente' %}
+    <!-- Delivery Location & Coverage Modal -->
+    {% include 'components/location_modal.html' %}
+    {% endif %}
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

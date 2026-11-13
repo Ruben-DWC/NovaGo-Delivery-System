@@ -28,3 +28,9 @@ DELIVERY_FEE_BASE = Decimal("5.00")
 DELIVERY_FREE_THRESHOLD = Decimal("50.00")  # Beneficio comercial acordado para clientes
 DEFAULT_ETA_MINUTES = 25
 MAX_ACTIVE_ORDERS_PER_RIDER = 4  # Capacidad máxima ajustada para alta demanda
+
+# Coordenadas del Hub Central NovaGo (Lima Metropolitana) y radio de cobertura
+NOVAGO_STORE_LAT = -12.1191
+NOVAGO_STORE_LNG = -77.0292
+NOVAGO_COVERAGE_RADIUS_KM = 15.0
+NOVAGO_AVG_SPEED_KMH = 24.0

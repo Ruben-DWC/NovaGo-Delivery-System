@@ -68,6 +68,9 @@ urlpatterns = [
     path('portal/admin/pagos/acciones-masivas/', views.AdminPaymentsBulkActionView.as_view(), name='admin_payments_bulk_action'),
     path('portal/admin/bitacora/', views.AdminAuditLogListView.as_view(), name='admin_audit_logs'),
 
+    # API de ubicación / cobertura
+    path('api/ubicacion/', views.DeliveryLocationApiView.as_view(), name='api_delivery_location'),
+
     # Alias compatibles (legacy)
     path('client/portal/', views.ClientPortalView.as_view(), name='client_portal'),
     path('admin/dashboard/', views.AdminDashboardView.as_view(), name='admin_dashboard'),

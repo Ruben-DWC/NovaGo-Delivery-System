@@ -184,17 +184,17 @@
 <section class="order-detail-page">
     <div class="order-detail-hero">
         <div>
-            <h2><i class="fas fa-receipt"></i> Pedido #{{ order.id }}</h2>
+            <h2><i class="ph-duotone ph-receipt"></i> Pedido #{{ order.id }}</h2>
             <p>Detalle operativo, pago y acciones rápidas para seguimiento.</p>
         </div>
         <a class="order-detail-back" href="{% if user.role == 'motorizado' %}{% url 'tracking:motorizado_historial' %}{% else %}{% url 'orders:order_list' %}{% endif %}">
-            <i class="fas fa-arrow-left"></i> Volver
+            <i class="ph-bold ph-arrow-left"></i> Volver
         </a>
     </div>
 
     <div class="order-detail-grid">
         <article class="order-panel">
-            <h4><i class="fas fa-box-open"></i> Información del pedido</h4>
+            <h4><i class="ph-duotone ph-package"></i> Información del pedido</h4>
             <div class="order-meta-grid">
                 <div class="meta-item">
                     <label>Estado</label>
@@ -222,7 +222,7 @@
                 </div>
             </div>
 
-            <h4><i class="fas fa-basket-shopping"></i> Items</h4>
+            <h4><i class="ph-duotone ph-shopping-bag"></i> Items</h4>
             <div class="items-list">
                 {% for item in order.items.all %}
                 <div class="item-row">
@@ -234,7 +234,7 @@
         </article>
 
         <article class="order-panel">
-            <h4><i class="fas fa-credit-card"></i> Pago y totales</h4>
+            <h4><i class="ph-duotone ph-credit-card"></i> Pago y totales</h4>
             <div class="order-meta-grid">
                 <div class="meta-item">
                     <label>Método</label>
@@ -260,18 +260,18 @@
 
             <div class="order-actions">
                 <a class="detail-btn primary" href="{% if user.role == 'motorizado' %}{% url 'tracking:motorizado_rastreo_pedido' order.id %}{% else %}{% url 'tracking:track_order' order.id %}{% endif %}">
-                    <i class="fas fa-map-location-dot"></i> Ver ruta
+                    <i class="ph-duotone ph-map-trifold"></i> Ver ruta
                 </a>
                 {% if user.role == 'motorizado' and order.telefono_contacto %}
                 <a class="detail-btn success" href="tel:{{ order.telefono_contacto }}">
-                    <i class="fas fa-phone"></i> Llamar
+                    <i class="ph-duotone ph-phone"></i> Llamar
                 </a>
                 <a class="detail-btn whatsapp" href="https://wa.me/{{ order.telefono_contacto|cut:' ' }}" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
+                    <i class="ph-duotone ph-whatsapp-logo"></i> WhatsApp
                 </a>
                 {% elif user.role == 'motorizado' %}
                 <span class="detail-btn disabled">
-                    <i class="fas fa-phone"></i> Sin teléfono
+                    <i class="ph-duotone ph-phone"></i> Sin teléfono
                 </span>
                 {% endif %}
             </div>

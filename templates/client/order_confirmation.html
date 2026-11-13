@@ -765,11 +765,11 @@
 {% block content %}
 <div class="confirm-page">
     <section class="confirm-hero">
-        <h1><i class="fas fa-circle-check"></i> Pedido confirmado correctamente</h1>
+        <h1><i class="ph-duotone ph-check-circle"></i> Pedido confirmado correctamente</h1>
         <p>Tu pedido #{{ order.id }} fue registrado con exito. Desde aqui puedes revisar el resumen y rastrearlo en vivo.</p>
         <div class="success-banner">
             <div class="success-ring">
-                <i class="fas fa-check"></i>
+                <i class="ph-bold ph-check"></i>
             </div>
             <p class="success-copy">
                 <strong>Pago enviado exitosamente</strong>
@@ -801,25 +801,25 @@
             <div class="progress-dots">
                 <div class="p-step {% if order.estado == 'cancelado' %}cancelled{% elif progress_step >= 1 %}done{% else %}pending{% endif %}" data-step="1">
                     <button type="button" class="p-step-btn" data-context-title="Pedido confirmado" data-context-body="Tu pedido fue recibido y validado por NovaGo. Estamos iniciando el flujo de preparacion." data-context-cta-label="Ver mis pedidos" data-context-cta-url="{% url 'users:portal_cliente_pedidos' %}">
-                        <span class="p-step-dot"><i class="fas fa-check"></i></span>
+                        <span class="p-step-dot"><i class="ph-bold ph-check"></i></span>
                         <span class="p-step-label">Confirmado</span>
                     </button>
                 </div>
                 <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 2 %}current{% elif progress_step > 2 %}done{% else %}pending{% endif %}" data-step="2">
                     <button type="button" class="p-step-btn" data-context-title="Pedido en preparacion" data-context-body="Tu pedido esta siendo preparado. Tiempo estimado actual: {{ eta_minutes }} min." data-context-cta-label="Ver detalle de pedido" data-context-cta-url="{% url 'users:portal_cliente_pedido_detalle' order.id %}">
-                        <span class="p-step-dot"><i class="fas fa-utensils"></i></span>
+                        <span class="p-step-dot"><i class="ph-duotone ph-fork-knife"></i></span>
                         <span class="p-step-label">Preparacion</span>
                     </button>
                 </div>
                 <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 3 %}current{% elif progress_step > 3 %}done{% else %}pending{% endif %}" data-step="3">
                     <button type="button" class="p-step-btn" data-context-title="Pedido en camino" data-context-body="Tu pedido ya va rumbo a tu direccion. Puedes abrir el rastreo en vivo para seguirlo en tiempo real." data-context-cta-label="Abrir rastreo en vivo" data-context-cta-url="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
-                        <span class="p-step-dot"><i class="fas fa-motorcycle"></i></span>
+                        <span class="p-step-dot"><i class="ph-duotone ph-moped"></i></span>
                         <span class="p-step-label">En camino</span>
                     </button>
                 </div>
                 <div class="p-step {% if order.estado == 'cancelado' %}pending{% elif progress_step == 4 %}current{% elif progress_step > 4 %}done{% else %}pending{% endif %}" data-step="4">
                     <button type="button" class="p-step-btn" data-context-title="Pedido entregado" data-context-body="Tu pedido fue entregado correctamente. Gracias por comprar en NovaGo." data-context-cta-label="Volver al portal" data-context-cta-url="{% url 'users:portal_cliente' %}">
-                        <span class="p-step-dot"><i class="fas fa-house"></i></span>
+                        <span class="p-step-dot"><i class="ph-duotone ph-house"></i></span>
                         <span class="p-step-label">Entregado</span>
                     </button>
                 </div>
@@ -835,8 +835,8 @@
 
     <section class="confirm-layout">
         <article class="confirm-card">
-            <h2 class="confirm-title"><i class="fas fa-receipt"></i> Resumen del pedido #{{ order.id }}</h2>
-            <span class="status-chip"><i class="fas fa-bolt"></i> <span id="orderStatusLabel">{{ order.get_estado_display }}</span></span>
+            <h2 class="confirm-title"><i class="ph-duotone ph-receipt"></i> Resumen del pedido #{{ order.id }}</h2>
+            <span class="status-chip"><i class="ph-duotone ph-lightning"></i> <span id="orderStatusLabel">{{ order.get_estado_display }}</span></span>
 
             <div class="meta-grid mt-3">
                 <div class="meta-item">
@@ -853,7 +853,7 @@
                 </div>
             </div>
 
-            <h3 class="confirm-title mt-2"><i class="fas fa-basket-shopping"></i> Productos</h3>
+            <h3 class="confirm-title mt-2"><i class="ph-duotone ph-shopping-bag"></i> Productos</h3>
             <div class="items-list">
                 {% for item in order.items.all %}
                 <div class="item-row">
@@ -868,7 +868,7 @@
         </article>
 
         <article class="confirm-card">
-            <h2 class="confirm-title"><i class="fas fa-wallet"></i> Pago y totales</h2>
+            <h2 class="confirm-title"><i class="ph-duotone ph-wallet"></i> Pago y totales</h2>
 
             <div class="sum-list">
                 <div class="sum-row">
@@ -897,7 +897,7 @@
                 </div>
             </div>
             <div class="payment-ok">
-                <i class="fas fa-shield-check"></i> Registro de pago generado correctamente
+                <i class="ph-duotone ph-shield-check"></i> Registro de pago generado correctamente
             </div>
             {% endif %}
 
@@ -905,13 +905,13 @@
 
             <div class="confirm-actions">
                 <a class="btn-confirm primary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
-                    <i class="fas fa-location-crosshairs"></i> Rastrear pedido
+                    <i class="ph-duotone ph-crosshair"></i> Rastrear pedido
                 </a>
                 <a class="btn-confirm" href="{% url 'users:portal_cliente_pedidos' %}">
-                    <i class="fas fa-clipboard-list"></i> Ver mis pedidos
+                    <i class="ph-duotone ph-clipboard-text"></i> Ver mis pedidos
                 </a>
                 <a class="btn-confirm" href="{% url 'users:portal_cliente' %}">
-                    <i class="fas fa-house"></i> Ir al portal
+                    <i class="ph-duotone ph-house"></i> Ir al portal
                 </a>
             </div>
         </article>
@@ -920,7 +920,7 @@
 
 <aside class="app-toast" id="statusToast" role="status" aria-live="polite" aria-atomic="true">
     <div class="toast-head">
-        <p class="toast-title" id="toastTitle"><i class="fas fa-bell"></i> Estado actualizado</p>
+        <p class="toast-title" id="toastTitle"><i class="ph-duotone ph-bell"></i> Estado actualizado</p>
         <button class="toast-close" id="toastClose" type="button" aria-label="Cerrar notificacion">×</button>
     </div>
     <p class="toast-body" id="toastBody">Tu pedido ha cambiado de estado.</p>
@@ -1073,7 +1073,7 @@
 
         function showStatusToast(previousLabel, currentLabel) {
             if (!toast || !toastTitle || !toastBody) return;
-            toastTitle.innerHTML = '<i class="fas fa-bell"></i> Estado actualizado';
+            toastTitle.innerHTML = '<i class="ph-duotone ph-bell"></i> Estado actualizado';
             toastBody.textContent = `Tu pedido paso de "${previousLabel}" a "${currentLabel}".`;
 
             toast.classList.add('show');

@@ -382,7 +382,7 @@
 {% block content %}
 <div class="moto-history-page">
     <section class="moto-history-hero">
-        <h2><i class="fas fa-clock-rotate-left"></i> Historial de entregas</h2>
+        <h2><i class="ph-duotone ph-clock-counter-clockwise"></i> Historial de entregas</h2>
         <p>Revisa tus pedidos asignados, su estado y el detalle operativo de cada entrega.</p>
 
         <div class="moto-kpi-grid">
@@ -406,16 +406,16 @@
 
         <div class="moto-quick-filters">
             <a class="moto-chip {% if not filter_estado %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=">
-                <i class="fas fa-layer-group"></i> Todos ({{ status_totals.all }})
+                <i class="ph-duotone ph-stack"></i> Todos ({{ status_totals.all }})
             </a>
             <a class="moto-chip {% if filter_estado == 'en_camino' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=en_camino">
-                <i class="fas fa-route"></i> En camino ({{ status_totals.en_camino }})
+                <i class="ph-duotone ph-path"></i> En camino ({{ status_totals.en_camino }})
             </a>
             <a class="moto-chip {% if filter_estado == 'entregado' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=entregado">
-                <i class="fas fa-circle-check"></i> Entregados ({{ status_totals.entregado }})
+                <i class="ph-duotone ph-check-circle"></i> Entregados ({{ status_totals.entregado }})
             </a>
             <a class="moto-chip {% if filter_estado == 'cancelado' %}active{% endif %}" href="?{% if quick_state_query %}{{ quick_state_query }}&{% endif %}estado=cancelado">
-                <i class="fas fa-circle-xmark"></i> Cancelados ({{ status_totals.cancelado }})
+                <i class="ph-duotone ph-x-circle"></i> Cancelados ({{ status_totals.cancelado }})
             </a>
         </div>
     </section>
@@ -461,13 +461,13 @@
                 </select>
             </div>
             <button type="submit" class="moto-filter-btn primary">
-                <i class="fas fa-filter"></i> Filtrar
+                <i class="ph-duotone ph-funnel"></i> Filtrar
             </button>
             <a href="{% url 'tracking:motorizado_historial' %}" class="moto-filter-btn">
-                <i class="fas fa-rotate-left"></i> Limpiar
+                <i class="ph-bold ph-arrow-counter-clockwise"></i> Limpiar
             </a>
             <button type="button" id="export-csv-btn" class="moto-filter-btn">
-                <i class="fas fa-file-csv"></i> Exportar CSV
+                <i class="ph-duotone ph-file-csv"></i> Exportar CSV
             </button>
         </form>
     </section>
@@ -506,27 +506,27 @@
 
             <div class="moto-order-actions">
                 <a class="moto-btn" href="{% url 'tracking:motorizado_pedido_detalle' order.id %}">
-                    <i class="fas fa-file-lines"></i> Ver detalle
+                    <i class="ph-duotone ph-file-text"></i> Ver detalle
                 </a>
                 <a class="moto-btn primary" href="{% url 'tracking:motorizado_rastreo_pedido' order.id %}">
-                    <i class="fas fa-map-location-dot"></i> Ver ruta
+                    <i class="ph-duotone ph-map-trifold"></i> Ver ruta
                 </a>
                 {% if order.estado in active_states %}
                     {% if order.telefono_contacto %}
                     <a class="moto-btn success" href="tel:{{ order.telefono_contacto }}">
-                        <i class="fas fa-phone"></i> Llamar
+                        <i class="ph-duotone ph-phone"></i> Llamar
                     </a>
                     <a class="moto-btn whatsapp" href="https://wa.me/{{ order.telefono_contacto|cut:' ' }}" target="_blank" rel="noopener noreferrer">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
+                        <i class="ph-duotone ph-whatsapp-logo"></i> WhatsApp
                     </a>
                     {% else %}
                     <span class="moto-btn disabled">
-                        <i class="fas fa-phone"></i> Sin teléfono
+                        <i class="ph-duotone ph-phone"></i> Sin teléfono
                     </span>
                     {% endif %}
                 {% else %}
                 <span class="moto-btn disabled">
-                    <i class="fas fa-phone"></i> Sin acción directa
+                    <i class="ph-duotone ph-phone"></i> Sin acción directa
                 </span>
                 {% endif %}
             </div>
@@ -538,7 +538,7 @@
     <nav class="moto-pagination" aria-label="Paginación historial motorizado">
         {% if page_obj.has_previous %}
         <a class="moto-page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior" title="Página anterior">
-            <i class="fas fa-chevron-left"></i>
+            <i class="ph-bold ph-caret-left"></i>
         </a>
         {% endif %}
 
@@ -552,7 +552,7 @@
 
         {% if page_obj.has_next %}
         <a class="moto-page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Página siguiente" title="Página siguiente">
-            <i class="fas fa-chevron-right"></i>
+            <i class="ph-bold ph-caret-right"></i>
         </a>
         {% endif %}
     </nav>

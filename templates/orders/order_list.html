@@ -233,7 +233,7 @@
 {% block content %}
 <div class="orders-page">
     <section class="orders-hero">
-        <h2><i class="fas fa-clipboard-list"></i> Mis pedidos</h2>
+        <h2><i class="ph-duotone ph-clipboard-text"></i> Mis pedidos</h2>
         <p>Gestiona tu historial, revisa estados en tiempo real y abre la confirmacion premium cuando quieras.</p>
 
         <div class="orders-kpis">
@@ -286,20 +286,20 @@
 
             <div class="order-actions">
                 <a class="order-btn" href="{% if is_client_order_view %}{% url 'users:portal_cliente_pedido_detalle' order.id %}{% else %}{% url 'orders:order_detail' order.id %}{% endif %}">
-                    <i class="fas fa-file-lines"></i> Detalle
+                    <i class="ph-duotone ph-file-text"></i> Detalle
                 </a>
                 {% if is_client_order_view %}
                 <a class="order-btn confirm" href="{% url 'users:portal_cliente_confirmacion' order.id %}">
-                    <i class="fas fa-circle-check"></i> Confirmacion
+                    <i class="ph-duotone ph-check-circle"></i> Confirmacion
                 </a>
                 {% endif %}
                 {% if order.estado in active_states %}
                 <a class="order-btn primary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">
-                    <i class="fas fa-location-crosshairs"></i> Rastrear
+                    <i class="ph-duotone ph-crosshair"></i> Rastrear
                 </a>
                 {% else %}
                 <span class="order-btn disabled">
-                    <i class="fas fa-location-crosshairs"></i> Rastreo no disponible
+                    <i class="ph-duotone ph-crosshair"></i> Rastreo no disponible
                 </span>
                 {% endif %}
             </div>
@@ -310,7 +310,7 @@
     <div class="empty-state">
         <p>Aun no tienes pedidos registrados.</p>
         <a class="order-btn primary" href="{% url 'users:portal_cliente_catalogo' %}">
-            <i class="fas fa-basket-shopping"></i> Ir al catalogo
+            <i class="ph-duotone ph-shopping-bag"></i> Ir al catalogo
         </a>
     </div>
     {% endif %}

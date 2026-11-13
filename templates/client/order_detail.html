@@ -279,18 +279,18 @@
 <div class="order-detail-page">
     <section class="order-hero">
         <div class="order-hero-top">
-            <h2><i class="fas fa-receipt"></i> Pedido #{{ order.id }}</h2>
-            <span class="status-chip"><i class="fas fa-bolt"></i> <span id="liveEstadoText">{{ estado_display|default:order.get_estado_display }}</span></span>
+            <h2><i class="ph-duotone ph-receipt"></i> Pedido #{{ order.id }}</h2>
+            <span class="status-chip"><i class="ph-duotone ph-lightning"></i> <span id="liveEstadoText">{{ estado_display|default:order.get_estado_display }}</span></span>
         </div>
         <p>Vista cliente del pedido con resumen, pago y accesos directos a confirmación y rastreo.</p>
 
         <div class="live-status" data-progress-url="{{ progress_status_url }}">
             <div class="live-status-top">
-                <p class="live-status-title"><i class="fas fa-signal"></i> Estado en vivo</p>
+                <p class="live-status-title"><i class="ph-duotone ph-cell-signal-full"></i> Estado en vivo</p>
                 <p class="live-status-meta">
-                    <span><i class="fas fa-clock"></i> ETA: <strong id="liveEtaText">{{ eta_minutes }} min</strong></span>
-                    <span><i class="fas fa-wifi"></i> Canal: <strong id="liveChannelText">conectando...</strong></span>
-                    <span><i class="fas fa-rotate"></i> Sync: <strong id="liveLastSync">justo ahora</strong></span>
+                    <span><i class="ph-duotone ph-clock"></i> ETA: <strong id="liveEtaText">{{ eta_minutes }} min</strong></span>
+                    <span><i class="ph-duotone ph-wifi-high"></i> Canal: <strong id="liveChannelText">conectando...</strong></span>
+                    <span><i class="ph-bold ph-arrows-clockwise"></i> Sync: <strong id="liveLastSync">justo ahora</strong></span>
                 </p>
             </div>
             <div class="live-progress-track" aria-label="Progreso en vivo del pedido">
@@ -305,7 +305,7 @@
 
     <section class="detail-layout">
         <article class="detail-card">
-            <h3 class="detail-title"><i class="fas fa-user"></i> Datos del pedido</h3>
+            <h3 class="detail-title"><i class="ph-duotone ph-user"></i> Datos del pedido</h3>
             <div class="meta-grid">
                 <div class="meta-box">
                     <label>Cliente</label>
@@ -329,7 +329,7 @@
                 </div>
             </div>
 
-            <h3 class="detail-title"><i class="fas fa-basket-shopping"></i> Items</h3>
+            <h3 class="detail-title"><i class="ph-duotone ph-shopping-bag"></i> Items</h3>
             <div class="items-list">
                 {% for item in order.items.all %}
                 <div class="item-row">
@@ -344,7 +344,7 @@
         </article>
 
         <article class="detail-card">
-            <h3 class="detail-title"><i class="fas fa-wallet"></i> Pago y total</h3>
+            <h3 class="detail-title"><i class="ph-duotone ph-wallet"></i> Pago y total</h3>
 
             {% if order.pago %}
             <div class="meta-grid">
@@ -377,9 +377,9 @@
             </div>
 
             <div class="detail-actions">
-                <a class="detail-btn" href="{% url 'users:portal_cliente_pedidos' %}"><i class="fas fa-arrow-left"></i> Volver a pedidos</a>
-                <a class="detail-btn primary" href="{% url 'users:portal_cliente_confirmacion' order.id %}"><i class="fas fa-circle-check"></i> Ver confirmacion</a>
-                <a class="detail-btn secondary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}"><i class="fas fa-location-crosshairs"></i> Rastrear</a>
+                <a class="detail-btn" href="{% url 'users:portal_cliente_pedidos' %}"><i class="ph-bold ph-arrow-left"></i> Volver a pedidos</a>
+                <a class="detail-btn primary" href="{% url 'users:portal_cliente_confirmacion' order.id %}"><i class="ph-duotone ph-check-circle"></i> Ver confirmacion</a>
+                <a class="detail-btn secondary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}"><i class="ph-duotone ph-crosshair"></i> Rastrear</a>
             </div>
         </article>
     </section>

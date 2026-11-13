@@ -12,7 +12,7 @@
             <h2 class="mb-0">Tu Carrito</h2>
         </div>
         <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-            <i class="fas fa-arrow-left"></i> Continuar comprando
+            <i class="ph-bold ph-arrow-left"></i> Continuar comprando
         </a>
     </div>
 
@@ -40,7 +40,7 @@
                             <form method="post" action="{% url 'orders:remove_from_cart' item.producto.id %}">
                                 {% csrf_token %}
                                 <button class="btn btn-sm btn-outline-danger" type="submit" title="Quitar {{ item.producto.nombre }}">
-                                    <i class="fas fa-trash-can"></i> Quitar
+                                    <i class="ph-duotone ph-trash"></i> Quitar
                                 </button>
                             </form>
                         </div>
@@ -82,7 +82,7 @@
                 <div class="mt-4 d-grid gap-2">
                     {% if user.is_authenticated and user.role == 'cliente' %}
                     <a class="btn btn-cta btn-lift py-2" href="{% url 'users:portal_cliente_pago' %}">
-                        <i class="fas fa-credit-card me-1"></i> Ir a pago y checkout
+                        <i class="ph-duotone ph-credit-card me-1"></i> Ir a pago y checkout
                     </a>
                     {% elif user.is_authenticated %}
                     <div class="alert alert-warning small mb-2">
@@ -90,14 +90,14 @@
                     </div>
                     {% else %}
                     <a class="btn btn-cta btn-lift py-2" href="{% url 'users:login' %}?next={% url 'users:portal_cliente_pago' %}">
-                        <i class="fas fa-sign-in-alt me-1"></i> Inicia sesión para ordenar
+                        <i class="ph-bold ph-sign-in me-1"></i> Inicia sesión para ordenar
                     </a>
                     <a class="btn btn-outline-primary btn-sm py-2" href="{% url 'users:register' %}">
-                        <i class="fas fa-user-plus me-1"></i> ¿No tienes cuenta? Regístrate aquí
+                        <i class="ph-duotone ph-user-plus me-1"></i> ¿No tienes cuenta? Regístrate aquí
                     </a>
                     {% endif %}
                     <a class="btn btn-outline-secondary btn-sm" href="{% url 'products:product_list' %}">
-                        <i class="fas fa-store me-1"></i> Seguir explorando catálogo
+                        <i class="ph-duotone ph-storefront me-1"></i> Seguir explorando catálogo
                     </a>
                 </div>
             </article>
@@ -106,12 +106,12 @@
     {% else %}
     <article class="hero-shell cart-empty-state py-5 text-center">
         <div class="mb-3">
-            <i class="fas fa-cart-shopping fa-3x text-muted opacity-50"></i>
+            <i class="ph-duotone ph-shopping-cart fs-1 text-muted opacity-50"></i>
         </div>
         <h4 class="mb-2 fw-bold">Tu carrito está vacío</h4>
         <p class="text-muted mb-4">Aún no has agregado productos. Explora nuestro catálogo y selecciona tus artículos favoritos.</p>
         <a class="btn btn-cta btn-lift px-4" href="{% url 'products:product_list' %}">
-            <i class="fas fa-store me-1"></i> Ver catálogo de productos
+            <i class="ph-duotone ph-storefront me-1"></i> Ver catálogo de productos
         </a>
     </article>
     {% endif %}

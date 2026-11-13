@@ -323,7 +323,7 @@
 {% block content %}
 <div class="tracking-hub">
     <section class="tracking-hero">
-        <h1><i class="fas fa-map-location-dot"></i> Rastreo de Pedidos</h1>
+        <h1><i class="ph-duotone ph-map-trifold"></i> Rastreo de Pedidos</h1>
         <p>Accede al mapa en tiempo real de tus pedidos activos y revisa tu historial reciente.</p>
         <div class="sync-strip" id="hubSyncStrip" aria-live="polite">
             <span class="sync-dot"></span>
@@ -333,13 +333,13 @@
 
     <div class="tracking-actions">
         <a href="{% url 'users:portal_cliente' %}" class="btn-track">
-            <i class="fas fa-house"></i> Volver al Portal
+            <i class="ph-duotone ph-house"></i> Volver al Portal
         </a>
         <a href="{% url 'users:portal_cliente_pedidos' %}" class="btn-track">
-            <i class="fas fa-clipboard-list"></i> Ver Mis Pedidos
+            <i class="ph-duotone ph-clipboard-text"></i> Ver Mis Pedidos
         </a>
         <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-track primary">
-            <i class="fas fa-basket-shopping"></i> Ir al Catálogo
+            <i class="ph-duotone ph-shopping-bag"></i> Ir al Catálogo
         </a>
     </div>
 
@@ -351,7 +351,7 @@
                 <div>
                     <h3 class="tracking-order-title">Pedido #{{ order.id }}</h3>
                     <span class="tracking-status-badge status-{{ order.estado }}" data-role="estado-badge">
-                        <i class="fas fa-bolt"></i>
+                        <i class="ph-duotone ph-lightning"></i>
                         <span data-role="estado-text">{{ order.get_estado_display }}</span>
                     </span>
                     <div class="tracking-meta">
@@ -374,13 +374,13 @@
 
             <div class="tracking-actions-row">
                 <a href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}" class="btn-track primary">
-                    <i class="fas fa-location-crosshairs"></i> Ver en mapa
+                    <i class="ph-duotone ph-crosshair"></i> Ver en mapa
                 </a>
                 <a href="{% url 'users:portal_cliente_confirmacion' order.id %}" class="btn-track confirm">
-                    <i class="fas fa-circle-check"></i> Confirmación
+                    <i class="ph-duotone ph-check-circle"></i> Confirmación
                 </a>
                 <a href="{% url 'users:portal_cliente_pedido_detalle' order.id %}" class="btn-track">
-                    <i class="fas fa-file-lines"></i> Detalle
+                    <i class="ph-duotone ph-file-text"></i> Detalle
                 </a>
             </div>
         </article>
@@ -395,7 +395,7 @@
 
     {% if recent_orders %}
     <section class="recent-box">
-        <h3 class="recent-title"><i class="fas fa-clock-rotate-left"></i> Pedidos recientes</h3>
+        <h3 class="recent-title"><i class="ph-duotone ph-clock-counter-clockwise"></i> Pedidos recientes</h3>
         <div class="recent-list">
             {% for order in recent_orders|slice:":5" %}
             <div class="recent-item">

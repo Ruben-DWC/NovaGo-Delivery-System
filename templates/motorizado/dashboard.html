@@ -159,11 +159,11 @@
                 <div>
                     {% if perfil_motorizado.jornada_activa %}
 					<button class="btn-jornada btn-finalizar" onclick="finalizarJornada()" {% if not can_finalize_jornada %}disabled title="Finaliza o entrega tus pedidos activos antes de cerrar jornada"{% endif %}>
-                        <i class="fas fa-stop-circle"></i> Finalizar Jornada
+                        <i class="ph-duotone ph-stop-circle"></i> Finalizar Jornada
                     </button>
                     {% else %}
                     <button class="btn-jornada btn-iniciar" onclick="iniciarJornada()">
-                        <i class="fas fa-play-circle"></i> Iniciar Jornada
+                        <i class="ph-duotone ph-play-circle"></i> Iniciar Jornada
                     </button>
                     {% endif %}
                 </div>
@@ -173,7 +173,7 @@
         <!-- Header -->
         <div class="motorizado-header">
             <h1>
-                <i class="fas fa-motorcycle"></i> 
+                <i class="ph-duotone ph-moped"></i> 
                 Bienvenido, {{ user.first_name|default:user.username }}
             </h1>
             <p>Gestiona tus entregas del día en tiempo real</p>
@@ -182,22 +182,22 @@
         <!-- Estadísticas -->
         <div class="motorizado-stats">
             <div class="stat-box">
-                <span class="stat-icon"><i class="fas fa-boxes-stacked"></i></span>
+                <span class="stat-icon"><i class="ph-duotone ph-stack"></i></span>
                 <div class="stat-number">{{ active_orders_count }}</div>
                 <div class="stat-label">Entregas Activas</div>
             </div>
             <div class="stat-box">
-                <span class="stat-icon"><i class="fas fa-circle-check"></i></span>
+                <span class="stat-icon"><i class="ph-duotone ph-check-circle"></i></span>
                 <div class="stat-number">{{ completed_today }}</div>
                 <div class="stat-label">Completadas Hoy</div>
             </div>
             <div class="stat-box">
-                <span class="stat-icon"><i class="fas fa-star"></i></span>
+                <span class="stat-icon"><i class="ph-fill ph-star"></i></span>
                 <div class="stat-number">{{ rating|default:"4.9" }}</div>
                 <div class="stat-label">Calificación</div>
             </div>
             <div class="stat-box">
-                <span class="stat-icon"><i class="fas fa-wallet"></i></span>
+                <span class="stat-icon"><i class="ph-duotone ph-wallet"></i></span>
                 <div class="stat-number">{{ total_earned|default:"S/.0.00" }}</div>
                 <div class="stat-label">Ganado</div>
             </div>
@@ -209,7 +209,7 @@
             <div class="deliveries-section">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-route"></i> Entregas Activas
+                        <i class="ph-duotone ph-path"></i> Entregas Activas
                     </h2>
                     <span class="active-count">
                         {{ active_orders_count }} activas
@@ -220,7 +220,7 @@
                     <div class="mini-map-header">
                         <div>
                             <h3 class="mini-map-title">
-                                <i class="fas fa-map-location-dot"></i> Ruta GPS en Vivo
+                                <i class="ph-duotone ph-map-trifold"></i> Ruta GPS en Vivo
                             </h3>
                             <p class="mini-map-subtitle">Base NovaGo: {{ novago_store_name }}</p>
                         </div>
@@ -236,16 +236,16 @@
                             </select>
                             {% endif %}
                             <button type="button" id="map-refresh-btn" class="mini-map-ghost-btn">
-                                <i class="fas fa-rotate"></i> Refrescar
+                                <i class="ph-bold ph-arrows-clockwise"></i> Refrescar
                             </button>
                             <button type="button" id="map-center-btn" class="mini-map-ghost-btn">
-                                <i class="fas fa-crosshairs"></i> Centrar
+                                <i class="ph-duotone ph-crosshair"></i> Centrar
                             </button>
                             <button type="button" id="gps-update-btn" class="mini-map-gps-btn">
-                                <i class="fas fa-location-crosshairs"></i> Usar mi GPS
+                                <i class="ph-duotone ph-crosshair"></i> Usar mi GPS
                             </button>
                             <button type="button" id="gps-auto-toggle" class="mini-map-ghost-btn" aria-pressed="false">
-                                <i class="fas fa-wave-square"></i> Auto GPS OFF
+                                <i class="ph-duotone ph-activity"></i> Auto GPS OFF
                             </button>
                             <label for="gps-auto-interval" class="mini-map-control-label">Intervalo</label>
                             <select id="gps-auto-interval" class="mini-map-select mini-map-select-compact">
@@ -255,7 +255,7 @@
                                 <option value="30">30s</option>
                             </select>
                             <span class="mini-map-status" id="gps-signal-status">
-                                <i class="fas fa-satellite-dish"></i> Esperando datos
+                                <i class="ph-duotone ph-broadcast"></i> Esperando datos
                             </span>
                         </div>
                     </div>
@@ -273,34 +273,34 @@
                         <div class="metric-item">
                             <span class="metric-label">Distancia</span>
                             <span class="metric-value" id="current-distance">
-                                <i class="fas fa-location-dot icon"></i> 0.00 km
+                                <i class="ph-duotone ph-map-pin icon"></i> 0.00 km
                             </span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">Tiempo estimado</span>
                             <span class="metric-value" id="current-eta">
-                                <i class="fas fa-clock icon"></i> ETA 0 min
+                                <i class="ph-duotone ph-clock icon"></i> ETA 0 min
                             </span>
                         </div>
                         <div class="metric-item metric-item-wide">
                             <span class="metric-label">Ultima actualizacion</span>
                             <span class="metric-value" id="current-last-update">
-                                <i class="fas fa-wave-square icon"></i> Sin señal GPS
+                                <i class="ph-duotone ph-activity icon"></i> Sin señal GPS
                             </span>
                         </div>
                         <div class="metric-item metric-item-wide">
                             <span class="metric-label">Estado de pedido activo</span>
                             <span class="metric-value" id="current-order-state">
-                                <i class="fas fa-box icon"></i> Sin pedido seleccionado
+                                <i class="ph-duotone ph-package icon"></i> Sin pedido seleccionado
                             </span>
                         </div>
                         <div class="metric-item metric-item-wide">
                             <span class="metric-label">Auto GPS</span>
                             <span class="metric-value" id="auto-gps-status">
-                                <i class="fas fa-wave-square icon"></i> Inactivo
+                                <i class="ph-duotone ph-activity icon"></i> Inactivo
                             </span>
                             <span class="metric-value" id="auto-gps-counters">
-                                <i class="fas fa-paper-plane icon"></i> Envios: 0 | Fallos: 0
+                                <i class="ph-duotone ph-paper-plane-tilt icon"></i> Envios: 0 | Fallos: 0
                             </span>
                         </div>
                     </div>
@@ -319,21 +319,21 @@
 
                         <div class="delivery-details">
                             <div class="detail-line">
-                                <span class="detail-label"><i class="fas fa-user"></i> Cliente</span>
+                                <span class="detail-label"><i class="ph-duotone ph-user"></i> Cliente</span>
                                 <span class="detail-value">{{ order.cliente.first_name|default:order.cliente.username }}</span>
                             </div>
                             <div class="detail-line">
-                                <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Dirección</span>
+                                <span class="detail-label"><i class="ph-duotone ph-map-pin"></i> Dirección</span>
                                 <span class="detail-value" title="{{ order.direccion_entrega }}">
                                     {{ order.direccion_entrega|truncatewords:3 }}
                                 </span>
                             </div>
                             <div class="detail-line">
-                                <span class="detail-label"><i class="fas fa-phone"></i> Contacto</span>
+                                <span class="detail-label"><i class="ph-duotone ph-phone"></i> Contacto</span>
                                 <span class="detail-value">{{ order.telefono_contacto }}</span>
                             </div>
                             <div class="detail-line">
-                                <span class="detail-label"><i class="fas fa-box"></i> Items</span>
+                                <span class="detail-label"><i class="ph-duotone ph-package"></i> Items</span>
                                 <span class="detail-value">{{ order.items.count }}</span>
                             </div>
                         </div>
@@ -373,14 +373,14 @@
                                 <input type="text" name="longitud" placeholder="Longitud" required title="Ej: -77.0428">
                             </div>
                             <button type="submit" class="action-btn primary location-update-btn">
-                                <i class="fas fa-location-arrow"></i> Actualizar
+                                <i class="ph-duotone ph-navigation-arrow"></i> Actualizar
                             </button>
                         </form>
                     </div>
                     {% endfor %}
                 {% else %}
                     <div class="empty-state">
-                        <div class="empty-icon"><i class="fas fa-circle-check"></i></div>
+                        <div class="empty-icon"><i class="ph-duotone ph-check-circle"></i></div>
                         <p>¡Excelente! No tienes entregas activas por ahora.</p>
                         <p class="empty-note">Pronto tendrás nuevas ordenes</p>
                     </div>
@@ -406,7 +406,7 @@
                 <!-- Entregas Completadas -->
                 <div class="sidebar-card">
                     <h3 class="card-title">
-                        <i class="fas fa-check-circle"></i> Completadas Hoy
+                        <i class="ph-duotone ph-check-circle"></i> Completadas Hoy
                     </h3>
                     {% if completed_orders %}
                         <div class="completed-list">
@@ -427,7 +427,7 @@
                 <!-- Información Rápida -->
                 <div class="sidebar-card">
                     <h3 class="card-title">
-                        <i class="fas fa-info-circle"></i> Mi Información
+                        <i class="ph-duotone ph-info"></i> Mi Información
                     </h3>
                     <div class="sidebar-text">
                         <div class="sidebar-row">
@@ -448,14 +448,14 @@
                 <!-- Soporte -->
                 <div class="sidebar-card support-card">
                     <h3 class="card-title">
-                        <i class="fas fa-headset"></i> ¿Necesitas ayuda?
+                        <i class="ph-duotone ph-headset"></i> ¿Necesitas ayuda?
                     </h3>
                     <div class="support-center">
                         <a href="tel:+51999999999" class="support-link">
-                            <i class="fas fa-phone"></i> Soporte
+                            <i class="ph-duotone ph-phone"></i> Soporte
                         </a>
                         <a href="https://wa.me/51999999999" class="support-link support-link-whatsapp">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
+                            <i class="ph-duotone ph-whatsapp-logo"></i> WhatsApp
                         </a>
                     </div>
                 </div>
@@ -468,7 +468,7 @@
 <script src="{% static 'js/delivery-map.js' %}"></script>
 
 <div class="moto-toast" id="motoToast" role="status" aria-live="polite">
-    <span class="moto-toast-icon"><i class="fas fa-circle-info"></i></span>
+    <span class="moto-toast-icon"><i class="ph-duotone ph-info"></i></span>
     <span id="motoToastText">Operación completada.</span>
 </div>
 

@@ -1,6 +1,13 @@
 import json
 import csv
+import math
 from io import StringIO, BytesIO
+from config.constants import (
+    NOVAGO_AVG_SPEED_KMH,
+    NOVAGO_COVERAGE_RADIUS_KM,
+    NOVAGO_STORE_LAT,
+    NOVAGO_STORE_LNG,
+)
 from decimal import Decimal
 from datetime import timedelta
 from datetime import datetime
@@ -438,6 +445,17 @@ class ClientPaymentGatewayView(ClientRequiredMixin, FormView):
     login_url = reverse_lazy('users:login')
     template_name = 'client/payment_gateway.html'
     form_class = CheckoutForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        saved_loc = self.request.session.get('delivery_location') or {}
+        initial['direccion_entrega'] = (
+            saved_loc.get('address')
+            or getattr(self.request.user, 'direccion', '')
+            or ''
+        )
+        initial['telefono_contacto'] = getattr(self.request.user, 'telefono', '') or ''
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1557,4 +1575,81 @@ class PortalDispatcherRedirectView(LoginRequiredMixin, View):
     """
     def get(self, request, *args, **kwargs):
         return redirect(resolve_destination_by_role(request.user))
+
+
+def _haversine_km(lat1, lng1, lat2, lng2):
+    """Calcula la distancia geodésica en kilómetros entre dos coordenadas."""
+    earth_radius_km = 6371.0
+    d_lat = math.radians(lat2 - lat1)
+    d_lng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(d_lng / 2) ** 2
+    )
+    return 2 * earth_radius_km * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+class DeliveryLocationApiView(View):
+    """API para validar cobertura, calcular ETA y guardar la ubicación de entrega en sesión."""
+
+    def get(self, request):
+        location = request.session.get('delivery_location')
+        return JsonResponse({
+            'ok': True,
+            'location': location,
+            'store': {
+                'lat': NOVAGO_STORE_LAT,
+                'lng': NOVAGO_STORE_LNG,
+                'radius_km': NOVAGO_COVERAGE_RADIUS_KM,
+            },
+        })
+
+    def post(self, request):
+        try:
+            payload = json.loads(request.body.decode('utf-8') or '{}')
+        except (ValueError, UnicodeDecodeError):
+            return JsonResponse({'ok': False, 'error': 'Formato JSON inválido.'}, status=400)
+
+        address = (payload.get('address') or '').strip()
+        reference = (payload.get('reference') or '').strip()
+        try:
+            lat = float(payload.get('lat'))
+            lng = float(payload.get('lng'))
+        except (TypeError, ValueError):
+            return JsonResponse({'ok': False, 'error': 'Coordenadas inválidas.'}, status=400)
+
+        if not address:
+            return JsonResponse({'ok': False, 'error': 'Ingresa una dirección válida.'}, status=400)
+
+        distance_km = round(_haversine_km(NOVAGO_STORE_LAT, NOVAGO_STORE_LNG, lat, lng), 2)
+        in_coverage = distance_km <= NOVAGO_COVERAGE_RADIUS_KM
+        eta_minutes = max(12, int(round(10 + (distance_km / NOVAGO_AVG_SPEED_KMH) * 60)))
+        short_address = address.split(',')[0].strip()[:34]
+
+        location_data = {
+            'address': address[:255],
+            'short_address': short_address,
+            'reference': reference[:120],
+            'lat': round(lat, 6),
+            'lng': round(lng, 6),
+            'distance_km': distance_km,
+            'eta_minutes': eta_minutes,
+            'in_coverage': in_coverage,
+        }
+        request.session['delivery_location'] = location_data
+        request.session.modified = True
+
+        if in_coverage and request.user.is_authenticated and hasattr(request.user, 'direccion'):
+            full_addr = f"{address} ({reference})" if reference else address
+            request.user.direccion = full_addr[:255]
+            request.user.save(update_fields=['direccion'])
+
+        return JsonResponse({'ok': True, 'location': location_data})
+
+    def delete(self, request):
+        request.session.pop('delivery_location', None)
+        request.session.modified = True
+        return JsonResponse({'ok': True})
 

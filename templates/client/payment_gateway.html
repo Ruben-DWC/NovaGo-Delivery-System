@@ -525,13 +525,13 @@
 {% block content %}
 <div class="pay-page">
     <section class="pay-hero">
-        <h1><i class="fas fa-credit-card"></i> Pasarela de Pago NovaGo</h1>
+        <h1><i class="ph-duotone ph-credit-card"></i> Pasarela de Pago NovaGo</h1>
         <p>Vista central para pagos del cliente con estados claros, resumen de carrito y acceso directo al checkout seguro.</p>
     </section>
 
     <section class="pay-layout">
         <article class="pay-card">
-            <h2 class="pay-title"><i class="fas fa-wallet"></i> Pasarela y checkout integrado</h2>
+            <h2 class="pay-title"><i class="ph-duotone ph-wallet"></i> Pasarela y checkout integrado</h2>
             <div class="pay-total">
                 <div class="pay-total-item">
                     <label>Subtotal</label>
@@ -725,26 +725,26 @@
 
                 <div class="pay-form-actions">
                     <button type="submit" class="btn-pay primary" id="submit_btn" {% if not items %}disabled{% endif %}>
-                        <i class="fas fa-lock"></i> Confirmar pedido seguro
+                        <i class="ph-duotone ph-lock"></i> Confirmar pedido seguro
                     </button>
                     <a href="{% url 'users:portal_cliente_carrito' %}" class="btn-pay soft">
-                        <i class="fas fa-cart-shopping"></i> Volver al carrito
+                        <i class="ph-duotone ph-shopping-cart"></i> Volver al carrito
                     </a>
                 </div>
             </form>
 
-            <h3 class="pay-title pay-title-spaced"><i class="fas fa-shield-check"></i> Métodos disponibles</h3>
+            <h3 class="pay-title pay-title-spaced"><i class="ph-duotone ph-shield-check"></i> Métodos disponibles</h3>
             <div class="methods-grid">
-                <div class="method-pill"><i class="fas fa-money-bill-wave"></i> Efectivo</div>
-                <div class="method-pill"><i class="fas fa-building-columns"></i> Transferencia</div>
-                <div class="method-pill"><i class="fas fa-credit-card"></i> Tarjeta</div>
-                <div class="method-pill"><i class="fas fa-mobile-screen-button"></i> Yape / Plin</div>
-                <div class="method-pill"><i class="fas fa-handshake"></i> Contra Entrega (POS)</div>
+                <div class="method-pill"><i class="ph-duotone ph-money"></i> Efectivo</div>
+                <div class="method-pill"><i class="ph-duotone ph-bank"></i> Transferencia</div>
+                <div class="method-pill"><i class="ph-duotone ph-credit-card"></i> Tarjeta</div>
+                <div class="method-pill"><i class="ph-duotone ph-device-mobile"></i> Yape / Plin</div>
+                <div class="method-pill"><i class="ph-duotone ph-handshake"></i> Contra Entrega (POS)</div>
             </div>
         </article>
 
         <article class="pay-card">
-            <h2 class="pay-title"><i class="fas fa-basket-shopping"></i> Resumen del carrito</h2>
+            <h2 class="pay-title"><i class="ph-duotone ph-shopping-bag"></i> Resumen del carrito</h2>
             {% if items %}
             <div class="order-summary-list mb-3">
                 {% for item in items %}
@@ -761,7 +761,7 @@
             <p class="empty-payments mb-3">No hay productos en carrito para generar pedido.</p>
             {% endif %}
 
-            <h2 class="pay-title"><i class="fas fa-wave-square"></i> Estados de pago recientes</h2>
+            <h2 class="pay-title"><i class="ph-duotone ph-activity"></i> Estados de pago recientes</h2>
             {% if payment_cards %}
             <div class="state-list">
                 {% for card in payment_cards %}
@@ -873,10 +873,10 @@
 
             if (cardType === 'visa') {
                 cardTypeIcon.classList.add('visa');
-                cardTypeIcon.innerHTML = '<i class="fab fa-cc-visa"></i>';
+                cardTypeIcon.innerHTML = '<i class="ph-duotone ph-credit-card"></i>';
             } else if (cardType === 'mastercard') {
                 cardTypeIcon.classList.add('mastercard');
-                cardTypeIcon.innerHTML = '<i class="fab fa-cc-mastercard"></i>';
+                cardTypeIcon.innerHTML = '<i class="ph-duotone ph-credit-card"></i>';
             } else {
                 cardTypeIcon.classList.add('empty');
                 cardTypeIcon.innerHTML = '';
@@ -1037,7 +1037,7 @@
                 if (!submitBtn.disabled) {
                     setTimeout(() => {
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Procesando pedido...';
+                        submitBtn.innerHTML = '<i class="ph-bold ph-spinner ph-spin me-1"></i> Procesando pedido...';
                     }, 0);
                 }
             });

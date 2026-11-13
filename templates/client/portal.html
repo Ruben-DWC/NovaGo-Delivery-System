@@ -14,17 +14,17 @@
         <div class="dashboard-header">
             <div>
                 <h1>
-                    <i class="fas fa-user-circle"></i> 
+                    <i class="ph-duotone ph-user-circle"></i> 
                     Bienvenido, {{ user.first_name|default:user.username }}
                 </h1>
                 <p>Gestiona tus pedidos y sigue tu estado en tiempo real</p>
             </div>
             <div class="header-actions">
                 <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-header">
-                    <i class="fas fa-shopping-bag"></i> Hacer Compra
+                    <i class="ph-duotone ph-shopping-bag"></i> Hacer Compra
                 </a>
                 <a href="{% url 'users:portal_cliente_perfil' %}" class="btn-header secondary">
-                    <i class="fas fa-cog"></i> Configuración
+                    <i class="ph-duotone ph-gear"></i> Configuración
                 </a>
             </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="stats-grid">
             <div class="stat-card stat-card-orders">
                 <div class="stat-top">
-                    <span class="stat-icon-shell"><i class="fas fa-bag-shopping"></i></span>
+                    <span class="stat-icon-shell"><i class="ph-duotone ph-bag"></i></span>
                     <span class="stat-kicker">Actividad</span>
                 </div>
                 <div class="stat-value">{{ total_orders }}</div>
@@ -41,7 +41,7 @@
             </div>
             <div class="stat-card stat-card-active secondary">
                 <div class="stat-top">
-                    <span class="stat-icon-shell"><i class="fas fa-route"></i></span>
+                    <span class="stat-icon-shell"><i class="ph-duotone ph-path"></i></span>
                     <span class="stat-kicker">En curso</span>
                 </div>
                 <div class="stat-value">{{ active_orders }}</div>
@@ -49,7 +49,7 @@
             </div>
             <div class="stat-card stat-card-spent danger">
                 <div class="stat-top">
-                    <span class="stat-icon-shell"><i class="fas fa-wallet"></i></span>
+                    <span class="stat-icon-shell"><i class="ph-duotone ph-wallet"></i></span>
                     <span class="stat-kicker">Consumo</span>
                 </div>
                 <div class="stat-value">S/. {{ total_spent }}</div>
@@ -62,7 +62,7 @@
             <div class="live-order-glow"></div>
             <div class="live-order-main">
                 <p class="live-order-pill">
-                    <i class="fas fa-bolt"></i> Pedido activo ahora
+                    <i class="ph-duotone ph-lightning"></i> Pedido activo ahora
                 </p>
                 <h3>Pedido #{{ active_order_widget.id }} en curso</h3>
                 <p class="live-order-meta">
@@ -73,10 +73,10 @@
             </div>
             <div class="live-order-actions">
                 <a href="{% url 'users:portal_cliente_rastreo_pedido' active_order_widget.id %}" class="btn-live-track">
-                    <i class="fas fa-location-crosshairs"></i> Seguir en mapa
+                    <i class="ph-duotone ph-crosshair"></i> Seguir en mapa
                 </a>
                 <a href="{% url 'users:portal_cliente_pedido_detalle' active_order_widget.id %}" class="btn-live-soft">
-                    <i class="fas fa-receipt"></i> Ver detalle
+                    <i class="ph-duotone ph-receipt"></i> Ver detalle
                 </a>
             </div>
         </div>
@@ -88,10 +88,10 @@
             <div class="content-card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-clipboard-list"></i> Pedidos Recientes
+                        <i class="ph-duotone ph-clipboard-text"></i> Pedidos Recientes
                     </h3>
                     <a href="{% url 'users:portal_cliente_pedidos' %}" class="view-all-link">
-                        Ver todos <i class="fas fa-arrow-right"></i>
+                        Ver todos <i class="ph-bold ph-arrow-right"></i>
                     </a>
                 </div>
 
@@ -124,7 +124,7 @@
                                     <td>{{ order.fecha_pedido|date:"d/m H:i" }}</td>
                                     <td>
                                         <a href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}" class="track-link" title="Rastrear pedido #{{ order.id }}">
-                                            <i class="fas fa-map-marker-alt"></i>
+                                            <i class="ph-duotone ph-map-pin"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -137,7 +137,7 @@
                         <div class="empty-state-icon">📭</div>
                         <p>Aún no tienes pedidos</p>
                         <a href="{% url 'users:portal_cliente_catalogo' %}" class="btn-header first-order-btn">
-                            <i class="fas fa-shopping-bag"></i> Hacer tu Primer Pedido
+                            <i class="ph-duotone ph-shopping-bag"></i> Hacer tu Primer Pedido
                         </a>
                     </div>
                 {% endif %}
@@ -148,26 +148,26 @@
                 <!-- Quick Actions -->
                 <div class="sidebar-card">
                     <h4 class="sidebar-title">
-                        <i class="fas fa-zap"></i> Acciones Rápidas
+                        <i class="ph-duotone ph-lightning"></i> Acciones Rápidas
                     </h4>
                     <div class="quick-actions">
                         <a href="{% url 'users:portal_cliente_catalogo' %}" class="action-btn">
-                            <i class="fas fa-plus-circle"></i> Nuevo Pedido
+                            <i class="ph-duotone ph-plus-circle"></i> Nuevo Pedido
                         </a>
                         <a href="{% url 'users:portal_cliente_pedidos' %}" class="action-btn secondary">
-                            <i class="fas fa-history"></i> Ver Historial
+                            <i class="ph-duotone ph-clock-counter-clockwise"></i> Ver Historial
                         </a>
                         <a href="{% url 'users:portal_cliente_carrito' %}" class="action-btn secondary">
-                            <i class="fas fa-cart-shopping"></i> Mi Carrito
+                            <i class="ph-duotone ph-shopping-cart"></i> Mi Carrito
                         </a>
                         <a href="{% url 'users:portal_cliente_pago' %}" class="action-btn secondary">
-                            <i class="fas fa-credit-card"></i> Pasarela de Pago
+                            <i class="ph-duotone ph-credit-card"></i> Pasarela de Pago
                         </a>
                         <a href="{% url 'users:portal_cliente_rastreo' %}" class="action-btn secondary">
-                            <i class="fas fa-map-location-dot"></i> Rastrear Pedido
+                            <i class="ph-duotone ph-map-trifold"></i> Rastrear Pedido
                         </a>
                         <a href="{% url 'users:portal_cliente_perfil' %}" class="action-btn secondary">
-                            <i class="fas fa-user"></i> Mi Perfil
+                            <i class="ph-duotone ph-user"></i> Mi Perfil
                         </a>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                 <!-- Información Rápida -->
                 <div class="sidebar-card">
                     <h4 class="sidebar-title">
-                        <i class="fas fa-info-circle"></i> Información
+                        <i class="ph-duotone ph-info"></i> Información
                     </h4>
                     <ul class="sidebar-list">
                         <li>
@@ -200,20 +200,20 @@
                 <!-- Beneficios -->
                 <div class="sidebar-card benefits-card">
                     <h4 class="sidebar-title">
-                        <i class="fas fa-crown"></i> Beneficios NovaGo
+                        <i class="ph-duotone ph-crown"></i> Beneficios NovaGo
                     </h4>
                     <ul class="sidebar-list">
                         <li class="benefit-item">
-                            <span class="benefit-text"><i class="fas fa-bolt"></i> Envío rápido 22 min</span>
+                            <span class="benefit-text"><i class="ph-duotone ph-lightning"></i> Envío rápido 22 min</span>
                         </li>
                         <li class="benefit-item">
-                            <span class="benefit-text"><i class="fas fa-shield-halved"></i> Pagos seguros</span>
+                            <span class="benefit-text"><i class="ph-duotone ph-shield"></i> Pagos seguros</span>
                         </li>
                         <li class="benefit-item">
-                            <span class="benefit-text"><i class="fas fa-location-crosshairs"></i> Rastreo en vivo</span>
+                            <span class="benefit-text"><i class="ph-duotone ph-crosshair"></i> Rastreo en vivo</span>
                         </li>
                         <li class="benefit-item">
-                            <span class="benefit-text"><i class="fas fa-gift"></i> Promociones exclusivas</span>
+                            <span class="benefit-text"><i class="ph-duotone ph-gift"></i> Promociones exclusivas</span>
                         </li>
                     </ul>
                 </div>

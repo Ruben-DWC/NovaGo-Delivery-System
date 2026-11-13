@@ -502,6 +502,20 @@
             
             <div class="navbar-nav align-items-lg-center gap-lg-2">
                 {% spaceless %}
+                            {% if not user.is_authenticated or user.role == 'cliente' %}
+                            <div class="nav-item">
+                                <button type="button"
+                                        class="nav-location-pill"
+                                        id="navLocationBtn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#locationCoverageModal"
+                                        title="Configurar dirección de entrega y verificar cobertura">
+                                    <i class="ph-duotone ph-map-pin" aria-hidden="true"></i>
+                                    <span class="nav-location-text" id="navLocationLabel">{% if delivery_location %}{{ delivery_location.short_address }}{% else %}Ubica tu dirección{% endif %}</span>
+                                    <span class="nav-location-eta {% if not delivery_location or not delivery_location.in_coverage %}d-none{% endif %}" id="navLocationEta">{% if delivery_location %}{{ delivery_location.eta_minutes }} min{% endif %}</span>
+                                </button>
+                            </div>
+                            {% endif %}
                             <div class="nav-item dropdown">
                                 <button class="nav-link nav-theme-toggle dropdown-toggle" id="themeMenu" data-bs-toggle="dropdown" aria-expanded="false" type="button">
                                     <i class="fas fa-circle-half-stroke"></i>
