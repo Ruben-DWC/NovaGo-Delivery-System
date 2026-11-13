@@ -359,7 +359,7 @@
                         </a>
                         <form method="post" action="{% url 'users:admin_category_delete' category.id %}" style="display:inline;" onsubmit="return confirm('¿Confirma que desea eliminar la categoría {{ category.nombre }}?');">
                             {% csrf_token %}
-                            <button type="submit" class="btn-action-delete">
+                            <button type="submit" class="btn-action-delete" title="Eliminar categoría" aria-label="Eliminar categoría">
                                 <i class="fas fa-trash-can"></i>
                             </button>
                         </form>

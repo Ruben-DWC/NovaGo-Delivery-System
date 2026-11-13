@@ -499,7 +499,7 @@
                         </a>
                         <form method="post" action="{% url 'users:admin_product_delete' product.id %}" style="display:inline;" onsubmit="return confirm('¿Confirma que desea eliminar el producto {{ product.nombre }}?');">
                             {% csrf_token %}
-                            <button type="submit" class="btn-action-delete">
+                            <button type="submit" class="btn-action-delete" title="Eliminar producto" aria-label="Eliminar producto">
                                 <i class="fas fa-trash-can"></i>
                             </button>
                         </form>

@@ -99,6 +99,7 @@ h6 {
 }
 
 .nav-neo {
+    -webkit-backdrop-filter: saturate(160%) blur(8px);
     backdrop-filter: saturate(160%) blur(8px);
     background: rgba(255, 255, 255, 0.8);
     border-bottom: 1px solid rgba(221, 227, 239, 0.85);

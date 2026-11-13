@@ -10,6 +10,10 @@ from .forms import CheckoutForm
 from .services import CartService, OrderService, AutoAsignmentService
 from apps.products.models import Producto
 from apps.users.mixins import AdminRequiredMixin
+from django.utils import timezone
+
+JSON_CONTENT_TYPE = "application/json"
+CART_VIEW_NAME = "orders:cart"
 
 
 def serialize_cart(request, message="Carrito actualizado."):
@@ -42,7 +46,7 @@ class CartView(TemplateView):
 	template_name = 'orders/cart.html'
 
 	def get(self, request, *args, **kwargs):
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or JSON_CONTENT_TYPE in request.headers.get('Accept', ''):
 			return JsonResponse(serialize_cart(request, "Datos del carrito recuperados."))
 		return super().get(request, *args, **kwargs)
 
@@ -70,18 +74,18 @@ class AddToCartView(View):
 		CartService.add_product(request, producto_id, qty_int)
 		msg = f'¡"{producto.nombre}" agregado al carrito!'
 
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or JSON_CONTENT_TYPE in request.headers.get('Accept', ''):
 			return JsonResponse(serialize_cart(request, msg))
 
 		messages.success(request, msg)
-		return redirect(request.META.get('HTTP_REFERER', 'orders:cart'))
+		return redirect(request.META.get('HTTP_REFERER', CART_VIEW_NAME))
 
 
 class UpdateCartView(View):
 	def post(self, request, item_id):
 		quantity = request.POST.get('quantity')
 		if quantity is None:
-			if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+			if request.headers.get('x-requested-with') == 'XMLHttpRequest' or JSON_CONTENT_TYPE in request.headers.get('Accept', ''):
 				return JsonResponse({'status': 'error', 'message': 'Cantidad inválida.'}, status=400)
 			return HttpResponseBadRequest('Cantidad invalida.')
 
@@ -93,11 +97,11 @@ class UpdateCartView(View):
 		CartService.update_product(request, item_id, qty_int)
 		msg = 'Carrito actualizado.'
 
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or JSON_CONTENT_TYPE in request.headers.get('Accept', ''):
 			return JsonResponse(serialize_cart(request, msg))
 
 		messages.success(request, msg)
-		return redirect('orders:cart')
+		return redirect(CART_VIEW_NAME)
 
 
 class RemoveFromCartView(View):
@@ -105,11 +109,11 @@ class RemoveFromCartView(View):
 		CartService.remove_product(request, item_id)
 		msg = 'Producto retirado del carrito.'
 
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest' or JSON_CONTENT_TYPE in request.headers.get('Accept', ''):
 			return JsonResponse(serialize_cart(request, msg))
 
 		messages.info(request, msg)
-		return redirect('orders:cart')
+		return redirect(CART_VIEW_NAME)
 
 
 class CheckoutView(LoginRequiredMixin, FormView):
@@ -327,7 +331,6 @@ class AdminAsignarPedidoView(AdminRequiredMixin, View):
 				)
 			
 			# Reasignar
-			from django.utils import timezone
 			pedido.motorizado = motorizado
 			pedido.estado = 'confirmado'
 			if not pedido.fecha_asignacion:

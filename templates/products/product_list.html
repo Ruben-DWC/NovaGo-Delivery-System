@@ -171,9 +171,9 @@
 
 <!-- Floating Cart Action Pill: Permite ver de inmediato dónde quedan los productos seleccionados -->
 <aside id="floating-cart-pill" class="floating-cart-container {% if not cart_count %}is-hidden{% endif %}" aria-label="Acceso rápido al carrito de compras">
-    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
+    <button type="button" class="floating-cart-pill border-0" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
         <div class="cart-pill-icon">
-            <i class="fas fa-shopping-bag"></i>
+            <i class="ph-duotone ph-shopping-bag" aria-hidden="true"></i>
             <span class="cart-pill-counter js-nav-cart-count">{{ cart_count|default:0 }}</span>
         </div>
         <div class="cart-pill-info">
@@ -181,9 +181,9 @@
             <span class="cart-pill-total" id="floating-cart-total">S/ {{ cart_total|floatformat:2 }}</span>
         </div>
         <div class="cart-pill-arrow">
-            <i class="fas fa-chevron-right"></i>
+            <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
         </div>
-    </a>
+    </button>
 </aside>
 
 <!-- Toast Notification Feedback -->

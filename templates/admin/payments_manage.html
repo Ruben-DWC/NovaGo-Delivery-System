@@ -425,13 +425,13 @@
                 <i class="fas fa-bolt text-warning"></i> Acción Masiva:
             </span>
             <div class="bulk-fields">
-                <select id="payments-action" name="action" class="payments-control">
+                <select id="payments-action" name="action" class="payments-control" title="Acción masiva de pagos" aria-label="Acción masiva de pagos">
                     <option value="">-- Selecciona acción --</option>
                     <option value="set_status">Cambiar estado del pago</option>
                     <option value="reconcile">Marcar como conciliado</option>
                     <option value="unreconcile">Marcar como no conciliado</option>
                 </select>
-                <select id="payments-status" name="new_status" class="payments-control">
+                <select id="payments-status" name="new_status" class="payments-control" title="Nuevo estado del pago" aria-label="Nuevo estado del pago">
                     <option value="">-- Nuevo estado (opcional) --</option>
                     {% for value, label in estado_options %}
                     <option value="{{ value }}">{{ label }}</option>
