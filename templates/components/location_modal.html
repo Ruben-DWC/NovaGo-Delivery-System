@@ -167,14 +167,9 @@
         loadLeafletAssets(function () {
             if (!mapInstance) {
                 mapInstance = L.map('novagoCoverageMap').setView([selectedLat, selectedLng], 14);
-                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                const tileUrl = isDark
-                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-                L.tileLayer(tileUrl, {
-                    subdomains: 'abcd',
-                    maxZoom: 20,
-                    attribution: '&copy; OpenStreetMap &copy; CARTO'
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                    maxZoom: 19,
+                    attribution: '&copy; Esri &mdash; Source: Esri, HERE, Garmin, OpenStreetMap'
                 }).addTo(mapInstance);
 
                 L.circle([storeLat, storeLng], {
