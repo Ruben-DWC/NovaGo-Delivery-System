@@ -14,7 +14,7 @@
 > **Curso:** Herramientas de Desarrollo (`100000S66T`) - Ciclo 2026-II  
 > **Docente Oficial:** Jeymi Melanie Valdivia Eguiluz  
 > **Equipo de Desarrollo (Modalidad Dúo Oficial UTP):**  
-> 1. **Ruben Walter Vivas Jimenez** (Código: `U18209770` | Correo: `u22224908@utp.edu.pe` | GitHub: [`@Ruben-DWC`](https://github.com/Ruben-DWC)) - *Líder Backend & Cloud Architecture*  
+> 1. **Ruben Walter Vivas Jimenez** (Código: `U22224908` | Correo: `u22224908@utp.edu.pe` | GitHub: [`@Ruben-DWC`](https://github.com/Ruben-DWC)) - *Líder Backend & Cloud Architecture*  
 > 2. **Conislla Lavado Cesar Jesus** (Código: `U23264049` | Correo: `u23264049@utp.edu.pe` | GitHub: [`@umaten`](https://github.com/umaten)) - *Responsable QA, CI/CD & Telemetría*  
 > **Repositorio Oficial:** [https://github.com/Ruben-DWC/NovaGo-Delivery-System](https://github.com/Ruben-DWC/NovaGo-Delivery-System)
 
@@ -571,7 +571,7 @@ git diff develop..main
 
 | Integrante | Código UTP | Correo Institucional | Rol Técnico Principal | Responsabilidades Clave |
 |---|---|---|---|---|
-| **Ruben Walter Vivas Jimenez** | `U18209770` | `u22224908@utp.edu.pe` | Líder Backend & Cloud Architecture | Arquitectura Docker multi-stage, `docker-compose.yml`, soporte dual SQLite/PostgreSQL 16, GitFlow central y releases. |
+| **Ruben Walter Vivas Jimenez** | `U22224908` | `u22224908@utp.edu.pe` | Líder Backend & Cloud Architecture | Arquitectura Docker multi-stage, `docker-compose.yml`, soporte dual SQLite/PostgreSQL 16, GitFlow central y releases. |
 | **Conislla Lavado Cesar Jesus** | `U23264049` | `u23264049@utp.edu.pe` | Responsable QA, CI/CD & Telemetría | Endpoint `/health/`, suite de 14 pruebas Pytest, workflows de GitHub Actions (`ci.yml`, `cd.yml`) y gestión de incidencias. |
 
 ## 🚀 Despliegue y Ejecución Rápida (APF3)
