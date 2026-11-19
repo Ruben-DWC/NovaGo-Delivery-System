@@ -16,11 +16,13 @@ from django.shortcuts import redirect, render, get_object_or_404 # type: ignore
 from django.http import JsonResponse, HttpResponse # type: ignore
 from django.urls import reverse_lazy, reverse # pyright: ignore[reportMissingModuleSource]
 from django.views.generic import TemplateView, FormView, View, ListView, CreateView, UpdateView, DeleteView # type: ignore
-from django.contrib.auth.views import LoginView as AuthLoginView # type: ignore
+from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView # type: ignore
 from django.contrib.auth import login, logout, get_user_model # type: ignore
 from django.contrib import messages # type: ignore
 from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
+from django.utils.decorators import method_decorator # type: ignore
 from django.utils import timezone # pyright: ignore[reportMissingModuleSource]
+from django.views.decorators.http import require_http_methods # type: ignore
 from django.db import transaction # pyright: ignore[reportMissingModuleSource]
 from django.db.models import Count, Sum, Q # pyright: ignore[reportMissingModuleSource]
 from .forms import ClientRegisterForm, UserProfileForm, AdminProductForm, AdminCategoryForm, AdminUserManageForm
@@ -299,13 +301,14 @@ class ProfileView(LoginRequiredMixin, FormView):
             return str(value)
 
         changed_fields = []
+        field_labels = {'avatar_cropped_data': 'Foto de perfil'}
         for field_name in form.changed_data:
             field = form.fields.get(field_name)
             old_value = getattr(self.request.user, field_name, None)
             new_value = form.cleaned_data.get(field_name)
             changed_fields.append({
                 'field': field_name,
-                'label': field.label if field else field_name,
+                'label': field_labels.get(field_name) or (field.label if field and field.label else field_name),
                 'before': stringify_value(old_value),
                 'after': stringify_value(new_value),
             })
