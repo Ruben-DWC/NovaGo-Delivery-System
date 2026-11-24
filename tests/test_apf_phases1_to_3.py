@@ -4,7 +4,7 @@ Suite de Pruebas Automatizadas para Fases 1 a 3 (NovaGo Delivery System):
 - Fase 2: Concurrencia robusta, select_for_update(), idempotencia y excepciones de dominio.
 - Fase 3: Modernización UI/UX con HTMX parciales, Alpine.js y diseño impecable.
 
-Autores: Ruben Walter Vivas Jimenez (Ruben-DWC) & Conislla Lavado Cesar Jesus (umaten)
+Autores: Ruben Walter Vivas Jimenez (Ruben-DWC) & Conislla Lavado Cesar Jesus (CesarConisllaLavado)
 """
 from decimal import Decimal
 import threading

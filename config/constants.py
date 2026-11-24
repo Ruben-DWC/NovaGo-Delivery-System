@@ -3,7 +3,7 @@ Constantes de configuración y políticas operativas de NovaGo Delivery System.
 Versión unificada y conciliada colaborativamente para el Avance 3 (APF3).
 Integrantes del Equipo (Modalidad Dúo Oficial UTP):
 - Ruben Walter Vivas Jimenez (Ruben-DWC / u22224908@utp.edu.pe) - Arquitectura Backend & Docker
-- Conislla Lavado Cesar Jesus (umaten / u23264049@utp.edu.pe) - Calidad, CI/CD & Telemetría
+- Conislla Lavado Cesar Jesus (CesarConisllaLavado / u23264049@utp.edu.pe) - Calidad, CI/CD & Telemetría
 """
 from decimal import Decimal
 

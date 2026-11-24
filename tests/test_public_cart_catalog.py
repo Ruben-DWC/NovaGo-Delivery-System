@@ -2,7 +2,7 @@
 Pruebas de Catálogo Público, Carrito de Compras Global y Accesibilidad UI.
 Verifica que usuarios anónimos y registrados puedan consultar el catálogo,
 agregar productos al carrito, recibir feedback visual y acceder a /orders/carrito/.
-Autores: Conislla Lavado Cesar Jesus (umaten) & Ruben Walter Vivas Jimenez (Ruben-DWC)
+Autores: Conislla Lavado Cesar Jesus (CesarConisllaLavado) & Ruben Walter Vivas Jimenez (Ruben-DWC)
 """
 from decimal import Decimal
 from django.test import TestCase, Client, RequestFactory

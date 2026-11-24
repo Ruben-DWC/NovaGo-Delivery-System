@@ -1,7 +1,7 @@
 """
 Pruebas de Seguridad y Control de Acceso Basado en Roles (RBAC).
 Verifica que las rutas canónicas /portal/* protejan los recursos de usuarios no autorizados.
-Autor: Conislla Lavado Cesar Jesus (umaten / u23264049@utp.edu.pe)
+Autor: Conislla Lavado Cesar Jesus (CesarConisllaLavado / u23264049@utp.edu.pe)
 """
 from django.test import TestCase, Client
 

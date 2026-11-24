@@ -1,7 +1,7 @@
 """
 Pruebas de Catálogo, Filtros Dinámicos e Integridad de Inventario.
 Verifica la disponibilidad de productos y la consulta de catálogo.
-Autor: Conislla Lavado Cesar Jesus (umaten / u23264049@utp.edu.pe)
+Autor: Conislla Lavado Cesar Jesus (CesarConisllaLavado / u23264049@utp.edu.pe)
 """
 from decimal import Decimal
 from django.test import TestCase, Client

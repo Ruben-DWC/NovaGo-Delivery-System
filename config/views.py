@@ -1,7 +1,7 @@
 """
 Vistas de monitoreo y diagnóstico de NovaGo Delivery System.
 Módulo de Telemetría y Health Check para Orquestación Cloud y Docker (APF3).
-Autor: Conislla Lavado Cesar Jesus (umaten / u23264049@utp.edu.pe)
+Autor: Conislla Lavado Cesar Jesus (CesarConisllaLavado / u23264049@utp.edu.pe)
 """
 import time
 from django.http import JsonResponse

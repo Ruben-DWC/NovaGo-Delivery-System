@@ -1,7 +1,7 @@
 # NovaGo - Sistema de Delivery & Despacho de Encomiendas
 
 [![CI/CD Pipeline](https://github.com/Ruben-DWC/NovaGo-Delivery-System/actions/workflows/ci.yml/badge.svg)](https://github.com/Ruben-DWC/NovaGo-Delivery-System/actions)
-[![Release](https://img.shields.io/badge/Release-v0.3.0--apf3-blue.svg)](https://github.com/Ruben-DWC/NovaGo-Delivery-System/releases)
+[![Release](https://img.shields.io/badge/Release-v1.0.0--final-blue.svg)](https://github.com/Ruben-DWC/NovaGo-Delivery-System/releases)
 [![Docker](https://img.shields.io/badge/Docker-Multi--Stage_Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Package Manager](https://img.shields.io/badge/Packaging-uv_(Astral)_%26_pip-blueviolet.svg)](https://github.com/astral-sh/uv)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_16_Alpine-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -15,7 +15,7 @@
 > **Docente Oficial:** Jeymi Melanie Valdivia Eguiluz  
 > **Equipo de Desarrollo (Modalidad Dúo Oficial UTP):**  
 > 1. **Ruben Walter Vivas Jimenez** (Código: `U22224908` | Correo: `u22224908@utp.edu.pe` | GitHub: [`@Ruben-DWC`](https://github.com/Ruben-DWC)) - *Líder Backend & Cloud Architecture*  
-> 2. **Conislla Lavado Cesar Jesus** (Código: `U23264049` | Correo: `u23264049@utp.edu.pe` | GitHub: [`@umaten`](https://github.com/umaten)) - *Responsable QA, CI/CD & Telemetría*  
+> 2. **Conislla Lavado Cesar Jesus** (Código: `U23264049` | Correo: `u23264049@utp.edu.pe` | GitHub: [`@CesarConisllaLavado`](https://github.com/CesarConisllaLavado)) - *Responsable QA, CI/CD & Telemetría*  
 > **Repositorio Oficial:** [https://github.com/Ruben-DWC/NovaGo-Delivery-System](https://github.com/Ruben-DWC/NovaGo-Delivery-System)
 
 ---
@@ -574,7 +574,27 @@ git diff develop..main
 | **Ruben Walter Vivas Jimenez** | `U22224908` | `u22224908@utp.edu.pe` | Líder Backend & Cloud Architecture | Arquitectura Docker multi-stage, `docker-compose.yml`, soporte dual SQLite/PostgreSQL 16, GitFlow central y releases. |
 | **Conislla Lavado Cesar Jesus** | `U23264049` | `u23264049@utp.edu.pe` | Responsable QA, CI/CD & Telemetría | Endpoint `/health/`, suite de 14 pruebas Pytest, workflows de GitHub Actions (`ci.yml`, `cd.yml`) y gestión de incidencias. |
 
-## 🚀 Despliegue y Ejecución Rápida (APF3)
+## 🚀 Despliegue y Ejecución Rápida (Entrega Final - Semana 18)
+
+### Variables de Entorno (`.env.example`)
+Antes de ejecutar el proyecto, copia la plantilla de variables de entorno y completa tus credenciales locales:
+```bash
+cp .env.example .env
+```
+Variables principales incluidas en `.env.example`:
+- **Django Core**: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL` (vacío para usar SQLite local o URI de PostgreSQL en producción).
+- **OAuth 2.0 (`django-allauth`)**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`.
+- **Correo de Bienvenida (SMTP)**: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`, `NOVAGO_PUBLIC_URL`.
+- **Asistente IA 3D Nova**: `NOVA_AI_PROVIDER`, `NOVA_AI_MODEL`, `NOVA_AI_API_KEY`, `NOVA_RATE_LIMIT`, `NOVA_RATE_WINDOW_SECONDS`.
+
+### Funcionalidades de la Entrega Final (v1.0.0-final)
+1. **Autenticación OAuth 2.0 (Google y GitHub) + Correo de Bienvenida**:
+   - Integración con `django-allauth` en `/accounts/` y botones sociales en login/registro.
+   - Gestión de avatares con fallback automático a `static/images/default-avatar.svg`.
+   - Envío automático de correo HTML de bienvenida (`templates/emails/welcome_email.html`) al registrarse o iniciar sesión por primera vez mediante señales en `apps/users/signals.py`.
+2. **Asistente IA 3D Nova con Tool-Calling (`apps/assistant/`)**:
+   - Widget flotante con avatar 3D interactivo renderizado con Three.js (`static/assistant/js/nova-avatar.js`).
+   - Motor conversacional con *tool-calling* (`apps/assistant/services/tools.py`) para consultar catálogo, disponibilidad de stock, seguimiento de pedidos y base de conocimiento FAQ (`apps/assistant/data/faq_novago.md`), protegido con *rate limiting*.
 
 ### Opción 1: Ejecución con uv (Recomendada - 10x a 50x más rápida)
 `uv` es el gestor moderno de paquetes de Python desarrollado en Rust por Astral:
@@ -602,6 +622,9 @@ python manage.py runserver
 # Construir y levantar servicios web y base de datos PostgreSQL 16
 docker compose up -d --build
 
+# Aplicar migraciones dentro del contenedor si es necesario
+docker compose exec web python manage.py migrate
+
 # Verificar estado y logs de salud
 docker compose ps
 docker compose logs -f web
@@ -610,13 +633,24 @@ docker compose logs -f web
 curl http://localhost:8000/health/
 ```
 
+### Opción 4: Despliegue en PythonAnywhere
+```bash
+# En la consola Bash de PythonAnywhere:
+git pull origin main
+workon novago-venv
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py collectstatic --noinput
+# Recargar la aplicación web desde el panel Web (WSGI) de PythonAnywhere
+```
+
 ### Endpoint de Monitoreo y Telemetría (`/health/`)
 NovaGo expone un endpoint de salud HTTP 200 en `/health/` que devuelve telemetría en tiempo real:
 ```json
 {
   "status": "healthy",
   "app_name": "NovaGo Delivery System",
-  "version": "0.3.0-apf3",
+  "version": "1.0.0-final",
   "environment": "production-container",
   "database": {
     "status": "connected",
