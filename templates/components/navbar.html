@@ -532,9 +532,9 @@
                         <a class="nav-link dropdown-toggle nav-user-chip" href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown">
                             {% if user.foto_perfil %}
-                            <img src="{{ user.foto_perfil.url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto de perfil" class="nav-avatar">
+                            <img src="{{ user.avatar_url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto de perfil" class="nav-avatar">
                             {% else %}
-                            <span class="nav-avatar-fallback">{{ user.username|first|upper }}</span>
+                            <img src="{{ user.avatar_url }}" alt="Foto de perfil" class="nav-avatar">
                             {% endif %}
                             <span>{{ user.username }}</span>
                         </a>
@@ -583,9 +583,9 @@
             {% spaceless %}
             <span class="crumb crumb-root">
                 {% if user.foto_perfil %}
-                <img src="{{ user.foto_perfil.url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto perfil" class="crumb-avatar">
+                <img src="{{ user.avatar_url }}?v={{ user.historial_perfil.first.actualizado_en|date:'U' }}" alt="Foto perfil" class="crumb-avatar">
                 {% else %}
-                <span class="crumb-avatar-fallback">{{ user.username|first|upper }}</span>
+                <img src="{{ user.avatar_url }}" alt="Foto perfil" class="crumb-avatar">
                 {% endif %}
                 <a href="{% url 'users:portal_cliente' %}">Portal cliente</a>
             </span>

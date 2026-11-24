@@ -326,10 +326,9 @@
 		<article class="profile-card">
 			<div class="profile-avatar-wrap">
 				{% if profile_user.foto_perfil %}
-				<img src="{{ profile_user.foto_perfil.url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Foto de perfil" class="profile-avatar" id="profilePreviewAvatar">
+				<img src="{{ profile_user.avatar_url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Foto de perfil" class="profile-avatar" id="profilePreviewAvatar">
 				{% else %}
-				<div class="profile-avatar-fallback" id="profilePreviewFallback">{{ profile_user.username|first|upper }}</div>
-				<img src="" alt="Foto de perfil" class="profile-avatar is-hidden" id="profilePreviewAvatar">
+				<img src="{{ profile_user.avatar_url }}" alt="Foto de perfil" class="profile-avatar" id="profilePreviewAvatar">
 				{% endif %}
 			</div>
 			<h3 class="profile-name">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
@@ -438,8 +437,13 @@
 						>
 						{% if profile_user.foto_perfil %}
 						<div class="current-avatar-inline">
-							<img src="{{ profile_user.foto_perfil.url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Avatar actual">
+							<img src="{{ profile_user.avatar_url }}?v={{ profile_last_updated_at|date:'U' }}" alt="Avatar actual">
 							<span>Imagen actual cargada</span>
+						</div>
+						{% else %}
+						<div class="current-avatar-inline">
+							<img src="{{ profile_user.avatar_url }}" alt="Avatar actual">
+							<span>Avatar OAuth / predeterminado</span>
 						</div>
 						{% endif %}
 						{{ form.avatar_cropped_data }}

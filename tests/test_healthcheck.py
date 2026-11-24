@@ -1,7 +1,7 @@
 """
 Pruebas Automatizadas para el Endpoint de Diagnóstico y Health Check.
 Verifica que el servicio esté operativo y la base de datos responda.
-Autor: Conislla Lavado Cesar Jesus (umaten / u23264049@utp.edu.pe)
+Autor: Conislla Lavado Cesar Jesus (CesarConisllaLavado / u23264049@utp.edu.pe)
 """
 from django.test import TestCase, Client
 

@@ -121,7 +121,7 @@ class Pedido(models.Model):
     
     def puede_cancelar(self):
         """Verifica si el pedido puede ser cancelado"""
-        return self.estado in ['pendiente', 'confirmado']
+        return self.estado in ['pendiente_asignacion', 'confirmado']
 
 
 class ItemPedido(models.Model):
