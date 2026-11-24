@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenido a NovaGo Delivery</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+          <tr>
+            <td style="background:#ff6b35;padding:24px;text-align:center;color:#ffffff;">
+              <h1 style="margin:0;font-size:24px;">NovaGo Delivery System</h1>
+              <p style="margin:6px 0 0;font-size:14px;opacity:0.95;">Tu minimarket digital con entrega en minutos</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 24px;">
+              <h2 style="margin:0 0 12px;font-size:20px;color:#111827;">¡Hola, {{ nombre }}!</h2>
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.5;">
+                Tu registro e inicio de sesión mediante <strong>{{ metodo_registro }}</strong> se completó exitosamente.
+              </p>
+              <p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#4b5563;">
+                Cuenta registrada: <strong>{{ email }}</strong><br>
+                Rol asignado: <strong>{{ rol|title }}</strong>
+              </p>
+              <p style="margin:0 0 22px;font-size:14px;line-height:1.5;">
+                Ya puedes explorar el catálogo en vivo, realizar pedidos con Yape, Plin o efectivo, rastrear tu reparto en mapa y conversar con <strong>Nova</strong>, nuestro asistente IA 3D.
+              </p>
+              <p style="text-align:center;margin:0;">
+                <a href="{{ app_url }}" style="display:inline-block;background:#ff6b35;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+                  Ir a NovaGo
+                </a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f9fafb;padding:14px 24px;text-align:center;font-size:12px;color:#6b7280;">
+              © 2026 NovaGo Delivery System · Proyecto Académico UTP
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

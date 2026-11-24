@@ -80,6 +80,35 @@ class User(AbstractUser):
         """Verifica si el usuario es administrador"""
         return self.role == 'admin'
 
+    @property
+    def avatar_url(self):
+        """
+        Resolución jerárquica de avatar del usuario:
+        1. Foto de perfil subida manualmente (foto_perfil)
+        2. Avatar de SocialAccount (Google 'picture' / GitHub 'avatar_url')
+        3. Imagen estática por defecto
+        """
+        if self.foto_perfil:
+            try:
+                return self.foto_perfil.url
+            except ValueError:
+                pass
+
+        try:
+            for account in self.socialaccount_set.all():
+                extra = account.extra_data or {}
+                if account.provider == 'google' and extra.get('picture'):
+                    return extra['picture']
+                if account.provider == 'github' and extra.get('avatar_url'):
+                    return extra['avatar_url']
+                if extra.get('picture') or extra.get('avatar_url'):
+                    return extra.get('picture') or extra.get('avatar_url')
+        except Exception:
+            pass
+
+        from django.templatetags.static import static
+        return static('images/default-avatar.svg')
+
 
 class PerfilMotorizado(models.Model):
     """
