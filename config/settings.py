@@ -21,6 +21,12 @@ except ImportError:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env', override=True)
+except ImportError:
+    pass
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -58,12 +64,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'channels',
     
     # Third party apps
     'crispy_forms',
     'crispy_bootstrap5',
     'django_htmx',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     
     # Local apps
     'apps.users',
@@ -71,6 +83,7 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.payments',
     'apps.tracking',
+    'apps.assistant',
 ]
 
 # Crispy Forms
@@ -85,6 +98,7 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'apps.users.middleware.RoleBasedAccessMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -190,9 +204,60 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Authentication
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'users:dashboard'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DEFAULT_FROM_EMAIL',
+    EMAIL_HOST_USER or 'NovaGo Delivery <no-reply@novago.pe>',
+)
+NOVAGO_PUBLIC_URL = os.environ.get('NOVAGO_PUBLIC_URL', 'http://127.0.0.1:8000/')
+
+if os.environ.get('EMAIL_BACKEND'):
+    EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
+            'key': '',
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'github': {
+        'APP': {
+            'client_id': os.environ.get('GITHUB_CLIENT_ID', ''),
+            'secret': os.environ.get('GITHUB_CLIENT_SECRET', ''),
+            'key': '',
+        },
+        'SCOPE': ['read:user', 'user:email'],
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
@@ -203,3 +268,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'  # Resolucion unificada: co
 AUTH_USER_MODEL = 'users.User'
 
 WHITENOISE_MANIFEST_STRICT = False
+
+# AI Assistant (Nova 3D IA - multi-provider with fake mode for tests)
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+NOVA_AI_PROVIDER = os.environ.get('NOVA_AI_PROVIDER', 'gemini').strip().lower()
+NOVA_AI_MODEL = os.environ.get('NOVA_AI_MODEL', 'gemini-3.5-flash-lite').strip()
+NOVA_AI_API_KEY = (
+    os.environ.get('NOVA_AI_API_KEY', '').strip()
+    or GEMINI_API_KEY
+)
+NOVA_RATE_LIMIT = int(os.environ.get('NOVA_RATE_LIMIT', '20'))
+NOVA_RATE_WINDOW_SECONDS = int(os.environ.get('NOVA_RATE_WINDOW_SECONDS', '600'))

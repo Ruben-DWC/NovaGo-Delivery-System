@@ -37,9 +37,11 @@ urlpatterns = [
     path('portal/motorizado/', tracking_views.MotorizadoDashboardView.as_view(), name='canonical_portal_motorizado'),
     
     path('users/', include('apps.users.urls')),
+    path('accounts/', include('allauth.urls')),
     path('products/', include('apps.products.urls')),
     path('orders/', include('apps.orders.urls')),
     path('tracking/', include('apps.tracking.urls')),
+    path('assistant/', include('apps.assistant.urls')),
 ]
 
 # Archivos media (fotos de perfil y productos). Se sirven tambien con DEBUG=False

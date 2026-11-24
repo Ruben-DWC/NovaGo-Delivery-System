@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load socialaccount %}
 {% block title %}Iniciar Sesion - NovaGo{% endblock %}
 {% block content %}
 <section class="auth-shell reveal-up is-visible">
@@ -34,6 +35,21 @@
                 <button type="submit" class="btn btn-cta btn-lg btn-lift">Entrar a NovaGo</button>
             </div>
         </form>
+        <div class="d-flex align-items-center my-4">
+            <hr class="flex-grow-1">
+            <span class="px-3 text-muted small fw-semibold text-uppercase">o continúa con</span>
+            <hr class="flex-grow-1">
+        </div>
+        <div class="d-grid gap-2">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-center gap-2">
+                <i class="ph ph-google-logo fs-5"></i>
+                <span>Continuar con Google</span>
+            </a>
+            <a href="{% provider_login_url 'github' %}" class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-center gap-2">
+                <i class="ph ph-github-logo fs-5"></i>
+                <span>Continuar con GitHub</span>
+            </a>
+        </div>
         <div class="auth-foot text-center mt-3">
             <p>¿No tienes cuenta? <a href="{% url 'users:register' %}">Crear cuenta</a></p>
         </div>
