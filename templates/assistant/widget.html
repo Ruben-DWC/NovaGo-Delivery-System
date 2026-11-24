@@ -1,0 +1,123 @@
+{% load static %}
+<div
+    id="nova-root"
+    class="nova-root"
+    data-chat-url="{% url 'assistant:chat' %}"
+    data-reset-url="/assistant/reset/"
+    data-avatar-src="{% static 'assistant/js/nova-avatar.js' %}"
+    data-model-url="{% static 'assistant/models/nova.glb' %}"
+>
+    <!-- Botón flotante de apertura -->
+    <button
+        type="button"
+        id="nova-toggle"
+        class="nova-fab"
+        aria-label="Abrir asistente virtual Nova"
+        aria-expanded="false"
+        aria-controls="nova-panel"
+        title="Nova - Asistente IA 3D"
+    >
+        <i class="ph-fill ph-moped nova-fab-icon" aria-hidden="true"></i>
+        <span class="nova-fab-badge" aria-hidden="true">3D</span>
+    </button>
+
+    <!-- Panel flotante del chat -->
+    <section
+        id="nova-panel"
+        class="nova-panel is-hidden"
+        role="dialog"
+        aria-label="Asistente virtual Nova"
+        aria-hidden="true"
+    >
+        <header class="nova-header">
+            <div class="nova-header-brand">
+                <div class="nova-avatar-stage">
+                    <canvas
+                        id="nova-avatar-canvas"
+                        class="nova-avatar-canvas"
+                        aria-label="Avatar 3D de Nova en moto de reparto"
+                    ></canvas>
+                </div>
+                <div class="nova-title-wrap">
+                    <h2 class="nova-title">Nova</h2>
+                    <small id="nova-status" class="nova-subtitle">Asistente IA NovaGo</small>
+                </div>
+            </div>
+            <div class="nova-header-actions">
+                <button
+                    type="button"
+                    id="nova-voice-toggle"
+                    class="nova-icon-btn"
+                    title="Activar o silenciar voz"
+                    aria-label="Activar voz de Nova"
+                    aria-pressed="false"
+                >
+                    <i id="nova-voice-icon" class="ph ph-speaker-slash" aria-hidden="true"></i>
+                </button>
+                <button
+                    type="button"
+                    id="nova-reset"
+                    class="nova-icon-btn"
+                    title="Reiniciar conversación"
+                    aria-label="Reiniciar conversación"
+                >
+                    <i class="ph ph-trash" aria-hidden="true"></i>
+                </button>
+                <button
+                    type="button"
+                    id="nova-close"
+                    class="nova-icon-btn"
+                    title="Cerrar chat (Esc)"
+                    aria-label="Cerrar chat"
+                >
+                    <i class="ph ph-x" aria-hidden="true"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="nova-messages" class="nova-messages" aria-live="polite">
+            <div class="nova-msg nova-msg-bot">
+                <div class="nova-bubble">
+                    ¡Hola! Soy Nova, tu asistente de entregas NovaGo. Pregúntame por tu pedido, productos del catálogo, métodos de pago o costos de envío.
+                </div>
+            </div>
+        </div>
+
+        <div class="nova-chips" role="group" aria-label="Consultas rápidas">
+            <button type="button" class="nova-chip" data-nova-prompt="¿Dónde está mi pedido?">
+                ¿Dónde está mi pedido?
+            </button>
+            <button type="button" class="nova-chip" data-nova-prompt="Buscar productos">
+                Buscar productos
+            </button>
+            <button type="button" class="nova-chip" data-nova-prompt="Métodos de pago">
+                Métodos de pago
+            </button>
+            <button type="button" class="nova-chip" data-nova-prompt="Costo de envío">
+                Costo de envío
+            </button>
+        </div>
+
+        <form id="nova-form" class="nova-footer">
+            <label for="nova-input" class="visually-hidden">Escribe tu consulta para Nova</label>
+            <input
+                type="text"
+                id="nova-input"
+                class="nova-input"
+                placeholder="Escribe tu consulta..."
+                maxlength="500"
+                autocomplete="off"
+                required
+            >
+            <button
+                type="submit"
+                id="nova-send"
+                class="nova-send-btn"
+                title="Enviar mensaje"
+                aria-label="Enviar mensaje"
+            >
+                <i class="ph-fill ph-paper-plane-tilt" aria-hidden="true"></i>
+            </button>
+        </form>
+    </section>
+</div>

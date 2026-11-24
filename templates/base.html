@@ -25,6 +25,16 @@
     <!-- Custom CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assistant/css/nova-widget.css' %}">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+            }
+        }
+    </script>
 
     <script>
         (function () {
@@ -83,6 +93,8 @@
     
     <!-- Custom JS -->
     <script src="{% static 'js/main.js' %}"></script>
+    {% include 'assistant/widget.html' %}
+    <script type="module" src="{% static 'assistant/js/nova-widget.js' %}"></script>
     
     <!-- HTMX Configuration -->
     <script>
