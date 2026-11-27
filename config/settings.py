@@ -47,6 +47,7 @@ else:
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
+    'https://rubendwc.pythonanywhere.com',
     'https://*.northflank.app',
     'https://*.run.app',
     'https://*.koyeb.app',

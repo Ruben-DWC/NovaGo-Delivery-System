@@ -129,9 +129,10 @@ class Producto(models.Model):
     @property
     def imagen_url(self):
         """Retorna la URL de la imagen del producto, con fallback temático gastronómico realista."""
-        if self.imagen:
+        if self.imagen and self.imagen.name:
             try:
-                return self.imagen.url
+                if self.imagen.storage.exists(self.imagen.name):
+                    return self.imagen.url
             except Exception:
                 pass
         food_fallbacks = {

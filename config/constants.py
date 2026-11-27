@@ -7,8 +7,8 @@ Integrantes del Equipo (Modalidad Dúo Oficial UTP):
 """
 from decimal import Decimal
 
-# Versión y metadatos del sistema (Consolidación Oficial APF3)
-APP_VERSION = "0.3.0-apf3"
+# Versión y metadatos del sistema (Consolidación Oficial v1.1.0-final)
+APP_VERSION = "1.1.0-final"
 APP_NAME = "NovaGo Delivery System"
 APP_ENV = "production-container"
 CANONICAL_PORTAL_PREFIX = "/portal/"
