@@ -4,6 +4,7 @@
 {% block title %}Pasarela de Pago - NovaGo{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/cart.css' %}">
 <style>
     .pay-page {
         max-width: 1180px;
@@ -79,9 +80,10 @@
     }
 
     .methods-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 0.75rem;
     }
 
     .pay-title-spaced {
@@ -90,14 +92,35 @@
 
     .method-pill {
         border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 0.7rem 0.8rem;
+        border-radius: 999px;
+        padding: 0.32rem 0.65rem;
         background: var(--bg);
-        color: var(--text);
-        font-weight: 700;
-        display: flex;
+        color: var(--text-secondary, #667799);
+        font-weight: 600;
+        font-size: 0.78rem;
+        display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.35rem;
+    }
+
+    .coverage-chip-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        background: rgba(59, 130, 246, 0.08);
+        color: #1d4ed8;
+        border-radius: 999px;
+        padding: 0.28rem 0.72rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    html[data-theme='dark'] .coverage-chip-btn {
+        border-color: rgba(96, 165, 250, 0.45);
+        background: rgba(59, 130, 246, 0.16);
+        color: #93c5fd;
     }
 
     .state-list {
@@ -501,17 +524,19 @@
         color: #f87171;
     }
 
-    /* Validación de formulario */
+    /* Validación de formulario (solo tras interacción o envío) */
     .form-control.is-invalid,
     .form-select.is-invalid,
-    .form-control:invalid,
-    .form-select:invalid {
+    .was-validated .form-control:invalid,
+    .was-validated .form-select:invalid {
         border-color: #dc2626 !important;
         background-color: rgba(220, 38, 38, 0.08);
     }
 
     html[data-theme='dark'] .form-control.is-invalid,
-    html[data-theme='dark'] .form-select.is-invalid {
+    html[data-theme='dark'] .form-select.is-invalid,
+    html[data-theme='dark'] .was-validated .form-control:invalid,
+    html[data-theme='dark'] .was-validated .form-select:invalid {
         border-color: #f87171 !important;
         background-color: rgba(220, 38, 38, 0.12);
     }
@@ -529,21 +554,38 @@
         <p>Vista central para pagos del cliente con estados claros, resumen de carrito y acceso directo al checkout seguro.</p>
     </section>
 
+    <nav class="checkout-stepper mb-3" aria-label="Progreso de compra">
+        <a href="{% url 'users:portal_cliente_carrito' %}" class="stepper-step completed text-decoration-none">
+            <span class="stepper-num"><i class="ph-bold ph-check" aria-hidden="true"></i></span>
+            <span class="stepper-label">Carrito</span>
+        </a>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step active" aria-current="step">
+            <span class="stepper-num">2</span>
+            <span class="stepper-label">Envío y Pago</span>
+        </div>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step">
+            <span class="stepper-num">3</span>
+            <span class="stepper-label">Confirmación</span>
+        </div>
+    </nav>
+
     <section class="pay-layout">
         <article class="pay-card">
             <h2 class="pay-title"><i class="ph-duotone ph-wallet"></i> Pasarela y checkout integrado</h2>
             <div class="pay-total">
                 <div class="pay-total-item">
                     <label>Subtotal</label>
-                    <strong>S/. {{ subtotal|floatformat:2 }}</strong>
+                    <strong>S/ {{ subtotal|floatformat:2 }}</strong>
                 </div>
                 <div class="pay-total-item">
                     <label>Envío</label>
-                    <strong>S/. {{ shipping|floatformat:2 }}</strong>
+                    <strong>S/ {{ shipping|floatformat:2 }}</strong>
                 </div>
                 <div class="pay-total-item">
                     <label>Total a pagar</label>
-                    <strong>S/. {{ total|floatformat:2 }}</strong>
+                    <strong id="payTotalAmount" data-total="{{ total|stringformat:'.2f' }}">S/ {{ total|floatformat:2 }}</strong>
                 </div>
             </div>
 
@@ -560,7 +602,21 @@
                     <h3 class="form-section-title">Información de Entrega</h3>
                     <div class="checkout-grid">
                         <div class="full">
-                            <label class="pay-form-label" for="id_direccion_entrega">Dirección de entrega</label>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <label class="pay-form-label mb-0" for="id_direccion_entrega">Dirección de entrega</label>
+                                <button type="button"
+                                        class="coverage-chip-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#locationCoverageModal">
+                                    <i class="ph-duotone ph-map-pin" aria-hidden="true"></i>
+                                    {% if delivery_location %}
+                                        <span>{{ delivery_location.short_address }}{% if delivery_location.in_coverage %} · {{ delivery_location.eta_minutes }} min{% endif %}</span>
+                                        <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
+                                    {% else %}
+                                        <span>Validar cobertura en mapa</span>
+                                    {% endif %}
+                                </button>
+                            </div>
                             {{ form.direccion_entrega }}
                             {% if form.direccion_entrega.errors %}
                                 <small class="form-error">{{ form.direccion_entrega.errors.0 }}</small>
@@ -597,7 +653,7 @@
                             <div class="full">
                                 <label class="pay-form-label" for="id_monto_efectivo">¿Cuánto pagarías en efectivo?</label>
                                 {{ form.monto_efectivo }}
-                                <small class="pay-help-note">Indicia el monto exacto que deseas pagar en efectivo (debe ser igual o mayor al total)</small>
+                                <small class="pay-help-note">Indica el monto exacto que deseas pagar en efectivo (debe ser igual o mayor al total)</small>
                                 {% if form.monto_efectivo.errors %}
                                     <small class="form-error">{{ form.monto_efectivo.errors.0 }}</small>
                                 {% endif %}
@@ -731,16 +787,16 @@
                         <i class="ph-duotone ph-shopping-cart"></i> Volver al carrito
                     </a>
                 </div>
-            </form>
 
-            <h3 class="pay-title pay-title-spaced"><i class="ph-duotone ph-shield-check"></i> Métodos disponibles</h3>
-            <div class="methods-grid">
-                <div class="method-pill"><i class="ph-duotone ph-money"></i> Efectivo</div>
-                <div class="method-pill"><i class="ph-duotone ph-bank"></i> Transferencia</div>
-                <div class="method-pill"><i class="ph-duotone ph-credit-card"></i> Tarjeta</div>
-                <div class="method-pill"><i class="ph-duotone ph-device-mobile"></i> Yape / Plin</div>
-                <div class="method-pill"><i class="ph-duotone ph-handshake"></i> Contra Entrega (POS)</div>
-            </div>
+                <div class="methods-grid" aria-label="Métodos de pago aceptados">
+                    <span class="method-pill"><i class="ph-duotone ph-shield-check" aria-hidden="true"></i> Pago seguro</span>
+                    <span class="method-pill"><i class="ph-duotone ph-money" aria-hidden="true"></i> Efectivo</span>
+                    <span class="method-pill"><i class="ph-duotone ph-credit-card" aria-hidden="true"></i> Tarjeta</span>
+                    <span class="method-pill"><i class="ph-duotone ph-device-mobile" aria-hidden="true"></i> Yape / Plin</span>
+                    <span class="method-pill"><i class="ph-duotone ph-bank" aria-hidden="true"></i> Transferencia</span>
+                    <span class="method-pill"><i class="ph-duotone ph-handshake" aria-hidden="true"></i> POS Contra Entrega</span>
+                </div>
+            </form>
         </article>
 
         <article class="pay-card">
@@ -753,7 +809,7 @@
                         <strong>{{ item.producto.nombre }}</strong><br>
                         <small class="state-meta">x{{ item.cantidad }}</small>
                     </div>
-                    <strong>S/. {{ item.subtotal|floatformat:2 }}</strong>
+                    <strong>S/ {{ item.subtotal|floatformat:2 }}</strong>
                 </div>
                 {% endfor %}
             </div>
@@ -768,7 +824,7 @@
                 <div class="state-item">
                     <div>
                         <strong>Pedido #{{ card.id }}</strong><br>
-                        <small class="state-meta">{{ card.fecha|date:'d/m/Y H:i' }} | S/. {{ card.total|floatformat:2 }}</small>
+                        <small class="state-meta">{{ card.fecha|date:'d/m/Y H:i' }} | S/ {{ card.total|floatformat:2 }}</small>
                     </div>
                     <span class="state-badge state-{{ card.estado_key }}">{{ card.estado_label }}</span>
                 </div>
@@ -990,14 +1046,16 @@
             });
         }
 
-        // Validación de monto en efectivo
+        // Validación de monto en efectivo (lee el Total real, no Subtotal)
         if (montoEfectivo) {
             montoEfectivo.addEventListener('input', function() {
                 const value = parseFloat(this.value);
-                const totalText = document.querySelector('.pay-total-item strong:last-of-type');
-                if (totalText) {
-                    const total = parseFloat(totalText.textContent.replace('S/. ', ''));
-                    if (value < total) {
+                const totalEl = document.getElementById('payTotalAmount');
+                if (totalEl) {
+                    const totalAttr = parseFloat(totalEl.dataset.total);
+                    const totalParsed = parseFloat(totalEl.textContent.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                    const total = !Number.isNaN(totalAttr) ? totalAttr : totalParsed;
+                    if (!Number.isNaN(value) && !Number.isNaN(total) && value < total) {
                         this.classList.add('is-invalid');
                     } else {
                         this.classList.remove('is-invalid');
@@ -1032,15 +1090,28 @@
         }
 
         const checkoutForm = document.getElementById('checkout_form');
-        if (checkoutForm && submitBtn) {
-            checkoutForm.addEventListener('submit', function() {
-                if (!submitBtn.disabled) {
-                    setTimeout(() => {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="ph-bold ph-spinner ph-spin me-1"></i> Procesando pedido...';
-                    }, 0);
-                }
+        if (checkoutForm) {
+            checkoutForm.querySelectorAll('.form-control, .form-select').forEach(function (el) {
+                el.addEventListener('blur', function () {
+                    if (!el.checkValidity()) {
+                        el.classList.add('is-invalid');
+                    } else {
+                        el.classList.remove('is-invalid');
+                    }
+                });
             });
+
+            if (submitBtn) {
+                checkoutForm.addEventListener('submit', function() {
+                    checkoutForm.classList.add('was-validated');
+                    if (!submitBtn.disabled) {
+                        setTimeout(() => {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<i class="ph-bold ph-spinner ph-spin me-1"></i> Procesando pedido...';
+                        }, 0);
+                    }
+                });
+            }
         }
     });
 </script>

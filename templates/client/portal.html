@@ -52,7 +52,7 @@
                     <span class="stat-icon-shell"><i class="ph-duotone ph-wallet"></i></span>
                     <span class="stat-kicker">Consumo</span>
                 </div>
-                <div class="stat-value">S/. {{ total_spent }}</div>
+                <div class="stat-value">S/ {{ total_spent }}</div>
                 <div class="stat-label">Dinero Gastado</div>
             </div>
         </div>
@@ -120,7 +120,7 @@
                                             {{ order.get_estado_display }}
                                         </span>
                                     </td>
-                                    <td><strong>S/. {{ order.total|floatformat:2 }}</strong></td>
+                                    <td><strong>S/ {{ order.total|floatformat:2 }}</strong></td>
                                     <td>{{ order.fecha_pedido|date:"d/m H:i" }}</td>
                                     <td>
                                         <a href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}" class="track-link" title="Rastrear pedido #{{ order.id }}">

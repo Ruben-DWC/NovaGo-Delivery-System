@@ -75,7 +75,7 @@
             </div>
             <div class="col-lg-2 col-sm-2 d-grid">
                 <button type="submit"
-                        class="btn btn-primary btn-lift"
+                        class="btn btn-cta btn-lift"
                         hx-get="{% url catalog_url_name %}"
                         hx-target="#product-grid-content"
                         hx-indicator="#catalog-loading-indicator"
@@ -89,7 +89,7 @@
         <hr class="my-3 opacity-25">
 
         <!-- Píldoras de Categorías con Conteo y HTMX -->
-        <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="d-flex flex-nowrap overflow-auto flex-md-wrap gap-2 align-items-center pb-2 pb-md-0">
             <span class="catalog-toolbar-label me-1"><i class="fas fa-tags me-1"></i> Categorías:</span>
             <a class="category-pill {% if not active_category %}active{% endif %}"
                href="{% url catalog_url_name %}{% if active_sort %}?sort={{ active_sort }}{% endif %}"
@@ -123,9 +123,9 @@
                     <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
                         <div class="skeleton-img shimmer"></div>
                         <div class="p-3">
-                            <div class="skeleton-line shimmer mb-2" style="width: 70%; height: 16px;"></div>
-                            <div class="skeleton-line shimmer mb-3" style="width: 40%; height: 14px;"></div>
-                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                            <div class="skeleton-line shimmer mb-2 skeleton-w-70"></div>
+                            <div class="skeleton-line shimmer mb-3 skeleton-w-40"></div>
+                            <div class="skeleton-line shimmer skeleton-btn"></div>
                         </div>
                     </div>
                 </div>
@@ -133,9 +133,9 @@
                     <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
                         <div class="skeleton-img shimmer"></div>
                         <div class="p-3">
-                            <div class="skeleton-line shimmer mb-2" style="width: 80%; height: 16px;"></div>
-                            <div class="skeleton-line shimmer mb-3" style="width: 35%; height: 14px;"></div>
-                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                            <div class="skeleton-line shimmer mb-2 skeleton-w-80"></div>
+                            <div class="skeleton-line shimmer mb-3 skeleton-w-35"></div>
+                            <div class="skeleton-line shimmer skeleton-btn"></div>
                         </div>
                     </div>
                 </div>
@@ -143,9 +143,9 @@
                     <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
                         <div class="skeleton-img shimmer"></div>
                         <div class="p-3">
-                            <div class="skeleton-line shimmer mb-2" style="width: 60%; height: 16px;"></div>
-                            <div class="skeleton-line shimmer mb-3" style="width: 45%; height: 14px;"></div>
-                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                            <div class="skeleton-line shimmer mb-2 skeleton-w-60"></div>
+                            <div class="skeleton-line shimmer mb-3 skeleton-w-45"></div>
+                            <div class="skeleton-line shimmer skeleton-btn"></div>
                         </div>
                     </div>
                 </div>
@@ -153,9 +153,9 @@
                     <div class="skeleton-card h-100 p-0 border-0 shadow-sm">
                         <div class="skeleton-img shimmer"></div>
                         <div class="p-3">
-                            <div class="skeleton-line shimmer mb-2" style="width: 75%; height: 16px;"></div>
-                            <div class="skeleton-line shimmer mb-3" style="width: 50%; height: 14px;"></div>
-                            <div class="skeleton-line shimmer" style="height: 38px; border-radius: 8px;"></div>
+                            <div class="skeleton-line shimmer mb-2 skeleton-w-75"></div>
+                            <div class="skeleton-line shimmer mb-3 skeleton-w-50"></div>
+                            <div class="skeleton-line shimmer skeleton-btn"></div>
                         </div>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
 </aside>
 
 <!-- Toast Notification Feedback -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+<div class="toast-container position-fixed top-0 end-0 p-3 toast-container-top">
     <div id="cartToast" class="toast cart-toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body d-flex align-items-center gap-2">

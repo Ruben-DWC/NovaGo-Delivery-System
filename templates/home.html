@@ -6,15 +6,36 @@
 <section class="hero-shell reveal-up is-visible">
     <div class="hero-grid">
         <div class="hero-copy">
+            <span class="hero-fast-badge">
+                <i class="ph-fill ph-lightning" aria-hidden="true"></i>
+                Entrega express &middot; 22 min promedio
+            </span>
             <span class="kicker">NUEVA EXPERIENCIA DE DELIVERY EN CIUDAD</span>
             <h1 class="hero-title">Tu minimarket de confianza, entregado en minutos.</h1>
-            <p class="hero-description">Compra snacks, bebidas y basicos del hogar con tracking en vivo, pagos seguros y atencion inmediata en cada pedido.</p>
+            <p class="hero-description">Compra snacks, bebidas y básicos del hogar con tracking en vivo, pagos seguros y atención inmediata en cada pedido.</p>
             <div class="hero-actions">
                 <a class="btn btn-cta btn-lg" href="{% url 'products:product_list' %}">
                     Pedir ahora
                 </a>
                 <a class="btn btn-outline-dark btn-lg" href="#beneficios">
                     Ver beneficios
+                </a>
+            </div>
+            <div class="home-category-chips" aria-label="Accesos rápidos por categoría">
+                <a class="home-category-chip" href="{% url 'products:product_list' %}?categoria=5">
+                    <i class="ph-duotone ph-cookie" aria-hidden="true"></i> Snacks
+                </a>
+                <a class="home-category-chip" href="{% url 'products:product_list' %}?categoria=2">
+                    <i class="ph-duotone ph-wine" aria-hidden="true"></i> Bebidas
+                </a>
+                <a class="home-category-chip" href="{% url 'products:product_list' %}?categoria=3">
+                    <i class="ph-duotone ph-package" aria-hidden="true"></i> Combos
+                </a>
+                <a class="home-category-chip" href="{% url 'products:product_list' %}?categoria=4">
+                    <i class="ph-duotone ph-cake" aria-hidden="true"></i> Postres
+                </a>
+                <a class="home-category-chip" href="{% url 'products:product_list' %}">
+                    <i class="ph-duotone ph-squares-four" aria-hidden="true"></i> Todo el catálogo
                 </a>
             </div>
             <ul class="hero-tags">
@@ -65,42 +86,55 @@
                 <span class="status-dot"></span>
                 Motorizado en camino hacia tu ubicación
             </div>
+            <a href="{% url 'tracking:public_lookup' %}" class="hero-panel-track-link">
+                <i class="ph-duotone ph-map-pin-line" aria-hidden="true"></i>
+                Rastrear mi pedido en vivo
+                <i class="ph-bold ph-arrow-right" aria-hidden="true"></i>
+            </a>
         </div>
     </div>
 </section>
 
 <section id="beneficios" class="section-space">
     <div class="section-header reveal-up">
-        <p class="section-label">POR QUE ELEGIR NOVAGO</p>
+        <p class="section-label">POR QUÉ ELEGIR NOVAGO</p>
         <h2>Diseñado como plataforma comercial real</h2>
     </div>
     <div class="row g-4">
         <div class="col-md-6 col-xl-3 reveal-up">
             <article class="feature-tile">
-                <i class="fas fa-box-open"></i>
-                <h5>Catalogo vivo</h5>
+                <div class="value-icon-box" aria-hidden="true">
+                    <i class="ph-duotone ph-storefront"></i>
+                </div>
+                <h5>Catálogo vivo</h5>
                 <p>Disponibilidad actualizada por tienda para evitar cancelaciones.</p>
             </article>
         </div>
         <div class="col-md-6 col-xl-3 reveal-up delay-1">
             <article class="feature-tile">
-                <i class="fas fa-shield-halved"></i>
+                <div class="value-icon-box" aria-hidden="true">
+                    <i class="ph-duotone ph-shield-check"></i>
+                </div>
                 <h5>Pagos confiables</h5>
                 <p>Flujo protegido con validaciones robustas y trazabilidad completa.</p>
             </article>
         </div>
         <div class="col-md-6 col-xl-3 reveal-up delay-2">
             <article class="feature-tile">
-                <i class="fas fa-route"></i>
+                <div class="value-icon-box" aria-hidden="true">
+                    <i class="ph-duotone ph-navigation-arrow"></i>
+                </div>
                 <h5>Tracking real</h5>
                 <p>Rastreo GPS en vivo con hitos visibles para el cliente final.</p>
             </article>
         </div>
         <div class="col-md-6 col-xl-3 reveal-up delay-3">
             <article class="feature-tile">
-                <i class="fas fa-headset"></i>
+                <div class="value-icon-box" aria-hidden="true">
+                    <i class="ph-duotone ph-headset"></i>
+                </div>
                 <h5>Soporte directo</h5>
-                <p>Asistencia centralizada para resolver incidencias sin friccion.</p>
+                <p>Asistencia centralizada para resolver incidencias sin fricción.</p>
             </article>
         </div>
     </div>
@@ -117,7 +151,7 @@
         <div class="col-6 col-md-3">
             <div class="metric-card">
                 <strong class="metric-value" data-target="4.9" data-fixed="1" data-suffix="/5">0</strong>
-                <span>Calificacion</span>
+                <span>Calificación</span>
             </div>
         </div>
         <div class="col-6 col-md-3">
@@ -140,9 +174,9 @@
         <div>
             <p class="section-label">TESTIMONIOS</p>
             <h2>Lo que dicen nuestros clientes</h2>
-            <p class="testimonial-subtitle">Experiencias reales de quienes confian en NovaGo para sus pedidos diarios.</p>
+            <p class="testimonial-subtitle">Experiencias reales de quienes confían en NovaGo para sus pedidos diarios.</p>
         </div>
-        <div class="testimonial-rating-pill" aria-label="Calificacion promedio 4.9 de 5 estrellas">
+        <div class="testimonial-rating-pill" aria-label="Calificación promedio 4.9 de 5 estrellas">
             <div class="testimonial-stars" aria-hidden="true">
                 <i class="ph-fill ph-star"></i>
                 <i class="ph-fill ph-star"></i>
@@ -169,7 +203,7 @@
                         <i class="ph-duotone ph-quotes"></i>
                     </span>
                 </div>
-                <p class="testimonial-quote">"La ruta en vivo funciona excelente. Veo exactamente en que calle viene el motorizado y cuando llega mi pedido."</p>
+                <p class="testimonial-quote">"La ruta en vivo funciona excelente. Veo exactamente en qué calle viene el motorizado y cuándo llega mi pedido."</p>
                 <div class="testimonial-footer">
                     <div class="testimonial-avatar testimonial-avatar-orange" aria-hidden="true">AR</div>
                     <div class="testimonial-user">
@@ -196,7 +230,7 @@
                         <i class="ph-duotone ph-quotes"></i>
                     </span>
                 </div>
-                <p class="testimonial-quote">"El tiempo de entrega es super estable y el pago por transferencia con comprobante me simplifica todo para la oficina."</p>
+                <p class="testimonial-quote">"El tiempo de entrega es súper estable y el pago por transferencia con comprobante me simplifica todo para la oficina."</p>
                 <div class="testimonial-footer">
                     <div class="testimonial-avatar testimonial-avatar-blue" aria-hidden="true">CM</div>
                     <div class="testimonial-user">
@@ -223,11 +257,11 @@
                         <i class="ph-duotone ph-quotes"></i>
                     </span>
                 </div>
-                <p class="testimonial-quote">"Interfaz clara, rapida y sin complicaciones. Desde validar cobertura hasta recibir mi combo tomo menos de 25 minutos."</p>
+                <p class="testimonial-quote">"Interfaz clara, rápida y sin complicaciones. Desde validar cobertura hasta recibir mi combo tomó menos de 25 minutos."</p>
                 <div class="testimonial-footer">
                     <div class="testimonial-avatar testimonial-avatar-emerald" aria-hidden="true">LP</div>
                     <div class="testimonial-user">
-                        <strong>Lucia P.</strong>
+                        <strong>Lucía P.</strong>
                         <span>Nueva cliente &middot; Surco</span>
                     </div>
                     <span class="testimonial-verified" title="Pedido verificado">

@@ -20,9 +20,12 @@
                 </div>
                 <div class="detail-image-wrap">
                     <img class="detail-image" src="{{ product.imagen_url }}" alt="{{ product.nombre }}">
+                    {% if product.destacado %}
+                    <span class="catalog-badge">Destacado</span>
+                    {% endif %}
                 </div>
                 <h2>{{ product.nombre }}</h2>
-                <p class="detail-description" style="color: var(--text-soft, #cbd5e1);">{{ product.descripcion }}</p>
+                <p class="detail-description">{{ product.descripcion }}</p>
 
                 <div class="detail-meta-grid">
                     <div class="detail-meta-item">
@@ -37,6 +40,11 @@
                         <span>Disponibilidad</span>
                         <strong>{% if product.stock > 0 %}Stock {{ product.stock }}{% else %}Sin stock{% endif %}</strong>
                     </div>
+                </div>
+
+                <div class="detail-price-hero">
+                    <span class="detail-price-amount">S/ {{ product.precio }}</span>
+                    <span class="text-muted small">Precio final incluido IGV</span>
                 </div>
 
                 {% if product.stock > 0 %}
@@ -67,11 +75,14 @@
                 <h5>Productos relacionados</h5>
                 {% for item in related_products %}
                     <div class="related-row">
-                        <div>
-                            <strong>{{ item.nombre }}</strong>
-                            <p class="related-price">S/ {{ item.precio }}</p>
+                        <div class="related-item-info">
+                            <img class="related-thumb" src="{{ item.imagen_url }}" alt="{{ item.nombre }}" loading="lazy">
+                            <div class="min-w-0">
+                                <strong class="d-block text-truncate">{{ item.nombre }}</strong>
+                                <p class="related-price">S/ {{ item.precio }}</p>
+                            </div>
                         </div>
-                        <a href="{% url product_detail_url_name item.id %}" class="btn-card-detail">Ver</a>
+                        <a href="{% url product_detail_url_name item.id %}" class="btn-card-detail flex-shrink-0">Ver</a>
                     </div>
                 {% empty %}
                 <p class="text-muted">Aún no hay productos relacionados.</p>
@@ -83,9 +94,9 @@
 
 <!-- Floating Cart Action Pill -->
 <aside id="floating-cart-pill" class="floating-cart-container {% if not cart_count %}is-hidden{% endif %}" aria-label="Acceso rápido al carrito de compras">
-    <a href="{% url 'orders:cart' %}" class="floating-cart-pill" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" role="button" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
+    <button type="button" class="floating-cart-pill border-0" id="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Ver carrito con {{ cart_count|default:0 }} productos">
         <div class="cart-pill-icon">
-            <i class="fas fa-shopping-bag"></i>
+            <i class="ph-duotone ph-shopping-bag" aria-hidden="true"></i>
             <span class="cart-pill-counter js-nav-cart-count">{{ cart_count|default:0 }}</span>
         </div>
         <div class="cart-pill-info">
@@ -93,13 +104,13 @@
             <span class="cart-pill-total" id="floating-cart-total">S/ {{ cart_total|floatformat:2 }}</span>
         </div>
         <div class="cart-pill-arrow">
-            <i class="fas fa-chevron-right"></i>
+            <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
         </div>
-    </a>
+    </button>
 </aside>
 
 <!-- Toast Notification Feedback -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+<div class="toast-container position-fixed top-0 end-0 p-3 toast-container-top">
     <div id="cartToast" class="toast cart-toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body d-flex align-items-center gap-2">

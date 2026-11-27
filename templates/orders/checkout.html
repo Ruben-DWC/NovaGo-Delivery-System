@@ -1,11 +1,32 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Checkout - NovaGo{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/cart.css' %}">
+{% endblock %}
 {% block content %}
 <section class="section-space reveal-up is-visible">
     <div class="section-header">
         <p class="section-label">FINALIZAR PEDIDO</p>
         <h2>Checkout</h2>
     </div>
+
+    <nav class="checkout-stepper mb-4" aria-label="Progreso de compra">
+        <a href="{% url 'orders:cart' %}" class="stepper-step completed text-decoration-none">
+            <span class="stepper-num"><i class="ph-bold ph-check" aria-hidden="true"></i></span>
+            <span class="stepper-label">Carrito</span>
+        </a>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step active" aria-current="step">
+            <span class="stepper-num">2</span>
+            <span class="stepper-label">Envío y Pago</span>
+        </div>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step">
+            <span class="stepper-num">3</span>
+            <span class="stepper-label">Confirmación</span>
+        </div>
+    </nav>
 
     {% if items %}
     <div class="row g-4">
@@ -19,15 +40,24 @@
                     {% endif %}
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label" for="id_direccion_entrega">Direccion de entrega</label>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <label class="form-label mb-0" for="id_direccion_entrega">Dirección de entrega</label>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary rounded-pill d-inline-flex align-items-center gap-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#locationCoverageModal">
+                                    <i class="ph-duotone ph-map-pin" aria-hidden="true"></i>
+                                    <span>{% if delivery_location %}{{ delivery_location.short_address }}{% else %}Elegir en mapa{% endif %}</span>
+                                </button>
+                            </div>
                             {{ form.direccion_entrega }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="id_telefono_contacto">Telefono</label>
+                            <label class="form-label" for="id_telefono_contacto">Teléfono</label>
                             {{ form.telefono_contacto }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="id_metodo_pago">Metodo de pago</label>
+                            <label class="form-label" for="id_metodo_pago">Método de pago</label>
                             {{ form.metodo_pago }}
                         </div>
                         <div class="col-md-6">
@@ -57,14 +87,14 @@
                     {% endfor %}
                 </div>
                 <p><strong>Subtotal:</strong> S/ {{ subtotal }}</p>
-                <p><strong>Envio:</strong> S/ {{ shipping }}</p>
+                <p><strong>Envío:</strong> S/ {{ shipping }}</p>
                 <p class="fs-5"><strong>Total:</strong> S/ {{ total }}</p>
             </article>
         </div>
     </div>
     {% else %}
     <div class="alert alert-warning">No tienes productos en el carrito.</div>
-    <a class="btn btn-cta" href="{% url 'products:product_list' %}">Ir al catalogo</a>
+    <a class="btn btn-cta" href="{% url 'products:product_list' %}">Ir al catálogo</a>
     {% endif %}
 </section>
 {% endblock %}

@@ -405,8 +405,8 @@
         {% else %}
         <section class="track-hero">
             <div class="track-hero-head">
-                <h1><i class="fas fa-map-marker-alt"></i> Rastrear Pedido #{{ pedido.id }}</h1>
-                <span class="status-chip"><i class="fas fa-bolt"></i> <span id="statusDisplay">{{ pedido.get_estado_display }}</span></span>
+                <h1><i class="ph-duotone ph-map-pin" aria-hidden="true"></i> Rastrear Pedido #{{ pedido.id }}</h1>
+                <span class="status-chip"><i class="ph-duotone ph-lightning" aria-hidden="true"></i> <span id="statusDisplay">{{ pedido.get_estado_display }}</span></span>
             </div>
             <p>Mapa en vivo con trayectoria, ETA y cambios de estado en tiempo real.</p>
             <div class="sync-pill" id="syncPill" aria-live="polite">
@@ -436,31 +436,31 @@
 
             <aside class="track-sidebar">
                 <div class="track-card">
-                    <h3 class="card-title"><i class="fas fa-clock"></i> Estado del Pedido</h3>
+                    <h3 class="card-title"><i class="ph-duotone ph-clock" aria-hidden="true"></i> Estado del Pedido</h3>
                     <div class="status-timeline">
                         <div class="timeline-item" id="stepConfirmado">
-                            <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                            <div class="timeline-dot"><i class="ph-bold ph-check" aria-hidden="true"></i></div>
                             <div>
                                 <p class="timeline-label">Pedido Confirmado</p>
                                 <p class="timeline-time">Validado por NovaGo</p>
                             </div>
                         </div>
                         <div class="timeline-item" id="stepPreparacion">
-                            <div class="timeline-dot"><i class="fas fa-utensils"></i></div>
+                            <div class="timeline-dot"><i class="ph-duotone ph-fork-knife" aria-hidden="true"></i></div>
                             <div>
                                 <p class="timeline-label">En Preparación</p>
                                 <p class="timeline-time">Armando tu pedido</p>
                             </div>
                         </div>
                         <div class="timeline-item" id="stepCamino">
-                            <div class="timeline-dot"><i class="fas fa-motorcycle"></i></div>
+                            <div class="timeline-dot"><i class="ph-duotone ph-moped" aria-hidden="true"></i></div>
                             <div>
                                 <p class="timeline-label">Motorizado en Ruta</p>
                                 <p class="timeline-time">Seguimiento GPS activo</p>
                             </div>
                         </div>
                         <div class="timeline-item" id="stepEntregado">
-                            <div class="timeline-dot"><i class="fas fa-house"></i></div>
+                            <div class="timeline-dot"><i class="ph-duotone ph-house" aria-hidden="true"></i></div>
                             <div>
                                 <p class="timeline-label">Entrega Completada</p>
                                 <p class="timeline-time">Pendiente</p>
@@ -470,41 +470,45 @@
                 </div>
 
                 <div class="track-card">
-                    <h3 class="card-title"><i class="fas fa-box"></i> Detalles</h3>
+                    <h3 class="card-title"><i class="ph-duotone ph-package" aria-hidden="true"></i> Detalles</h3>
                     <div class="details-grid">
                         <div class="detail-row">
                             <span>Subtotal</span>
-                            <strong>S/. {{ pedido.subtotal|floatformat:2 }}</strong>
+                            <strong>S/ {{ pedido.subtotal|floatformat:2 }}</strong>
                         </div>
                         <div class="detail-row">
                             <span>Envío</span>
-                            <strong>S/. {{ pedido.costo_envio|floatformat:2 }}</strong>
+                            <strong>S/ {{ pedido.costo_envio|floatformat:2 }}</strong>
                         </div>
                         <div class="detail-row total">
                             <span><strong>Total</strong></span>
-                            <strong>S/. {{ pedido.total|floatformat:2 }}</strong>
+                            <strong>S/ {{ pedido.total|floatformat:2 }}</strong>
                         </div>
                     </div>
                 </div>
 
                 {% if pedido.motorizado %}
                 <div class="motorizado-card">
-                    <p class="motorizado-name"><i class="fas fa-motorcycle"></i> {{ pedido.motorizado.get_full_name|default:"Motorizado" }}</p>
+                    <p class="motorizado-name"><i class="ph-duotone ph-moped" aria-hidden="true"></i> {{ pedido.motorizado.get_full_name|default:"Motorizado" }}</p>
                     <p class="motorizado-meta">Responsable actual de la entrega</p>
                     <div class="actions-row">
-                        <a href="tel:+51999999999" class="track-btn"> <i class="fas fa-phone"></i> Llamar </a>
-                        <a href="https://wa.me/51999999999" class="track-btn"> <i class="fab fa-whatsapp"></i> WhatsApp </a>
+                        {% if pedido.motorizado.telefono %}
+                        <a href="tel:{{ pedido.motorizado.telefono }}" class="track-btn"><i class="ph-duotone ph-phone" aria-hidden="true"></i> Llamar</a>
+                        <a href="https://wa.me/{{ pedido.motorizado.telefono|cut:'+'|cut:' '|cut:'-' }}" class="track-btn" target="_blank" rel="noopener noreferrer"><i class="ph-duotone ph-whatsapp-logo" aria-hidden="true"></i> WhatsApp</a>
+                        {% else %}
+                        <a href="{% url 'users:contact' %}" class="track-btn"><i class="ph-duotone ph-headset" aria-hidden="true"></i> Contactar soporte</a>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
 
                 <div class="actions-row">
                     <a href="{% if user.role == 'cliente' %}{% url 'users:portal_cliente_rastreo' %}{% elif user.role == 'motorizado' %}{% url 'tracking:motorizado_historial' %}{% else %}{% url 'tracking:motorizado_dashboard' %}{% endif %}" class="track-btn primary">
-                        <i class="fas fa-arrow-left"></i> Volver
+                        <i class="ph-bold ph-arrow-left" aria-hidden="true"></i> Volver
                     </a>
                     {% if user.role == 'cliente' %}
                     <a href="{% url 'users:portal_cliente_pedido_detalle' pedido.id %}" class="track-btn confirm">
-                        <i class="fas fa-file-lines"></i> Ver detalle
+                        <i class="ph-duotone ph-file-text" aria-hidden="true"></i> Ver detalle
                     </a>
                     {% endif %}
                 </div>
@@ -515,7 +519,7 @@
 </div>
 
 <aside class="track-toast" id="statusToast" role="status" aria-live="polite">
-    <p class="toast-title"><i class="fas fa-sparkles"></i> Estado actualizado</p>
+    <p class="toast-title"><i class="ph-duotone ph-sparkle" aria-hidden="true"></i> Estado actualizado</p>
     <p class="toast-body" id="toastBody">Tu pedido cambió de estado.</p>
 </aside>
 
@@ -576,19 +580,19 @@
     const markerIcons = {
         store: L.divIcon({
             className: 'map-pin map-pin-store',
-            html: '<div style="background:#0ea5e9;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-store"></i></div>',
+            html: '<div style="background:#0ea5e9;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="ph-duotone ph-storefront"></i></div>',
             iconSize: [32, 32],
             iconAnchor: [16, 16],
         }),
         rider: L.divIcon({
             className: 'map-pin map-pin-rider',
-            html: '<div style="background:#f97316;color:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-motorcycle"></i></div>',
+            html: '<div style="background:#f97316;color:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;border:2px solid #fff;"><i class="ph-duotone ph-moped"></i></div>',
             iconSize: [34, 34],
             iconAnchor: [17, 17],
         }),
         destination: L.divIcon({
             className: 'map-pin map-pin-destination',
-            html: '<div style="background:#22c55e;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="fas fa-house"></i></div>',
+            html: '<div style="background:#22c55e;color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;border:2px solid #fff;"><i class="ph-duotone ph-house"></i></div>',
             iconSize: [32, 32],
             iconAnchor: [16, 16],
         }),
