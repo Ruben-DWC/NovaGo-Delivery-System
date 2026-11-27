@@ -7,13 +7,12 @@
      x-data="alpineCartDrawer()">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title fw-bold d-flex align-items-center gap-2" id="cartOffcanvasLabel">
-            <i class="fas fa-bag-shopping text-brand"></i>
+            <i class="ph-duotone ph-bag text-brand" aria-hidden="true"></i>
             <span>Tu Carrito</span>
             <span class="badge rounded-pill cart-badge-nav ms-1 js-nav-cart-count"
                   x-text="count"
                   x-show="count > 0"
-                  x-cloak
-                  {% if not cart_count %}style="display: none;"{% endif %}>{{ cart_count|default:0 }}</span>
+                  x-cloak>{{ cart_count|default:0 }}</span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito" title="Cerrar"></button>
     </div>
@@ -21,9 +20,9 @@
         <!-- Contenedor dinámico de ítems con Alpine.js -->
         <div id="cartDrawerItemsList"
              class="flex-grow-1 overflow-y-auto p-3 vstack gap-3"
+             :class="{'opacity-50 pe-none': loading}"
              x-show="items && items.length > 0"
-             x-cloak
-             {% if not cart_items %}style="display: none;"{% endif %}>
+             x-cloak>
             
             <template x-for="item in items" :key="item.id">
                 <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center"
@@ -36,17 +35,15 @@
                          x-transition:leave-end="opacity-0 transform scale-95">
                     <img :src="item.imagen_url"
                          :alt="item.nombre"
-                         class="cart-drawer-thumb rounded"
+                         class="cart-drawer-thumb rounded object-fit-cover"
                          width="60"
-                         height="60"
-                         style="object-fit: cover;">
+                         height="60">
                     <div class="flex-grow-1 min-w-0">
                         <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold"
                             :title="item.nombre"
-                            x-text="item.nombre"
-                            style="color: var(--text, #f1f5f9);"></h6>
+                            x-text="item.nombre"></h6>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="small" style="color: var(--text-soft, #94a3b8);" x-text="'S/ ' + Number(item.precio).toFixed(2)"></span>
+                            <span class="small text-muted" x-text="'S/ ' + Number(item.precio).toFixed(2)"></span>
                             <strong class="text-brand small" x-text="'S/ ' + Number(item.subtotal).toFixed(2)"></strong>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
@@ -55,6 +52,7 @@
                                         class="qty-btn js-drawer-qty-minus"
                                         :data-id="item.id"
                                         @click="updateQty(item.id, item.cantidad - 1)"
+                                        :disabled="loading"
                                         aria-label="Disminuir cantidad">-</button>
                                 <span class="qty-input-text px-2 small fw-bold" x-text="item.cantidad"></span>
                                 <button type="button"
@@ -62,16 +60,17 @@
                                         :data-id="item.id"
                                         :data-max="item.stock"
                                         @click="updateQty(item.id, item.cantidad + 1)"
-                                        :disabled="item.cantidad >= item.stock"
+                                        :disabled="loading || item.cantidad >= item.stock"
                                         aria-label="Aumentar cantidad">+</button>
                             </div>
                             <button type="button"
-                                    class="btn btn-link text-danger p-0 js-drawer-remove"
+                                    class="btn btn-sm btn-outline-danger px-2 py-2 d-inline-flex align-items-center justify-content-center js-drawer-remove"
                                     :data-id="item.id"
                                     @click="removeItem(item.id)"
+                                    :disabled="loading"
                                     title="Quitar producto"
                                     :aria-label="'Quitar ' + item.nombre + ' del carrito'">
-                                <i class="fas fa-trash-can small"></i>
+                                <i class="ph-duotone ph-trash" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
@@ -82,7 +81,7 @@
             <noscript>
                 {% for item in cart_items %}
                 <article class="cart-drawer-item p-2 rounded border d-flex gap-3 align-items-center" data-item-id="{{ item.producto.id }}">
-                    <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}" class="cart-drawer-thumb rounded" width="60" height="60" style="object-fit: cover;">
+                    <img src="{{ item.producto.imagen_url }}" alt="{{ item.producto.nombre }}" class="cart-drawer-thumb rounded object-fit-cover" width="60" height="60">
                     <div class="flex-grow-1 min-w-0">
                         <h6 class="cart-drawer-item-title mb-1 text-truncate fw-bold">{{ item.producto.nombre }}</h6>
                         <div class="d-flex justify-content-between align-items-center">
@@ -99,24 +98,23 @@
         <div id="cartDrawerEmpty"
              class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-4 text-center"
              x-show="!items || items.length === 0"
-             x-cloak
-             {% if cart_items %}style="display: none;"{% endif %}>
+             x-cloak>
             <div class="cart-drawer-empty-icon mb-3 empty-state-icon">
-                <i class="fas fa-shopping-bag fa-2x"></i>
+                <i class="ph-duotone ph-shopping-bag fs-1" aria-hidden="true"></i>
             </div>
             <h5 class="fw-bold mb-1">Tu carrito está vacío</h5>
             <p class="text-muted small mb-4">Selecciona platillos, snacks o bebidas del catálogo para ordenar con despacho express.</p>
-            <a href="{% url 'products:product_list' %}" class="btn btn-cta btn-sm px-4 btn-lift" data-bs-dismiss="offcanvas">
-                <i class="fas fa-store me-1"></i> Explorar Catálogo
+            <a href="{% url 'products:product_list' %}" class="btn btn-cta btn-sm px-4 py-2 btn-lift" data-bs-dismiss="offcanvas">
+                <i class="ph-duotone ph-storefront me-1" aria-hidden="true"></i> Explorar Catálogo
             </a>
         </div>
 
         <!-- Resumen y checkout footer reactivo -->
         <div id="cartDrawerFooter"
              class="cart-drawer-footer border-top p-3 bg-surface"
+             :class="{'opacity-50 pe-none': loading}"
              x-show="items && items.length > 0"
-             x-cloak
-             {% if not cart_items %}style="display: none;"{% endif %}>
+             x-cloak>
             <div class="d-flex justify-content-between small text-muted mb-1">
                 <span>Subtotal</span>
                 <span id="cartDrawerSubtotal" class="fw-bold" x-text="'S/ ' + Number(subtotal).toFixed(2)">S/ {{ cart_subtotal|floatformat:2 }}</span>
@@ -133,18 +131,18 @@
             <div class="d-grid gap-2">
                 {% if user.is_authenticated and user.role == 'cliente' %}
                 <a href="{% url 'users:portal_cliente_pago' %}" class="btn btn-cta btn-lift py-2">
-                    <i class="fas fa-credit-card me-1"></i> Proceder al Pago
+                    <i class="ph-duotone ph-credit-card me-1" aria-hidden="true"></i> Proceder al Pago
                 </a>
                 {% else %}
                 <a href="{% url 'users:login' %}?next={% url 'users:portal_cliente_pago' %}" class="btn btn-cta btn-lift py-2">
-                    <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión para Ordenar
+                    <i class="ph-bold ph-sign-in me-1" aria-hidden="true"></i> Iniciar Sesión para Ordenar
                 </a>
                 {% endif %}
                 <div class="d-flex gap-2">
-                    <a href="{% url 'orders:cart' %}" class="btn btn-outline-secondary btn-sm flex-grow-1">
-                        <i class="fas fa-cart-shopping me-1"></i> Ver Carrito Completo
+                    <a href="{% url 'orders:cart' %}" class="btn btn-outline-secondary btn-sm py-2 flex-grow-1">
+                        <i class="ph-duotone ph-shopping-cart me-1" aria-hidden="true"></i> Ver Carrito Completo
                     </a>
-                    <button type="button" class="btn btn-outline-dark btn-sm" data-bs-dismiss="offcanvas">
+                    <button type="button" class="btn btn-outline-secondary btn-sm py-2 px-3" data-bs-dismiss="offcanvas">
                         Continuar
                     </button>
                 </div>

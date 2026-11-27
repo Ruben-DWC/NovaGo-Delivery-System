@@ -4,7 +4,7 @@
     <!-- Resumen de resultados dinámicos -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <span class="text-muted small">
-            Mostrando <strong>{{ products|length }}</strong> de <strong>{{ paginator.count|default:products|length }}</strong> productos disponibles
+            Mostrando <strong>{{ products|length }}</strong> de <strong>{% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ products|length }}{% endif %}</strong> productos disponibles
         </span>
         {% if search_query or min_price or max_price or active_category %}
         <a href="{% url catalog_url_name %}"
@@ -32,9 +32,11 @@
                 </a>
 
                 <div class="catalog-body">
-                    <div class="catalog-top">
-                        <h5 class="fw-bold text-truncate" title="{{ product.nombre }}">{{ product.nombre }}</h5>
-                        <span class="catalog-category badge border">{{ product.categoria.nombre|default:'General' }}</span>
+                    <div class="catalog-top d-flex justify-content-between align-items-start gap-2">
+                        <h5 class="fw-bold text-truncate" title="{{ product.nombre }}">
+                            <a href="{% url product_detail_url_name product.id %}" class="catalog-title-link">{{ product.nombre }}</a>
+                        </h5>
+                        <span class="catalog-category badge border flex-shrink-0">{{ product.categoria.nombre|default:'General' }}</span>
                     </div>
                     <p class="catalog-description small">{{ product.descripcion|truncatechars:75 }}</p>
 
@@ -47,20 +49,17 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="d-flex gap-2 js-add-cart-form" data-product-name="{{ product.nombre }}">
-                            {% csrf_token %}
-                            <div class="qty-control">
-                                <button type="button" class="qty-btn" aria-label="Disminuir cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)>1) el.value=parseInt(el.value)-1;">-</button>
-                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input" aria-label="Cantidad para {{ product.nombre }}" readonly>
-                                <button type="button" class="qty-btn" aria-label="Aumentar cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)<{{ product.stock }}) el.value=parseInt(el.value)+1;">+</button>
-                            </div>
-                            <button class="btn btn-cta flex-grow-1 btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>
-                                <i class="fas fa-shopping-cart me-1"></i> Agregar
-                            </button>
-                        </form>
-                        <a class="btn-card-detail" href="{% url product_detail_url_name product.id %}">Ver detalles</a>
-                    </div>
+                    <form method="post" action="{% url 'orders:add_to_cart' product.id %}" class="d-flex gap-2 js-add-cart-form" data-product-name="{{ product.nombre }}">
+                        {% csrf_token %}
+                        <div class="qty-control">
+                            <button type="button" class="qty-btn" aria-label="Disminuir cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)>1) el.value=parseInt(el.value)-1;">-</button>
+                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input" aria-label="Cantidad para {{ product.nombre }}" readonly>
+                            <button type="button" class="qty-btn" aria-label="Aumentar cantidad" onclick="const el=this.parentElement.querySelector('input'); if(parseInt(el.value)<{{ product.stock }}) el.value=parseInt(el.value)+1;">+</button>
+                        </div>
+                        <button class="btn btn-cta flex-grow-1 btn-lift" type="submit" {% if product.stock == 0 %}disabled{% endif %}>
+                            <i class="fas fa-shopping-cart me-1"></i> Agregar
+                        </button>
+                    </form>
                 </div>
             </article>
         </div>

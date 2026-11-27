@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Confirmacion de Pedido - NovaGo{% endblock %}
+{% block title %}Confirmación de Pedido - NovaGo{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/cart.css' %}">
 <style>
     .confirm-page * {
         box-sizing: border-box;
@@ -375,6 +376,17 @@
         color: #ffffff;
         font-size: 1.25rem;
         animation: checkPop 0.35s ease-out 0.25s both;
+    }
+
+    .success-banner.is-cancelled {
+        border-color: rgba(239, 68, 68, 0.45);
+        background: rgba(239, 68, 68, 0.14);
+    }
+
+    .success-ring.is-cancelled {
+        background: radial-gradient(circle at 30% 25%, #f87171, #dc2626);
+        box-shadow: none;
+        animation: none;
     }
 
     .success-copy {
@@ -764,18 +776,49 @@
 
 {% block content %}
 <div class="confirm-page">
+    <nav class="checkout-stepper mb-3" aria-label="Progreso de compra">
+        <a href="{% url 'users:portal_cliente_carrito' %}" class="stepper-step completed text-decoration-none">
+            <span class="stepper-num"><i class="ph-bold ph-check" aria-hidden="true"></i></span>
+            <span class="stepper-label">Carrito</span>
+        </a>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step completed">
+            <span class="stepper-num"><i class="ph-bold ph-check" aria-hidden="true"></i></span>
+            <span class="stepper-label">Envío y Pago</span>
+        </div>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step active" aria-current="step">
+            <span class="stepper-num">3</span>
+            <span class="stepper-label">Confirmación</span>
+        </div>
+    </nav>
+
     <section class="confirm-hero">
+        {% if order.estado == 'cancelado' %}
+        <h1><i class="ph-duotone ph-x-circle"></i> Pedido cancelado</h1>
+        <p>Tu pedido #{{ order.id }} fue cancelado. Desde aquí puedes revisar el detalle o realizar una nueva compra.</p>
+        <div class="success-banner is-cancelled">
+            <div class="success-ring is-cancelled">
+                <i class="ph-bold ph-x"></i>
+            </div>
+            <p class="success-copy">
+                <strong>Pedido cancelado</strong>
+                <small>Este pedido fue cancelado y no se encuentra en proceso de entrega.</small>
+            </p>
+        </div>
+        {% else %}
         <h1><i class="ph-duotone ph-check-circle"></i> Pedido confirmado correctamente</h1>
-        <p>Tu pedido #{{ order.id }} fue registrado con exito. Desde aqui puedes revisar el resumen y rastrearlo en vivo.</p>
+        <p>Tu pedido #{{ order.id }} fue registrado con éxito. Desde aquí puedes revisar el resumen y rastrearlo en vivo.</p>
         <div class="success-banner">
             <div class="success-ring">
                 <i class="ph-bold ph-check"></i>
             </div>
             <p class="success-copy">
                 <strong>Pago enviado exitosamente</strong>
-                <small>Tu transaccion quedo registrada y el equipo de NovaGo procesara tu pedido de inmediato.</small>
+                <small>Tu transacción quedó registrada y el equipo de NovaGo procesará tu pedido de inmediato.</small>
             </p>
         </div>
+        {% endif %}
 
         <div class="progress-shell" id="progressShell" data-refresh-url="{% url 'users:portal_cliente_confirmacion_estado' order.id %}" data-order-id="{{ order.id }}">
             <div class="progress-title">
@@ -791,7 +834,7 @@
 
             <div class="sync-pill" id="syncPill" aria-live="polite">
                 <span class="sync-dot"></span>
-                <span id="syncText">Actualizacion automatica activa</span>
+                <span id="syncText">Actualización automática activa</span>
             </div>
 
             <div class="progress-track" aria-label="Progreso del pedido">
@@ -844,11 +887,11 @@
                     <strong>{{ order.fecha_pedido|date:'d/m/Y H:i' }}</strong>
                 </div>
                 <div class="meta-item">
-                    <label>Telefono</label>
+                    <label>Teléfono</label>
                     <strong>{{ order.telefono_contacto }}</strong>
                 </div>
                 <div class="meta-item full">
-                    <label>Direccion de entrega</label>
+                    <label>Dirección de entrega</label>
                     <strong>{{ order.direccion_entrega }}</strong>
                 </div>
             </div>
@@ -861,7 +904,7 @@
                         <strong>{{ item.producto.nombre }}</strong><br>
                         <small class="note">x{{ item.cantidad }}</small>
                     </div>
-                    <strong>S/. {{ item.subtotal|floatformat:2 }}</strong>
+                    <strong>S/ {{ item.subtotal|floatformat:2 }}</strong>
                 </div>
                 {% endfor %}
             </div>
@@ -873,22 +916,22 @@
             <div class="sum-list">
                 <div class="sum-row">
                     <span>Subtotal</span>
-                    <strong>S/. {{ order.subtotal|floatformat:2 }}</strong>
+                    <strong>S/ {{ order.subtotal|floatformat:2 }}</strong>
                 </div>
                 <div class="sum-row">
-                    <span>Envio</span>
-                    <strong>S/. {{ order.costo_envio|floatformat:2 }}</strong>
+                    <span>Envío</span>
+                    <strong>S/ {{ order.costo_envio|floatformat:2 }}</strong>
                 </div>
                 <div class="sum-row total">
                     <span><strong>Total</strong></span>
-                    <strong>S/. {{ order.total|floatformat:2 }}</strong>
+                    <strong>S/ {{ order.total|floatformat:2 }}</strong>
                 </div>
             </div>
 
             {% if order.pago %}
             <div class="meta-grid mt-3">
                 <div class="meta-item">
-                    <label>Metodo de pago</label>
+                    <label>Método de pago</label>
                     <strong>{{ order.pago.get_metodo_display }}</strong>
                 </div>
                 <div class="meta-item">
@@ -896,12 +939,14 @@
                     <strong id="confirmPaymentStatus">{{ order.pago.get_estado_display }}</strong>
                 </div>
             </div>
+            {% if order.estado != 'cancelado' %}
             <div class="payment-ok">
                 <i class="ph-duotone ph-shield-check"></i> Registro de pago generado correctamente
             </div>
             {% endif %}
+            {% endif %}
 
-            <p class="note">Recibiras actualizaciones de estado desde tu seccion de rastreo.</p>
+            <p class="note">Recibirás actualizaciones de estado desde tu sección de rastreo.</p>
 
             <div class="confirm-actions">
                 <a class="btn-confirm primary" href="{% url 'users:portal_cliente_rastreo_pedido' order.id %}">

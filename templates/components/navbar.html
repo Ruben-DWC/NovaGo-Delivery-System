@@ -1,368 +1,3 @@
-<style>
-    .client-breadcrumb-wrap {
-        padding-top: 0.8rem;
-    }
-
-    .client-breadcrumb {
-        margin-bottom: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 0.55rem 0.85rem;
-        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
-    }
-
-    html[data-theme='dark'] .client-breadcrumb {
-        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
-        border-color: rgba(132, 153, 196, 0.28);
-        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
-    }
-
-    .client-breadcrumb .crumb + .crumb::before {
-        content: '\f054';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        font-size: 0.58rem;
-        margin: 0 0.42rem;
-        color: #7a879f;
-    }
-
-    html[data-theme='dark'] .client-breadcrumb .crumb + .crumb::before {
-        color: #93a4c4;
-    }
-
-    .client-breadcrumb .crumb {
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .client-breadcrumb .crumb a {
-        color: #2f4f8d;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-    .client-breadcrumb .crumb a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-
-    .client-breadcrumb .crumb-root {
-        gap: 0.4rem;
-        border-radius: 999px;
-        padding: 0.16rem 0.55rem;
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.24);
-    }
-
-    .client-breadcrumb .crumb-root i {
-        color: #2563eb;
-        font-size: 0.75rem;
-    }
-
-    .crumb-avatar {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid rgba(37, 99, 235, 0.4);
-    }
-
-    .crumb-avatar-fallback {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        font-weight: 800;
-        color: #fff;
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
-    }
-
-    .nav-user-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-    }
-
-    .nav-avatar {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid rgba(100, 116, 139, 0.45);
-    }
-
-    .nav-avatar-fallback {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #fff;
-        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
-        border: 1px solid rgba(100, 116, 139, 0.45);
-    }
-
-    .admin-breadcrumb-wrap {
-        padding-top: 0.8rem;
-    }
-
-    .admin-breadcrumb {
-        margin-bottom: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 0.55rem 0.85rem;
-        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb {
-        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
-        border-color: rgba(132, 153, 196, 0.28);
-        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
-    }
-
-    .admin-breadcrumb .crumb + .crumb::before {
-        content: '\f054';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        font-size: 0.58rem;
-        margin: 0 0.42rem;
-        color: #7a879f;
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb .crumb + .crumb::before {
-        color: #93a4c4;
-    }
-
-    .admin-breadcrumb .crumb {
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .admin-breadcrumb .crumb a {
-        color: #2f4f8d;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-    .admin-breadcrumb .crumb a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-
-    .admin-breadcrumb .crumb-root {
-        gap: 0.4rem;
-        border-radius: 999px;
-        padding: 0.16rem 0.55rem;
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.24);
-    }
-
-    .admin-breadcrumb .crumb-root i {
-        color: #2563eb;
-        font-size: 0.75rem;
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb .crumb-root {
-        background: rgba(96, 165, 250, 0.14);
-        border-color: rgba(96, 165, 250, 0.28);
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb .crumb-root i {
-        color: #7db4ff;
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb .crumb a {
-        color: #9dc0ff;
-    }
-
-    .admin-breadcrumb .crumb.active {
-        color: #5f6d86;
-        font-weight: 700;
-    }
-
-    html[data-theme='dark'] .admin-breadcrumb .crumb.active {
-        color: #a6b4ce;
-    }
-
-    .admin-nav-dropdown .dropdown-menu {
-        min-width: 18rem;
-        border-radius: 14px;
-        border: 1px solid var(--line);
-        background: var(--bg);
-        box-shadow: 0 20px 40px -24px rgba(15, 23, 40, 0.65);
-    }
-
-    .admin-nav-dropdown .dropdown-header {
-        color: var(--text-secondary, #667799);
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    .admin-nav-dropdown .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-    }
-
-    .admin-nav-dropdown .dropdown-item i {
-        width: 18px;
-        text-align: center;
-    }
-
-    .navbar-nav .nav-link {
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-    }
-
-    .nav-btn-store {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.38rem !important;
-        white-space: nowrap !important;
-        padding: 0.35rem 0.75rem !important;
-        border-radius: 999px !important;
-        font-size: 0.78rem !important;
-        font-weight: 700 !important;
-        color: var(--brand, #ff6a3d) !important;
-        background: rgba(255, 106, 61, 0.1) !important;
-        border: 1px solid rgba(255, 106, 61, 0.28) !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .nav-btn-store:hover {
-        background: var(--brand, #ff6a3d) !important;
-        color: #fff !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 10px 20px -10px rgba(255, 106, 61, 0.6) !important;
-    }
-
-    html[data-theme='dark'] .client-breadcrumb .crumb-root {
-        background: rgba(96, 165, 250, 0.14);
-        border-color: rgba(96, 165, 250, 0.28);
-    }
-
-    html[data-theme='dark'] .client-breadcrumb .crumb-root i {
-        color: #7db4ff;
-    }
-
-    html[data-theme='dark'] .client-breadcrumb .crumb a {
-        color: #9dc0ff;
-    }
-
-    .client-breadcrumb .crumb.active {
-        color: #5f6d86;
-        font-weight: 700;
-    }
-
-    html[data-theme='dark'] .client-breadcrumb .crumb.active {
-        color: #a6b4ce;
-    }
-
-    .moto-breadcrumb-wrap {
-        padding-top: 0.8rem;
-    }
-
-    .moto-breadcrumb {
-        margin-bottom: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        background: linear-gradient(120deg, rgba(245, 248, 255, 0.95), rgba(235, 242, 252, 0.95));
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 0.55rem 0.85rem;
-        box-shadow: 0 12px 24px -22px rgba(15, 23, 40, 0.65);
-    }
-
-    .moto-breadcrumb .crumb + .crumb::before {
-        content: '\f054';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        font-size: 0.58rem;
-        margin: 0 0.42rem;
-        color: #7a879f;
-    }
-
-    .moto-breadcrumb .crumb {
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .moto-breadcrumb .crumb a {
-        color: #8c3d12;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-    .moto-breadcrumb .crumb a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-
-    .moto-breadcrumb .crumb-root {
-        gap: 0.4rem;
-        border-radius: 999px;
-        padding: 0.16rem 0.55rem;
-        background: rgba(249, 115, 22, 0.12);
-        border: 1px solid rgba(249, 115, 22, 0.3);
-    }
-
-    .moto-breadcrumb .crumb-root i {
-        color: #ea580c;
-        font-size: 0.75rem;
-    }
-
-    .moto-breadcrumb .crumb.active {
-        color: #5f6d86;
-        font-weight: 700;
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb {
-        background: linear-gradient(120deg, rgba(19, 30, 53, 0.95), rgba(11, 20, 38, 0.95));
-        border-color: rgba(132, 153, 196, 0.28);
-        box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.85);
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb .crumb + .crumb::before {
-        color: #93a4c4;
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb .crumb a {
-        color: #ffb68e;
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb .crumb-root {
-        background: rgba(251, 146, 60, 0.16);
-        border-color: rgba(251, 146, 60, 0.32);
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb .crumb-root i {
-        color: #fdba74;
-    }
-
-    html[data-theme='dark'] .moto-breadcrumb .crumb.active {
-        color: #a6b4ce;
-    }
-</style>
-
 <nav class="navbar navbar-expand-lg nav-neo sticky-top">
     <div class="container">
         <a class="navbar-brand brand-mark"
@@ -500,6 +135,18 @@
                 {% endspaceless %}
             </div>
             
+            <form class="nav-search-form my-2 my-lg-0 me-lg-2" action="{% url 'products:product_list' %}" method="get" role="search">
+                <input class="form-control form-control-sm nav-search-input"
+                       type="search"
+                       name="q"
+                       value="{{ request.GET.q|default:'' }}"
+                       placeholder="Buscar productos..."
+                       aria-label="Buscar productos">
+                <button class="btn btn-sm nav-search-btn" type="submit" aria-label="Buscar productos">
+                    <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>
+                </button>
+            </form>
+
             <div class="navbar-nav align-items-lg-center gap-lg-2">
                 {% spaceless %}
                             {% if not user.is_authenticated or user.role == 'cliente' %}
@@ -522,7 +169,7 @@
                                     Tema
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end theme-menu" aria-labelledby="themeMenu">
-                                    <button class="dropdown-item" type="button" data-theme-option="auto">Automatico</button>
+                                    <button class="dropdown-item" type="button" data-theme-option="auto">Automático</button>
                                     <button class="dropdown-item" type="button" data-theme-option="light">Claro</button>
                                     <button class="dropdown-item" type="button" data-theme-option="dark">Oscuro</button>
                                 </div>
@@ -561,7 +208,7 @@
                 {% else %}
                     <div class="nav-item">
                         <a class="nav-link nav-link-soft" href="{% url 'users:login' %}">
-                            Iniciar sesion
+                            Iniciar sesión
                         </a>
                     </div>
                     <div class="nav-item">
@@ -577,9 +224,9 @@
 </nav>
 
 {% if user.is_authenticated and user.role == 'cliente' and 'portal_cliente' in request.resolver_match.url_name %}
-<section class="container client-breadcrumb-wrap">
+<section class="container portal-breadcrumb-wrap client-breadcrumb-wrap">
     <nav aria-label="breadcrumb">
-        <div class="breadcrumb client-breadcrumb">
+        <div class="breadcrumb portal-breadcrumb portal-breadcrumb--client client-breadcrumb">
             {% spaceless %}
             <span class="crumb crumb-root">
                 {% if user.foto_perfil %}
@@ -592,7 +239,7 @@
             {% if request.resolver_match.url_name == 'portal_cliente' %}
             <span class="crumb active" aria-current="page">Inicio</span>
             {% elif request.resolver_match.url_name == 'portal_cliente_catalogo' %}
-            <span class="crumb active" aria-current="page">Catalogo</span>
+            <span class="crumb active" aria-current="page">Catálogo</span>
             {% elif request.resolver_match.url_name == 'portal_cliente_carrito' %}
             <span class="crumb active" aria-current="page">Carrito</span>
             {% elif request.resolver_match.url_name == 'portal_cliente_pedidos' %}
@@ -620,9 +267,9 @@
 
 {% if user.is_authenticated and user.role == 'motorizado' %}
 {% if request.resolver_match.url_name == 'portal_motorizado' or request.resolver_match.url_name == 'motorizado_dashboard' or request.resolver_match.url_name == 'motorizado_dashboard_portal' or request.resolver_match.url_name == 'motorizado_historial' or request.resolver_match.url_name == 'motorizado_pedido_detalle' or request.resolver_match.url_name == 'motorizado_rastreo_pedido' or request.resolver_match.url_name == 'portal_motorizado_perfil' %}
-<section class="container moto-breadcrumb-wrap">
+<section class="container portal-breadcrumb-wrap moto-breadcrumb-wrap">
     <nav aria-label="breadcrumb">
-        <div class="breadcrumb moto-breadcrumb">
+        <div class="breadcrumb portal-breadcrumb portal-breadcrumb--moto moto-breadcrumb">
             {% spaceless %}
             <span class="crumb crumb-root">
                 <i class="fas fa-motorcycle"></i>
@@ -650,9 +297,9 @@
 
 {% if user.is_authenticated and user.is_staff or user.role == 'admin' %}
 {% if request.resolver_match.url_name == 'portal_admin' or request.resolver_match.url_name == 'admin_orders' or request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_update' or request.resolver_match.url_name == 'admin_clients' or request.resolver_match.url_name == 'admin_employees' or request.resolver_match.url_name == 'admin_roles' or request.resolver_match.url_name == 'admin_products' or request.resolver_match.url_name == 'admin_product_create' or request.resolver_match.url_name == 'admin_product_update' or request.resolver_match.url_name == 'admin_categories' or request.resolver_match.url_name == 'admin_category_create' or request.resolver_match.url_name == 'admin_category_update' or request.resolver_match.url_name == 'admin_payments' or request.resolver_match.url_name == 'admin_audit_logs' or request.resolver_match.url_name == 'admin_reports' or request.resolver_match.url_name == 'admin_income' or request.resolver_match.url_name == 'admin_performance' %}
-<section class="container admin-breadcrumb-wrap">
+<section class="container portal-breadcrumb-wrap admin-breadcrumb-wrap">
     <nav aria-label="breadcrumb">
-        <div class="breadcrumb admin-breadcrumb">
+        <div class="breadcrumb portal-breadcrumb portal-breadcrumb--admin admin-breadcrumb">
             {% spaceless %}
             <span class="crumb crumb-root">
                 <i class="fas fa-shield-halved"></i>

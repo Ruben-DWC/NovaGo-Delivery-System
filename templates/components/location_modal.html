@@ -15,6 +15,17 @@
             <div class="modal-body">
                 <div class="row g-3">
                     <div class="col-12">
+                        <div class="mb-2">
+                            <span class="d-block small text-muted mb-1">Zonas frecuentes (1 toque):</span>
+                            <div class="d-flex flex-wrap gap-1" id="coverageDistrictChips" role="group" aria-label="Distritos frecuentes">
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="Miraflores, Lima, Perú" data-lat="-12.1191" data-lng="-77.0292">Miraflores</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="San Isidro, Lima, Perú" data-lat="-12.0972" data-lng="-77.0365">San Isidro</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="Santiago de Surco, Lima, Perú" data-lat="-12.1456" data-lng="-76.9912">Surco</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="Barranco, Lima, Perú" data-lat="-12.1492" data-lng="-77.0217">Barranco</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="San Borja, Lima, Perú" data-lat="-12.0938" data-lng="-77.0036">San Borja</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill coverage-district-chip" data-district="Jesús María, Lima, Perú" data-lat="-12.0725" data-lng="-77.0489">Jesús María</button>
+                            </div>
+                        </div>
                         <label for="coverageAddressInput" class="form-label fw-semibold small">Dirección de entrega</label>
                         <div class="position-relative">
                             <div class="input-group">
@@ -254,6 +265,28 @@
 
     document.getElementById('coverageSearchBtn').addEventListener('click', function () {
         searchNominatim(addressInput.value);
+    });
+
+    const districtChips = document.querySelectorAll('.coverage-district-chip');
+    districtChips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            districtChips.forEach(c => {
+                c.classList.remove('btn-primary', 'text-white');
+                c.classList.add('btn-outline-secondary');
+            });
+            chip.classList.remove('btn-outline-secondary');
+            chip.classList.add('btn-primary', 'text-white');
+
+            const districtQuery = chip.dataset.district || chip.textContent.trim();
+            const chipLat = parseFloat(chip.dataset.lat);
+            const chipLng = parseFloat(chip.dataset.lng);
+
+            addressInput.value = districtQuery;
+            if (!Number.isNaN(chipLat) && !Number.isNaN(chipLng)) {
+                setCoordinates(chipLat, chipLng, false);
+            }
+            searchNominatim(districtQuery);
+        });
     });
 
     document.getElementById('coverageGpsBtn').addEventListener('click', function () {

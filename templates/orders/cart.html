@@ -16,6 +16,23 @@
         </a>
     </div>
 
+    <nav class="checkout-stepper mb-4" aria-label="Progreso de compra">
+        <div class="stepper-step active" aria-current="step">
+            <span class="stepper-num">1</span>
+            <span class="stepper-label">Carrito</span>
+        </div>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step">
+            <span class="stepper-num">2</span>
+            <span class="stepper-label">Envío y Pago</span>
+        </div>
+        <span class="stepper-line" aria-hidden="true"></span>
+        <div class="stepper-step">
+            <span class="stepper-num">3</span>
+            <span class="stepper-label">Confirmación</span>
+        </div>
+    </nav>
+
     {% if items %}
     <div class="cart-layout">
         <div class="cart-items-shell">
@@ -102,6 +119,25 @@
                 </div>
             </article>
         </aside>
+    </div>
+
+    <!-- Barra inferior fija en móvil/tablet para acceso inmediato al pago -->
+    <div class="cart-mobile-sticky-bar d-lg-none" role="region" aria-label="Resumen rápido de compra">
+        <div class="cart-mobile-sticky-inner">
+            <div>
+                <span class="cart-mobile-sticky-label">Total a pagar</span>
+                <strong class="cart-mobile-sticky-total">S/ {{ total }}</strong>
+            </div>
+            {% if user.is_authenticated and user.role == 'cliente' %}
+            <a class="btn btn-cta btn-lift px-4 py-2 fw-bold" href="{% url 'users:portal_cliente_pago' %}">
+                <i class="ph-duotone ph-credit-card me-1" aria-hidden="true"></i> Ir a Pagar
+            </a>
+            {% elif not user.is_authenticated %}
+            <a class="btn btn-cta btn-lift px-3 py-2 fw-bold" href="{% url 'users:login' %}?next={% url 'users:portal_cliente_pago' %}">
+                <i class="ph-bold ph-sign-in me-1" aria-hidden="true"></i> Iniciar sesión
+            </a>
+            {% endif %}
+        </div>
     </div>
     {% else %}
     <article class="hero-shell cart-empty-state py-5 text-center">
