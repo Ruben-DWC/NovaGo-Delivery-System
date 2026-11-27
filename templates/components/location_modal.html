@@ -109,13 +109,13 @@
     const modalEl = document.getElementById('locationCoverageModal');
     if (!modalEl) return;
 
-    const storeLat = Number("{{ novago_store.lat|default:'-12.1191' }}");
-    const storeLng = Number("{{ novago_store.lng|default:'-77.0292' }}");
-    const coverageKm = Number("{{ novago_store.radius_km|default:'15.0' }}");
+    const storeLat = Number("{{ novago_store.lat|default:'-12.1191' }}".replace(',', '.'));
+    const storeLng = Number("{{ novago_store.lng|default:'-77.0292' }}".replace(',', '.'));
+    const coverageKm = Number("{{ novago_store.radius_km|default:'15.0' }}".replace(',', '.'));
     const apiUrl = "{% url 'users:api_delivery_location' %}";
 
-    let selectedLat = Number("{{ delivery_location.lat|default:'-12.1191' }}");
-    let selectedLng = Number("{{ delivery_location.lng|default:'-77.0292' }}");
+    let selectedLat = Number("{{ delivery_location.lat|default:'-12.1191' }}".replace(',', '.'));
+    let selectedLng = Number("{{ delivery_location.lng|default:'-77.0292' }}".replace(',', '.'));
     let mapInstance = null;
     let markerInstance = null;
     let searchTimer = null;
