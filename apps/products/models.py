@@ -136,7 +136,7 @@ class Producto(models.Model):
             except Exception:
                 pass
         food_fallbacks = {
-            1: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=640&auto=format&fit=crop&q=80',  # Papas QA
+            1: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=640&auto=format&fit=crop&q=80',  # Papas QA
             2: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=640&auto=format&fit=crop&q=80',  # Combo Nova Burger
             3: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=640&auto=format&fit=crop&q=80',  # Pollo Crispy Box
             4: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=640&auto=format&fit=crop&q=80',  # Pizza Personal Pepperoni
