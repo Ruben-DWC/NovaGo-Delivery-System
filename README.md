@@ -649,12 +649,13 @@ NovaGo expone un endpoint de salud HTTP 200 en `/health/` que devuelve telemetr√
 ```json
 {
   "status": "healthy",
-  "app_name": "NovaGo Delivery System",
-  "version": "1.0.0-final",
-  "environment": "production-container",
-  "database": {
-    "status": "connected",
-    "latency_ms": 12.4
+  "service": "NovaGo Delivery System",
+  "version": "1.1.0-final",
+  "database": "connected",
+  "latency_ms": 4.43,
+  "checks": {
+    "database": "pass",
+    "routing": "pass"
   }
 }
 ```
